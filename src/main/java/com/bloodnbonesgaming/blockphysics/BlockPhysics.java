@@ -1,0 +1,2897 @@
+package com.bloodnbonesgaming.blockphysics;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockPistonBase;
+import net.minecraft.block.BlockPistonMoving;
+import net.minecraft.block.BlockSilverfish;
+import net.minecraft.block.BlockSlab;
+import net.minecraft.block.material.Material;
+import net.minecraft.enchantment.EnchantmentProtection;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityFallingBlock;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityTNTPrimed;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.play.server.S0EPacketSpawnObject;
+import net.minecraft.network.play.server.S12PacketEntityVelocity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityDispenser;
+import net.minecraft.tileentity.TileEntityPiston;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.Facing;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.ChunkPosition;
+import net.minecraft.world.Explosion;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FrameNode;
+import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.LineNumberNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
+
+import com.bloodnbonesgaming.blockphysics.util.DefinitionMaps;
+
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+
+@Mod(modid = ModInfo.MODID, version = ModInfo.VERSION, dependencies = "")
+public class BlockPhysics
+{
+	@Instance("BlockPhysics")
+	public static BlockPhysics instance;
+
+	@EventHandler
+	public void preInit(FMLPreInitializationEvent event)
+	{
+		ModConfig.init(event.getSuggestedConfigurationFile());
+		//MinecraftForge.EVENT_BUS.register(new BPEventHandler());
+		//FMLCommonHandler.instance().bus().register(new BPEventHandler());
+	}
+
+	@EventHandler
+	public void init(FMLInitializationEvent event)
+	{
+	}
+
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent event)
+	{
+	}
+
+	@EventHandler
+	public void serverStarting(FMLServerStartingEvent event)
+	{
+	}
+	
+	public static void printMethod(MethodNode method)
+	{
+		ModInfo.Log.info("Printing: " + method.name);
+		for (int i = 0; i < method.instructions.size() - 1; i++)
+		{
+			AbstractInsnNode node = method.instructions.get(i);
+			
+			if (node instanceof LineNumberNode)
+			{
+				LineNumberNode nodey = (LineNumberNode)node;
+				ModInfo.Log.info("DEBUG111 - LineNumber: " + nodey.line);
+			}
+			else if (node instanceof MethodInsnNode)
+			{
+				MethodInsnNode nodey = (MethodInsnNode)node;
+				ModInfo.Log.info("DEBUG111 - MethodNode: " + nodey.owner + " : " + nodey.name + " : " + nodey.desc);
+			}
+			else if (node instanceof VarInsnNode)
+			{
+				VarInsnNode nodey = (VarInsnNode)node;
+				ModInfo.Log.info("DEBUG111 - VarNode: " + nodey.getOpcode() + " : " + nodey.var);
+			}
+			else if (node instanceof FieldInsnNode)
+			{
+				FieldInsnNode nodey = (FieldInsnNode)node;
+				ModInfo.Log.info("DEBUG111 - FieldNode: " + nodey.owner + " : " + nodey.name + " : " + nodey.desc);
+			}
+			else if (node instanceof LdcInsnNode)
+			{
+				LdcInsnNode nodey = (LdcInsnNode)node;
+				ModInfo.Log.info("DEBUG111 - LdcNode: " + nodey.getOpcode() + " : " + nodey.cst);
+			}
+			else if (node instanceof TypeInsnNode)
+			{
+				TypeInsnNode nodey = (TypeInsnNode)node;
+				ModInfo.Log.info("DEBUG111 - TypeNode: " + nodey.getOpcode() + " : " + nodey.desc);
+			}
+			else if (node instanceof FrameNode)
+			{
+				FrameNode nodey = (FrameNode)node;
+				ModInfo.Log.info("DEBUG111 - FrameNode: " + nodey.getOpcode() + " : " + nodey.type);
+			}
+			else if (node instanceof JumpInsnNode)
+			{
+				JumpInsnNode nodey = (JumpInsnNode)node;
+				ModInfo.Log.info("DEBUG111 - JumpNode: " + nodey.getOpcode() + " : " + nodey.label);
+			}
+			else if (node instanceof LabelNode)
+			{
+				LabelNode nodey = (LabelNode)node;
+				ModInfo.Log.info("DEBUG111 - LabelNode: " + nodey);
+			}
+			else if (node instanceof IntInsnNode)
+			{
+				IntInsnNode nodey = (IntInsnNode)node;
+				ModInfo.Log.info("DEBUG111 - IntNode: " + nodey.getOpcode() + " : " + nodey.operand);
+			}
+			else
+			{
+				ModInfo.Log.info("DEBUG111 - SomethingElse");
+			}
+		}
+	}
+	
+	public static boolean skipTick;
+	
+	
+	
+	
+	//Everything below here needs to be reorganised into proper classes
+	protected static int updateLCG = (new Random()).nextInt();
+	final static double[][][] slideSpeedz = {
+    	{{-0.125D,-0.005D,0D},{0D,-0.005D,-0.125D},{0D,-0.005D,0.125D},{0.125D,-0.005D,0D}},
+    	{{-0.25D,-0.06D,0D},{0D,-0.06D,-0.25D},{0D,-0.06D,0.25D},{0.25D,-0.06D,0D}},
+    	{{-0.3D,-0.25D,0D},{0D,-0.25D,-0.3D},{0D,-0.25D,0.3D},{0.3D,-0.25D,0D}},
+    	{{-0.18D,-0.35D,0D},{0D,-0.35D,-0.18D},{0D,-0.35D,0.18D},{0.18D,-0.35D,0D}},
+    	{{-0.05D,-0.15D,0D},{0D,-0.15D,-0.05D},{0D,-0.15D,0.05D},{0.05D,-0.15D,0D}}
+	};
+	
+	protected static Random rand = new Random();
+	public static boolean skipMove = false;
+	static int nextrand = 0;
+	
+	final static byte prand[] = {
+		71, 65, 10, 40, 75, 97, 98, 39, 50, 47, 52, 65, 22, 32, 46, 86, 84, 22, 10, 41, 
+		45, 15, 65, 67, 91, 28, 83, 49, 83, 13, 77, 89, 90, 38, 67, 69, 36, 30, 1, 41, 
+		30, 79, 87, 95, 48, 14, 42, 8, 19, 22, 73, 84, 99, 7, 7, 72, 15, 63, 94, 34, 27, 
+		31, 79, 85, 62, 68, 11, 86, 10, 83, 54, 4, 74, 78, 45, 26, 56, 7, 45, 25, 58, 90, 
+		79, 68, 21, 62, 1, 89, 32, 5, 17, 65, 59, 34, 71, 87, 0, 39, 5, 32, 43, 64, 78, 
+		27, 24, 2, 53, 37, 63, 57, 31, 51, 51, 49, 47, 42, 11, 31, 26, 41, 2, 10, 60, 1, 
+		21, 45, 14, 18, 76, 75, 29, 32, 36, 60, 88, 51, 62, 55, 57, 3, 20, 80, 2, 0, 35, 
+		42, 57, 34, 56, 89, 53, 42, 57, 55, 61, 11, 1, 26, 74, 35, 33, 17, 8, 16, 98, 5, 
+		35, 76, 53, 58, 95, 55, 98, 70, 60, 24, 12, 39, 93, 43, 35, 66, 78, 87, 25, 20, 
+		68, 33, 84, 6, 23, 13, 24, 20, 30, 0, 46, 49, 38, 76, 70, 49, 85, 31, 72, 18, 50, 
+		88, 4, 18, 75, 96, 43, 28, 93, 38, 21, 71, 69, 19, 53, 91, 48, 29, 88, 89, 37, 
+		59, 68, 93, 66, 44, 99, 40, 31, 27, 56, 46, 12, 92, 60, 30, 76, 26, 9, 99, 36, 
+		77, 70, 9, 29, 12, 66, 3, 33, 43, 19, 3, 97, 81, 67, 72, 97, 32, 28, 96, 62, 71, 
+		74, 61, 80, 93, 61, 57, 46, 18, 34, 79, 18, 48, 86, 94, 61, 6, 97, 17, 81, 68, 
+		51, 29, 17, 92, 82, 62, 91, 39, 36, 64, 41, 85, 56, 66, 13, 59, 69, 37, 3, 76, 
+		2, 28, 21, 36, 54, 49, 64, 87, 63, 23, 10, 78, 23, 8, 74, 54, 33, 86, 25, 44, 
+		83, 6, 14, 3, 50, 38, 73, 5, 65, 55, 9, 15, 82, 82, 22, 99, 22, 2, 52, 81, 16, 
+		27, 90, 75, 67, 60, 40, 52, 0, 29, 73, 26, 69, 5, 44, 50, 4, 0, 59, 82, 40, 17, 
+		75, 12, 13, 99, 73, 72, 4, 25, 29, 55, 77, 80, 46, 74, 92, 44, 85, 88, 48, 84, 
+		71, 90, 91, 6, 7, 78, 97, 20, 45, 11, 24, 4, 34, 59, 92, 80, 30, 40, 33, 7, 37, 
+		43, 8, 13, 14, 54, 84, 12, 23, 86, 56, 9, 89, 73, 53, 8, 9, 93, 81, 85, 96, 28, 
+		20, 14, 64, 80, 19, 51, 79, 16, 82, 19, 16, 38, 21, 63, 83, 98, 69, 77, 81, 77, 
+		42, 35, 95, 58, 1, 94, 72, 15, 95, 48, 6, 44, 98, 91, 52, 67, 27, 96, 47, 88, 96, 
+		15, 90, 25, 50, 61, 47, 66, 94, 16, 64, 87, 39, 58, 52, 47, 41, 58, 63, 70, 54, 
+		37, 94, 23, 70, 11, 24, 95
+		};
+	
+	public static boolean setBlockBPdata( World world, int par1, int par2, int par3, int par4 )
+    {
+        if (par1 >= -30000000 && par3 >= -30000000 && par1 < 30000000 && par3 < 30000000)
+        {
+            if (par2 < 0)
+            {
+                return false;
+            }
+            else if (par2 >= 256)
+            {
+                return false;
+            }
+            else
+            {
+                Chunk chunk = world.getChunkFromChunkCoords(par1 >> 4, par3 >> 4);
+                int j1 = par1 & 15;
+                int k1 = par3 & 15;
+                return chunk.setBlockBPdata(j1, par2, k1, par4);
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+	
+	public static void onBlockDestroyedByPlayer(World par1World, int par2, int par3, int par4, int meta, String blockName)
+    {
+		if (!par1World.isRemote) 
+		{
+			meta &= 15;
+			if (DefinitionMaps.getBlockDef(blockName, meta).movenum == 2 && DefinitionMaps.getBlockDef(blockName, meta).movechanger > 1 ) moveChangeMechanic(par1World, par2, par3, par4, blockName, 1, 0);
+			notifyMove(par1World, par2, par3, par4);
+		}
+    }
+	
+	public static void notifyMove(World world, int i, int j, int k)
+	{
+		for (int i1 = i-1; i1 <= i + 1; i1++)
+	  	{
+	  		for (int j1 = j-1; j1 <= j + 1; j1++)
+	  		{
+	  			for (int k1 = k-1; k1 <= k + 1; k1++) world.moveTickList.scheduleBlockMoveUpdate(world, i1, j1, k1, Block.blockRegistry.getNameForObject(world.getBlock(i1, j1, k1)), world.getBlockMetadata(i1, j1, k1), false);
+	  		}					
+	  	}
+	}
+	
+	public static boolean tryToMove(World world, int i, int j, int k, String blid, int meta, boolean contslide)
+    {
+		if ( world.isRemote ) return false;
+		if (DefinitionMaps.getBlockDef(blid, meta).movenum == 0 ) return false;
+		
+		int players = world.playerEntities.size();
+		if (players == 0) return false;
+				
+		if (Block.blockRegistry.getObject(blid) instanceof BlockPistonBase && !canmove(world,i,j,k, (BlockPistonBase) Block.blockRegistry.getObject(blid)) ) return false;
+		
+		boolean outofRenderRange = true;
+		boolean outofFallRange = true;
+
+    	int ii;
+    	for ( ii = 0; ii < players; ii++ )
+    	{
+    		EntityPlayer entityplayer = (EntityPlayer)world.playerEntities.get(ii);
+    		if ( Math.abs( i - MathHelper.floor_double(entityplayer.posX) ) <= ModConfig.fallRange && Math.abs( k - MathHelper.floor_double(entityplayer.posZ) ) <= ModConfig.fallRange )
+    		{
+    			outofFallRange = false;
+    			break;
+	    	}
+     	}
+    	
+    	if ( outofFallRange ) return false;
+    	    	
+    	int move = 0;
+		if (DefinitionMaps.getBlockDef(blid, meta).movenum == 2)
+		{
+			if ( (getBlockBPdata( world,i, j, k) &15) >= DefinitionMaps.getBlockDef(blid, meta).moveflipnumber) move = 1;
+		}
+		
+		String movedefnum = DefinitionMaps.getBlockDef(blid, meta).movedefs[move];
+		
+		if (DefinitionMaps.getMovedef(movedefnum).floatingRadius > 0 )
+		{
+			if (floating(world,i,j,k,DefinitionMaps.getMovedef(movedefnum).floatingRadius,DefinitionMaps.getMovedef(movedefnum).floatingBlock)) return false;
+			move = 1;
+			movedefnum = DefinitionMaps.getBlockDef(blid, meta).movedefs[move];
+			setBlockBPdata( world, i, j, k, 15);
+		}
+	
+		if (DefinitionMaps.getMovedef(movedefnum).movetype == 3 )
+		{
+			if ( canMoveTo(world, i, j - 1, k, DefinitionMaps.getBlockDef(blid, meta).mass/10) )
+			{
+				int sv = DefinitionMaps.getMovedef(movedefnum).hanging;
+				if ( sv > 0 && hanging(world, i, j, k, sv, blid, meta)) return false;
+				sv = DefinitionMaps.getMovedef(movedefnum).attached;
+				if ( sv > 0 && attached(world, i, j, k, sv, blid, meta)) return false;
+				sv = DefinitionMaps.getMovedef(movedefnum).ncorbel;
+				if ( sv > 0 && ncorbel(world, i, j, k, sv)) return false;
+				sv = DefinitionMaps.getMovedef(movedefnum).corbel;
+				if ( sv > 0 && corbel(world, i, j, k, sv, blid, meta)) return false;
+				if ( DefinitionMaps.getMovedef(movedefnum).ceiling && ceiling(world, i, j, k)) return false;
+				sv = DefinitionMaps.getMovedef(movedefnum).smallarc;
+				if ( sv > 0 && smallArc(world, i, j, k, sv)) return false;
+		    	sv = DefinitionMaps.getMovedef(movedefnum).bigarc;
+				if ( sv > 0 && bigArc(world, i, j, k, sv)) return false;
+				if (DefinitionMaps.getMovedef(movedefnum).branch && branch(world, i, j, k, blid, meta) ) return false;
+				
+				Block block = (Block) Block.blockRegistry.getObject(blid);
+				
+				if ( block.hasTileEntity(meta) ) 
+        		{
+					//TODO I hope this works....
+        			NBTTagCompound nnn = new NBTTagCompound();
+        			world.getTileEntity(i, j, k).writeToNBT(nnn);
+        			dropItemsNBT(world, i, j, k, nnn);            			
+        			world.removeTileEntity(i, j, k);
+        		}
+				
+				block.dropBlockAsItem(world, i, j, k, meta, 0);
+				
+				world.setBlockToAir(i, j, k);
+				
+				world.playSoundEffect((double)((float)i + 0.5F), (double)((float)j + 0.5F), (double)((float)k + 0.5F), block.stepSound.getBreakSound(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
+	    		
+	            return true;
+			}
+			else return false;
+		}
+    	
+    	
+		for (int iii = ii; iii < players; iii++)
+    	{
+    		EntityPlayer entityplayer = (EntityPlayer)world.playerEntities.get(iii);
+
+    		if( Math.abs( i - MathHelper.floor_double(entityplayer.posX) ) <= ModConfig.fallRenderRange && Math.abs( k - MathHelper.floor_double(entityplayer.posZ) ) <= ModConfig.fallRenderRange ) 
+    		{	
+    			if ( MathHelper.floor_double(entityplayer.posY) - j <= ModConfig.fallRenderRange )
+				{
+					outofRenderRange = false;
+					break;
+				}
+    		}
+    	}
+    	    			
+		if ( !outofRenderRange && ((WorldServer)world).getEntityTracker().movingblocks >= ModConfig.maxMovingBlocks ) return false;
+    			
+		int movetype;
+		if ( contslide ) movetype = 2;
+		else movetype = DefinitionMaps.getMovedef(movedefnum).movetype;
+					
+		if ( movetype == 0) return false;
+		int ms = DefinitionMaps.getBlockDef(blid,meta).mass/10;
+		boolean canfall = canMoveTo(world, i, j - 1, k, ms);
+    	
+    	if ( !canfall )
+		{
+			if ( movetype == 1 ) return false;
+			if ( DefinitionMaps.getMovedef(movedefnum).slidechance != 100 && ( DefinitionMaps.getMovedef(movedefnum).slidechance == 0 || DefinitionMaps.getMovedef(movedefnum).slidechance < prandnextint(100) + 1 )) return false;
+		}
+	     	    	
+    	if ( !contslide )
+    	{
+			int sv = DefinitionMaps.getMovedef(movedefnum).hanging;
+			if ( sv > 0 && hanging(world,i,j,k,sv,blid,meta)) return false;
+			sv = DefinitionMaps.getMovedef(movedefnum).attached;
+			if ( sv > 0 && attached(world, i, j, k, sv, blid, meta)) return false;
+			sv = DefinitionMaps.getMovedef(movedefnum).ncorbel;
+			if ( sv > 0 && ncorbel(world, i, j, k, sv)) return false;
+			sv = DefinitionMaps.getMovedef(movedefnum).corbel;
+			if ( sv > 0 && corbel(world, i, j, k, sv, blid, meta)) return false;
+			if ( DefinitionMaps.getMovedef(movedefnum).ceiling && ceiling(world, i, j, k)) return false;
+			sv = DefinitionMaps.getMovedef(movedefnum).smallarc;
+			if ( sv > 0 && smallArc(world, i, j, k, sv)) return false;
+	    	sv = DefinitionMaps.getMovedef(movedefnum).bigarc;
+			if ( sv > 0 && bigArc(world, i, j, k, sv)) return false;
+			if (DefinitionMaps.getMovedef(movedefnum).branch && branch(world, i, j, k, blid, meta)) return false;
+    	}
+    	
+    	boolean canslide[] = new boolean[4];
+    	if ( movetype == 2 && !canfall )
+    	{
+    		canslide[0] = canMoveTo(world, i - 1, j - 1, k, ms);
+			canslide[1] = canMoveTo(world, i, j - 1, k - 1, ms);
+			canslide[2] = canMoveTo(world, i, j - 1, k + 1, ms);
+			canslide[3] = canMoveTo(world, i + 1, j - 1, k, ms);
+    		if (!(canslide[0] || canslide[1] || canslide[2] || canslide[3])) return false;
+			
+    		if (canslide[0]) canslide[0] = canMoveTo(world, i - 1, j, k, ms);
+    		if (canslide[1]) canslide[1] = canMoveTo(world, i, j, k - 1, ms);
+    		if (canslide[2]) canslide[2] = canMoveTo(world, i, j, k + 1, ms);
+    		if (canslide[3]) canslide[3] = canMoveTo(world, i + 1, j, k, ms);
+    		if (!(canslide[0] || canslide[1] || canslide[2] || canslide[3])) return false;
+    	}    	
+    	
+    	if (blid.equals(Block.blockRegistry.getNameForObject(Blocks.grass)) || blid.equals(Block.blockRegistry.getNameForObject(Blocks.farmland)) || blid.equals(Block.blockRegistry.getNameForObject(Blocks.mycelium)))
+    	{
+    		blid = Block.blockRegistry.getNameForObject(Blocks.dirt);
+    	}
+    	    	
+    	if ( outofRenderRange )
+        {
+			int bpdata = getBlockBPdata( world,i, j, k);
+    		world.setBlockToAir(i, j, k);
+			setBlockBPdata( world,i, j, k, 0);
+			notifyMove(world, i, j, k);
+			int jv = j;
+			if (canfall)
+        	{
+    			for (; canMoveTo(world, i, jv - 1, k, ms) && jv > 0; jv--);
+            	if (jv > 0) 
+            	{
+            		world.setBlock(i, jv, k, (Block)Block.blockRegistry.getObject(blid), meta, 3);
+            		setBlockBPdata( world,i, jv, k, bpdata);
+            		notifyMove(world, i, jv, k);
+            	}
+            }
+        	else
+        	{
+        		byte slide[] = {0,0,0,0};
+    			byte count = 0;
+        		for (byte si = 0; si < 4; si++)
+    			{
+        			if (canslide[si])
+        			{
+        				slide[count] = si;
+        				count++;
+        			}
+    			}
+        		
+        		int id = 0;
+                int kd = 0;
+                int rr = 0;
+                if ( count > 1 ) rr = prandnextint(count);
+                switch (slide[rr])
+                {
+                    case 0:
+                        id = - 1;
+                        break;
+                    case 1:
+                        kd = - 1;
+                        break;
+                    case 2:
+                        kd = + 1;
+                        break;
+                    case 3:
+                        id = + 1;
+                        break;
+                }
+                int iv = i + id, kv = k + kd; 
+                for (; canMoveTo(world, iv, jv - 1, kv, ms) && jv > 0; jv--);
+            	if (jv > 0) 
+            	{
+            		world.setBlock(iv, jv, kv, (Block)Block.blockRegistry.getObject(blid), meta, 3);
+            		setBlockBPdata( world,iv, jv, kv, bpdata);
+            		notifyMove(world, iv, jv, kv);
+            	}
+        	}
+			j++;
+			tryToMove( world, i, j, k, Block.blockRegistry.getNameForObject(world.getBlock( i, j , k )), world.getBlockMetadata( i, j , k ),false );
+			return true;
+        }
+    	
+    	if ( canfall )
+    	{
+    		//int metadata = world.getBlockMetadata(i, j, k);
+    		EntityFallingBlock entityfallingsand = new EntityFallingBlock(world, 0.5D + i, 0.5D + j, 0.5D + k, (Block)Block.blockRegistry.getObject(blid), meta);
+    		if ( ((Block)Block.blockRegistry.getObject(blid)).hasTileEntity(meta) ) 
+    		{
+    			//TODO I hope this works too....
+    			entityfallingsand.field_145810_d = new NBTTagCompound();
+    			world.getTileEntity(i, j, k).writeToNBT(entityfallingsand.field_145810_d);
+    			world.removeTileEntity(i, j, k);
+    		}
+    		if (canBurn(blid) && world.getBlock(i, j+1, k) == Blocks.fire) entityfallingsand.setFire(60);
+            entityfallingsand.bpdata = getBlockBPdata( world,i, j, k);
+    		world.spawnEntityInWorld(entityfallingsand);
+     	}
+    	else
+    	{
+    		if (canslide[0]) canslide[0] = isFallingEmpty(world, i - 1, j, k);
+    		if (canslide[1]) canslide[1] = isFallingEmpty(world, i, j, k - 1);
+    		if (canslide[2]) canslide[2] = isFallingEmpty(world, i, j, k + 1);
+    		if (canslide[3]) canslide[3] = isFallingEmpty(world, i + 1, j, k);
+    		if (!(canslide[0] || canslide[1] || canslide[2] || canslide[3])) return false;	
+    		
+    		byte slide[] = {0,0,0,0};
+			byte count = 0;
+    		for (byte si = 0; si < 4; si++)
+			{
+    			if (canslide[si])
+    			{
+    				slide[count] = si;
+    				count++;
+    			}
+			}
+    		
+    		int id = 0;
+            int kd = 0;
+            int rr = 0;
+            if ( count > 1 ) rr = prandnextint(count);
+            switch (slide[rr])
+            {
+                case 0:
+                    id = - 1;
+                    break;
+                case 1:
+                    kd = - 1;
+                    break;
+                case 2:
+                    kd = + 1;
+                    break;
+                case 3:
+                    id = + 1;
+                    break;
+            }
+            //int metadata = world.getBlockMetadata(i, j, k);
+            EntityFallingBlock entityfallingsand = new EntityFallingBlock(world, 0.5D + i + 0.0625D * id, 0.5D + j - 0.0625D, 0.5D + k + 0.0625D * kd, (Block)Block.blockRegistry.getObject(blid), meta);
+            if ( ((Block)Block.blockRegistry.getObject(blid)).hasTileEntity(meta) ) 
+            {
+            	entityfallingsand.field_145810_d = new NBTTagCompound();
+            	world.getTileEntity(i, j, k).writeToNBT(entityfallingsand.field_145810_d);
+            	world.removeTileEntity(i, j, k);
+            }
+    		
+            entityfallingsand.slideDir = (byte) (slide[rr]+1);
+            if (canBurn(blid) && world.getBlock(i, j+1, k) == Blocks.fire) entityfallingsand.setFire(60);
+            entityfallingsand.bpdata = getBlockBPdata( world,i, j, k);
+            world.spawnEntityInWorld(entityfallingsand);
+    	}
+    	world.setBlockToAir(i, j, k);
+    	setBlockBPdata( world,i, j, k, 0);
+    	j++;
+    	tryToMove(world, i, j, k, Block.blockRegistry.getNameForObject(world.getBlock(i, j, k)), world.getBlockMetadata(i, j, k), false);
+        return true;
+    }
+	
+	public static boolean canmove(World world, int i, int j, int k, BlockPistonBase par1block)
+    {
+    	int orient = par1block.getPistonOrientation(world.getBlockMetadata(i, j, k));
+    	if ( orient > 5 ) orient = 0;
+    	int i2 = i + Facing.offsetsXForSide[orient];
+    	int j2 = j + Facing.offsetsYForSide[orient];
+    	int k2 = k + Facing.offsetsZForSide[orient];
+    	
+    	String blockName = Block.blockRegistry.getNameForObject(world.getBlock(i2, j2, k2));
+    	
+    	if (blockName != Block.blockRegistry.getNameForObject(Blocks.piston_extension) && blockName != Block.blockRegistry.getNameForObject(Blocks.piston_head)) return true;
+    	
+    	int orient2 = par1block.getPistonOrientation(world.getBlockMetadata(i2, j2, k2) );
+    	if ( orient2 > 5 ) orient2 = 0;
+    	
+    	if (blockName == Block.blockRegistry.getNameForObject(Blocks.piston_head) && orient == orient2 ) return false;
+    	if (blockName == Block.blockRegistry.getNameForObject(Blocks.piston_extension))
+    	{
+    		TileEntity var7 = world.getTileEntity(i2, j2, k2);
+            if (var7 instanceof TileEntityPiston)
+            {
+            	if ( ((TileEntityPiston)var7).getPistonOrientation() == orient ) 
+            	{
+            		return false;
+            	}
+            }
+    	}
+    	return true;
+    }
+	
+	public static void moveChangeMechanic(World world, int i, int j, int k, String blockName, int radius, int strength)
+	{
+		int state,m;
+		String bid;
+		for (int ii = i - radius; ii <= i + radius; ii++ )
+		{
+			for (int jj = j - radius; jj <= j + radius; jj++ )
+			{
+				for (int kk = k - radius; kk <= k + radius; kk++ )
+				{
+					bid = Block.blockRegistry.getNameForObject(world.getBlock( ii, jj, kk ));
+					m = world.getBlockMetadata(ii, jj, kk );
+					if (DefinitionMaps.getBlockDef(blockName, m).movenum == 2 && DefinitionMaps.getBlockDef(blockName, m).movechanger > 1 /*&& ( blockID == 0 || blockID == bid )*/ )
+					{
+						int bpd = getBlockBPdata( world, ii, jj, kk );
+						state = bpd & 15;
+						bpd = bpd - state;
+						if (state < 15 )
+						{
+							state = state + prandnextint(4) + strength;
+							if ( state > 15 ) state = 15;
+							setBlockBPdata( world, ii, jj, kk, bpd + state);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public static int getBlockBPdata(World world, int par1, int par2, int par3)
+    {
+        if (par1 >= -30000000 && par3 >= -30000000 && par1 < 30000000 && par3 < 30000000)
+        {
+            if (par2 < 0)
+            {
+                return 0;
+            }
+            else if (par2 >= 256)
+            {
+                return 0;
+            }
+            else
+            {
+                Chunk chunk = world.getChunkFromChunkCoords(par1 >> 4, par3 >> 4);
+                par1 &= 15;
+                par3 &= 15;
+                return chunk.getBlockBPdata(par1, par2, par3);
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    }
+	
+	public static int prandnextint(int max)
+    {
+    	nextrand++;
+    	if (nextrand > 99) nextrand = nextrand - 100;
+    	return (int)prand[nextrand] % max;
+    }
+	
+	public static boolean floating(World world, int i, int j, int k, int rad, String bid)
+    {
+    	for (int jj = j-rad; jj <= j+rad; jj++ )
+    	{
+    		for (int ii = i-rad; ii <= i+rad; ii++ )
+        	{
+    			for (int kk = k-rad; kk <= k+rad; kk++ )
+    	    	{
+    				if (sameBlock(Block.blockRegistry.getNameForObject(world.getBlock(ii , jj, kk )),bid)) return true;
+    	    	}
+        	}    		
+    	}
+    	return false; 
+    }
+	
+	public static boolean sameBlock(String id1, int meta1, String id2, int meta2)
+	{
+		if (!id1.equals(id2)) return false;
+		if (Block.blockRegistry.getObject(id1) instanceof BlockSlab || Block.blockRegistry.getObject(id1) instanceof BlockSilverfish)
+		{
+			if (meta1 != meta2) return false;
+		}
+		return true;
+	}
+	
+	public static boolean sameBlock(String id1, String id2)
+	{
+		/*if ((id1.equals("minecraft:log") || id1.equals("minecraft:log2") || id1.equals("harvestcraft:pamMaple") || id1.equals("MineFactoryReloaded:rubberwood.log") || id1.equals("TConstruct:slime.gel") || id1.equals("Natura:tree") || id1.equals("Natura:redwood") || id1.equals("Natura:Saguaro") || id1.equals("Natura:willow") || id1.equals("Natura:bloodwood") || id1.equals("Natura:DarkTree") || id1.equals("Natura:RareTree")) 
+		 && (id2.equals("minecraft:log") || id2.equals("minecraft:log2") || id2.equals("harvestcraft:pamMaple") || id2.equals("MineFactoryReloaded:rubberwood.log") || id2.equals("TConstruct:slime.gel") || id2.equals("Natura:tree") || id2.equals("Natura:redwood") || id2.equals("Natura:Saguaro") || id2.equals("Natura:willow") || id2.equals("Natura:bloodwood") || id2.equals("Natura:DarkTree") || id2.equals("Natura:RareTree")))
+		{
+			return true;
+		}*/
+		if (!id1.equals(id2)) return false;
+		/*if (Block.blockRegistry.getObject(id1) instanceof BlockSlab || Block.blockRegistry.getObject(id1) instanceof BlockSilverfish)
+		{
+			return true;
+		}*/
+		return true;
+	}
+	
+	public static boolean canMoveTo(World world, int i, int j, int k, int e)
+    {
+    	Block l = world.getBlock(i, j, k);
+        if (l == Blocks.air) return true;
+        if (l == Blocks.water || l == Blocks.flowing_water || l == Blocks.lava || l == Blocks.flowing_lava) return true;		// water, lava
+        if (l == Blocks.fire) return true;				// fire
+        
+        Material mt = l.getMaterial();
+        if ( mt.isLiquid() ) return true; 
+        int m = world.getBlockMetadata(i, j, k);
+        if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(l), m).fragile > 0 && e > DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(l), m).strength ) return true;
+        
+        return false;
+    }
+	
+	public static boolean hanging(World world, int i, int j, int k, int hang, String bid, int met)
+    {
+		String b;
+    	int m;
+    	j++;
+    	hang = j+hang;
+    	for (int cc = j; cc < hang; cc++ )
+    	{
+    		b = Block.blockRegistry.getNameForObject(world.getBlock(i , cc, k ));
+    		m = world.getBlockMetadata(i , cc, k );
+    		if (DefinitionMaps.getBlockDef(b, m).supportingblock > 0 ) return true;
+    		else if (!sameBlock(bid,met,b,m)) return false;
+    		
+    	}
+    	return false; 
+    }
+	
+	public static boolean attached(World world, int i, int j, int k, int att, String bid, int met)
+    {
+		String b;
+    	int m;
+    	int cc;
+    	for ( cc = 1; cc <= att; cc++ )
+    	{
+    		b = Block.blockRegistry.getNameForObject(world.getBlock(i + cc , j, k ));
+    		m = world.getBlockMetadata(i + cc , j, k );
+    		if (DefinitionMaps.getBlockDef(b, m).supportingblock > 0 ) return true;
+    		else if (!sameBlock(bid,met,b,m)) break;
+    	}
+    	
+    	for ( cc = 1; cc <= att; cc++ )
+    	{
+    		b = Block.blockRegistry.getNameForObject(world.getBlock(i - cc , j, k ));
+    		m = world.getBlockMetadata(i - cc , j, k );
+    		if (DefinitionMaps.getBlockDef(b, m).supportingblock > 0 ) return true;
+    		else if (!sameBlock(bid,met,b,m)) break;
+    	}
+    	
+    	for ( cc = 1; cc <= att; cc++ )
+    	{
+    		b = Block.blockRegistry.getNameForObject(world.getBlock(i ,j ,k + cc ));
+    		m = world.getBlockMetadata(i ,j ,k + cc );
+    		if (DefinitionMaps.getBlockDef(b, m).supportingblock > 0 ) return true;
+    		else if (!sameBlock(bid,met,b,m)) break;
+    	}
+    	
+    	for ( cc = 1; cc <= att; cc++ )
+    	{
+    		b = Block.blockRegistry.getNameForObject(world.getBlock(i ,j ,k - cc ));
+    		m = world.getBlockMetadata(i ,j ,k - cc );
+    		if (DefinitionMaps.getBlockDef(b, m).supportingblock > 0 ) return true;
+    		else if (!sameBlock(bid,met,b,m)) break;
+    	}
+   	
+    	return false; 
+    }
+	
+	public static boolean ncorbel(World world, int i, int j, int k, int ni)
+    {
+    	int c;
+    	for ( c = 1; c <= ni; c++ )
+		{
+			if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i - c, j, k)),world.getBlockMetadata(i - c, j, k)).supportingblock > 0)
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i - c , j - 1, k)),world.getBlockMetadata(i - c , j - 1, k)).supportingblock > 0) return true;
+			}
+			else break;
+		}
+    	
+    	for ( c = 1; c <= ni; c++ )
+		{
+			if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i + c, j, k)),world.getBlockMetadata(i + c, j, k)).supportingblock > 0)
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i + c , j - 1, k)),world.getBlockMetadata(i + c , j - 1, k)).supportingblock > 0) return true;
+			}
+			else break;
+		}
+    	
+    	for ( c = 1; c <= ni; c++ )
+		{
+			if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i, j, k + c)),world.getBlockMetadata(i, j, k + c)).supportingblock > 0)
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i, j - 1, k + c)),world.getBlockMetadata(i , j - 1, k + c)).supportingblock > 0) return true;
+			}
+			else break;
+		}
+    	
+    	for ( c = 1; c <= ni; c++ )
+		{
+			if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i, j, k - c)),world.getBlockMetadata(i, j, k - c)).supportingblock > 0)
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i, j - 1, k - c)),world.getBlockMetadata(i, j - 1, k - c)).supportingblock > 0) return true;
+			}
+			else break;
+		}
+    	
+    	return false;
+    }
+	
+	public static boolean corbel(World world, int i, int j, int k, int ci, String blid, int meta)
+    {
+    	if(DefinitionMaps.getBlockDef(blid,meta).supportingblock == 0) return false;
+    	int c;
+    	for ( c = 1; c <= ci; c++ )
+		{
+			if ( sameBlock(Block.blockRegistry.getNameForObject(world.getBlock( i+c, j, k )), world.getBlockMetadata( i+c, j, k), blid, meta ))
+			{
+				if ( sameBlock( Block.blockRegistry.getNameForObject(world.getBlock( i+c, j - 1, k )), world.getBlockMetadata( i+c, j - 1, k), blid, meta ) ) return true;
+			}
+			else break;
+		}
+    	
+    	for ( c = 1; c <= ci; c++ )
+		{
+			if ( sameBlock( Block.blockRegistry.getNameForObject(world.getBlock( i-c, j, k )), world.getBlockMetadata( i-c, j, k), blid, meta ))
+			{
+				if ( sameBlock( Block.blockRegistry.getNameForObject(world.getBlock( i-c, j - 1, k )), world.getBlockMetadata( i-c, j - 1, k), blid, meta ) ) return true;
+			}
+			else break;
+		}
+    	
+    	for ( c = 1; c <= ci; c++ )
+		{
+			if ( sameBlock( Block.blockRegistry.getNameForObject(world.getBlock( i, j, k+c )), world.getBlockMetadata( i, j, k+c), blid, meta ))
+			{
+				if ( sameBlock( Block.blockRegistry.getNameForObject(world.getBlock( i, j - 1, k+c )), world.getBlockMetadata( i, j - 1, k+c), blid, meta ) ) return true;
+			}
+			else break;
+		}
+    	
+    	for ( c = 1; c <= ci; c++ )
+		{
+			if ( sameBlock( Block.blockRegistry.getNameForObject(world.getBlock( i, j, k-c )), world.getBlockMetadata( i, j, k-c), blid, meta ))
+			{
+				if ( sameBlock( Block.blockRegistry.getNameForObject(world.getBlock( i, j - 1, k-c )), world.getBlockMetadata( i, j - 1, k-c), blid, meta ) ) return true;
+			}
+			else break;
+		}
+    	
+    	return false;
+    }
+	
+	public static boolean ceiling(World world, int i, int j, int k)
+    {
+    	if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i-1, j, k)),world.getBlockMetadata(i-1, j, k)).supportingblock > 0 && DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i + 1, j, k )),world.getBlockMetadata(i + 1, j, k )).supportingblock > 0 ) return true;
+    	if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i, j, k-1)),world.getBlockMetadata(i, j, k-1)).supportingblock > 0 && DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i, j, k + 1 )),world.getBlockMetadata(i, j, k + 1 )).supportingblock > 0 ) return true;
+    	if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i-1, j, k-1)),world.getBlockMetadata(i-1, j, k-1)).supportingblock > 0 && DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i + 1, j, k + 1 )),world.getBlockMetadata(i + 1, j, k + 1 )).supportingblock > 0 ) return true;
+    	if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i-1, j, k+1)),world.getBlockMetadata(i-1, j, k+1)).supportingblock > 0 && DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i + 1, j, k-1 )),world.getBlockMetadata(i + 1, j, k-1 )).supportingblock > 0 ) return true;
+    	
+    	return false;
+    }
+	
+	public static boolean smallArc(World world, int i, int j, int k, int si)
+    {
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i - 1, j, k)),world.getBlockMetadata(i - 1, j, k)).supportingblock > 0 && DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i + 1, j, k )),world.getBlockMetadata( i + 1, j, k )).supportingblock > 0 )
+    	{
+    		if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i - 1, j - 1, k )),world.getBlockMetadata( i - 1, j - 1, k )).supportingblock > 0 || DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i + 1, j - 1, k)),world.getBlockMetadata(i + 1, j - 1, k)).supportingblock > 0) return true;
+    		if (si > 1)
+    		{
+    			int c;
+    			for ( c = 2; c <= si; c++ )
+    			{
+    				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i - c, j, k )),world.getBlockMetadata( i - c, j, k )).supportingblock > 0 )
+    				{
+    					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i - c, j - 1, k )),world.getBlockMetadata( i - c, j - 1, k )).supportingblock > 0 ) return true;
+    				}
+    				else break;
+    			}
+    			    			
+    			for ( c = 2; c <= si; c++ )
+    			{
+    				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i + c, j, k )),world.getBlockMetadata( i + c, j, k )).supportingblock > 0 )
+    				{
+    					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i + c, j - 1, k )),world.getBlockMetadata( i + c, j - 1, k )).supportingblock > 0 ) return true;
+    				}
+    				else break;
+    			}
+    		}
+    		
+    	}
+    	
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i, j, k - 1)),world.getBlockMetadata(i, j, k - 1)).supportingblock > 0 && DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i, j, k + 1)),world.getBlockMetadata( i, j, k + 1)).supportingblock > 0)
+    	{
+    		if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i, j - 1, k - 1)),world.getBlockMetadata(i, j - 1, k - 1)).supportingblock > 0 || DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i, j - 1, k + 1)),world.getBlockMetadata(i, j - 1, k + 1)).supportingblock > 0) return true;
+    		if (si > 1)
+    		{
+    			int c;
+    			for ( c = 2; c <= si; c++ )
+    			{
+    				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i, j, k - c )),world.getBlockMetadata( i, j, k - c )).supportingblock > 0 )
+    				{
+    					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i, j - 1, k - c )),world.getBlockMetadata( i, j - 1, k - c )).supportingblock > 0 ) return true;
+    				}
+    				else break;
+    			}
+    			    			
+    			for ( c = 2; c <= si; c++ )
+    			{
+    				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i, j, k + c )),world.getBlockMetadata( i, j, k + c )).supportingblock > 0 )
+    				{
+    					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i, j - 1, k + c )),world.getBlockMetadata( i, j - 1, k + c )).supportingblock > 0 ) return true;
+    				}
+    				else break;
+    			}
+    		}
+    	}
+    	
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i - 1, j, k + 1)),world.getBlockMetadata(i - 1, j, k + 1)).supportingblock > 0 && DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i + 1, j, k -1 )),world.getBlockMetadata( i + 1, j, k -1 )).supportingblock > 0)
+    	{
+    		if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i - 1, j - 1, k +1)),world.getBlockMetadata(i - 1, j - 1, k +1)).supportingblock > 0 || DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i + 1, j - 1, k -1)),world.getBlockMetadata(i + 1, j - 1, k -1)).supportingblock > 0) return true;
+    		if (si > 1)
+    		{
+    			int c;
+    			for ( c = 2; c <= si; c++ )
+    			{
+    				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i - c, j, k + c )),world.getBlockMetadata( i - c, j, k + c )).supportingblock > 0 )
+    				{
+    					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i - c, j - 1, k + c )),world.getBlockMetadata( i - c, j - 1, k + c )).supportingblock > 0 ) return true;
+    				}
+    				else break;
+    			}
+    			    			
+    			for ( c = 2; c <= si; c++ )
+    			{
+    				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i + c, j, k - c)),world.getBlockMetadata( i + c, j, k - c)).supportingblock > 0 )
+    				{
+    					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i + c, j - 1, k - c )),world.getBlockMetadata( i + c, j - 1, k - c )).supportingblock > 0 ) return true;
+    				}
+    				else break;
+    			}
+    		}
+    	}
+    	
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i + 1, j, k + 1)),world.getBlockMetadata(i + 1, j, k + 1)).supportingblock > 0 && DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i - 1, j, k - 1)),world.getBlockMetadata( i - 1, j, k - 1)).supportingblock > 0)
+    	{
+    		if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i + 1, j - 1, k + 1)),world.getBlockMetadata(i + 1, j - 1, k + 1)).supportingblock > 0 || DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i -1, j - 1, k - 1)),world.getBlockMetadata(i -1, j - 1, k - 1)).supportingblock > 0) return true;
+    		if (si > 1)
+    		{
+    			int c;
+    			for ( c = 2; c <= si; c++ )
+    			{
+    				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i + c, j, k + c )),world.getBlockMetadata( i + c, j, k + c )).supportingblock > 0 )
+    				{
+    					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i + c, j - 1, k + c )),world.getBlockMetadata( i + c, j - 1, k + c )).supportingblock > 0 ) return true;
+    				}
+    				else break;
+    			}
+    			    			
+    			for ( c = 2; c <= si; c++ )
+    			{
+    				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i - c, j, k - c )),world.getBlockMetadata( i - c, j, k - c )).supportingblock > 0 )
+    				{
+    					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i - c, j - 1, k - c )),world.getBlockMetadata( i - c, j - 1, k - c )).supportingblock > 0 ) return true;
+    				}
+    				else break;
+    			}
+    		}
+    	}
+    	
+    	return false;
+    }
+	
+	public static boolean bigArc(World world, int i, int j, int k, int bi)
+    {
+    	if(DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i,j+1,k)),world.getBlockMetadata(i,j+1,k)).supportingblock == 0) return false;
+    	
+    	int c;
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i+1,j+1,k)),world.getBlockMetadata(i+1,j+1,k)).supportingblock > 0)
+    	{
+    		for ( c = 1; c <= bi; c++ )
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i - c, j, k )),world.getBlockMetadata( i - c, j, k )).supportingblock > 0 )
+				{
+					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i - c, j - 1, k )),world.getBlockMetadata( i - c, j - 1, k )).supportingblock > 0 ) return true;
+				}
+				else break;
+			}
+    	}
+    	
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i-1,j+1,k)),world.getBlockMetadata(i-1,j+1,k)).supportingblock > 0)
+    	{
+    		for ( c = 1; c <= bi; c++ )
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i + c, j, k )),world.getBlockMetadata( i + c, j, k )).supportingblock > 0 )
+				{
+					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i + c, j - 1, k )),world.getBlockMetadata( i + c, j - 1, k )).supportingblock > 0 ) return true;
+				}
+				else break;
+			}
+    	}
+    	
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i,j+1,k+1)),world.getBlockMetadata(i,j+1,k+1)).supportingblock > 0)
+    	{
+    		for ( c = 1; c <= bi; c++ )
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i, j, k - c )),world.getBlockMetadata( i, j, k - c)).supportingblock > 0 )
+				{
+					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i , j - 1, k - c)),world.getBlockMetadata( i , j - 1, k - c)).supportingblock > 0 ) return true;
+				}
+				else break;
+			}
+    	}
+    	
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i,j+1,k-1)),world.getBlockMetadata(i,j+1,k-1)).supportingblock > 0)
+    	{
+    		for ( c = 1; c <= bi; c++ )
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i, j, k + c )),world.getBlockMetadata( i, j, k + c)).supportingblock > 0 )
+				{
+					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i , j - 1, k + c)),world.getBlockMetadata( i , j - 1, k + c)).supportingblock > 0 ) return true;
+				}
+				else break;
+			}
+    	}
+    	
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i+1,j+1,k+1)),world.getBlockMetadata(i+1,j+1,k+1)).supportingblock > 0)
+    	{
+    		for ( c = 1; c <= bi; c++ )
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i-c, j, k - c )),world.getBlockMetadata( i-c, j, k - c)).supportingblock > 0 )
+				{
+					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i -c, j - 1, k - c)),world.getBlockMetadata( i-c , j - 1, k - c)).supportingblock > 0 ) return true;
+				}
+				else break;
+			}
+    	}
+    	
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i-1,j+1,k-1)),world.getBlockMetadata(i-1,j+1,k-1)).supportingblock > 0)
+    	{
+    		for ( c = 1; c <= bi; c++ )
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i+c, j, k + c )),world.getBlockMetadata( i+c, j, k + c)).supportingblock > 0 )
+				{
+					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i +c, j - 1, k + c)),world.getBlockMetadata( i+c , j - 1, k + c)).supportingblock > 0 ) return true;
+				}
+				else break;
+			}
+    	}
+    	
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i+1,j+1,k-1)),world.getBlockMetadata(i+1,j+1,k-1)).supportingblock > 0)
+    	{
+    		for ( c = 1; c <= bi; c++ )
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i-c, j, k + c )),world.getBlockMetadata( i-c, j, k + c)).supportingblock > 0 )
+				{
+					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i -c, j - 1, k + c)),world.getBlockMetadata( i-c , j - 1, k + c)).supportingblock > 0 ) return true;
+				}
+				else break;
+			}
+    	}
+    	
+    	if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock(i-1,j+1,k+1)),world.getBlockMetadata(i-1,j+1,k+1)).supportingblock > 0)
+    	{
+    		for ( c = 1; c <= bi; c++ )
+			{
+				if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i+c, j, k - c )),world.getBlockMetadata( i+c, j, k - c)).supportingblock > 0 )
+				{
+					if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(world.getBlock( i +c, j - 1, k - c)),world.getBlockMetadata( i+c , j - 1, k - c)).supportingblock > 0 ) return true;
+				}
+				else break;
+			}
+    	}
+    	    	
+    	return false;
+    }
+	
+	public static boolean branch(World world, int i, int j, int k, String bid, int met)
+    {
+    	if (sameBlock(Block.blockRegistry.getNameForObject(world.getBlock(i+1 , j-1, k )),world.getBlockMetadata(i+1 , j-1, k ),bid,met)) return true;
+    	if (sameBlock(Block.blockRegistry.getNameForObject(world.getBlock(i-1 , j-1, k )),world.getBlockMetadata(i-1 , j-1, k ),bid,met)) return true;
+    	if (sameBlock(Block.blockRegistry.getNameForObject(world.getBlock(i , j-1, k+1 )),world.getBlockMetadata(i , j-1, k+1 ),bid,met)) return true;
+    	if (sameBlock(Block.blockRegistry.getNameForObject(world.getBlock(i , j-1, k-1 )),world.getBlockMetadata(i , j-1, k-1 ),bid,met)) return true;
+    	if (sameBlock(Block.blockRegistry.getNameForObject(world.getBlock(i+1 , j-1, k+1 )),world.getBlockMetadata(i+1 , j-1, k+1 ),bid,met)) return true;
+    	if (sameBlock(Block.blockRegistry.getNameForObject(world.getBlock(i-1 , j-1, k-1 )),world.getBlockMetadata(i-1 , j-1, k-1 ),bid,met)) return true;
+    	if (sameBlock(Block.blockRegistry.getNameForObject(world.getBlock(i-1 , j-1, k+1 )),world.getBlockMetadata(i-1 , j-1, k+1 ),bid,met)) return true;
+    	if (sameBlock(Block.blockRegistry.getNameForObject(world.getBlock(i+1 , j-1, k-1 )),world.getBlockMetadata(i+1 , j-1, k-1 ),bid,met)) return true;
+    	return false; 
+    }
+	
+	public static void dropItemsNBT(World world, int i, int j, int k, NBTTagCompound tileEntityData)
+	{
+		if ( tileEntityData == null ) return;
+		
+		NBTTagList nbttaglist = tileEntityData.getTagList("Items", 10);
+		
+		for (int tl = 0; tl < nbttaglist.tagCount(); ++tl)
+        {
+            
+            ItemStack itemstack = ItemStack.loadItemStackFromNBT((NBTTagCompound)nbttaglist.getCompoundTagAt(tl));
+		
+			if (itemstack != null)
+	        {
+	            float f = rand.nextFloat() * 0.8F + 0.1F;
+	            float f1 = rand.nextFloat() * 0.8F + 0.1F;
+	            EntityItem entityitem;
+	
+	            for (float f2 = rand.nextFloat() * 0.8F + 0.1F; itemstack.stackSize > 0; world.spawnEntityInWorld(entityitem))
+	            {
+	                int k1 = rand.nextInt(21) + 10;
+	
+	                if (k1 > itemstack.stackSize)
+	                {
+	                    k1 = itemstack.stackSize;
+	                }
+	
+	                itemstack.stackSize -= k1;
+	                entityitem = new EntityItem(world, (double)((float)i + f), (double)((float)j + f1), (double)((float)k + f2), new ItemStack(itemstack.getItem(), k1, itemstack.getItemDamage()));
+	                
+	                if (itemstack.hasTagCompound())
+	                {
+	                    entityitem.getEntityItem().setTagCompound((NBTTagCompound)itemstack.getTagCompound().copy());
+	                }
+	            }
+	        }
+        }
+	}
+	
+	public static boolean canBurn(String blid)
+    {
+    	if ( Blocks.fire.getFlammability((Block)Block.blockRegistry.getObject(blid)) != 0 ) return true;
+    	if ( (Block)Block.blockRegistry.getObject(blid) == Blocks.netherrack ) return true;
+    	return false;
+    }
+	
+	public static boolean isFallingEmpty(World world, int i, int j, int k)
+    {
+        AxisAlignedBB Sandbbox;
+        Sandbbox = AxisAlignedBB.getBoundingBox((float)i, (float)j, (float)k, (float)i + 1, (float)j + 1, (float)k + 1);
+        List ls = world.getEntitiesWithinAABB(net.minecraft.entity.item.EntityFallingBlock.class, Sandbbox);
+        if (ls.size() != 0) return false;
+        return true;
+    }
+	
+	public static void doExplosionA(World world, Explosion explosion)
+    {
+    	if ( world.isRemote ) return;
+    	float var1 = explosion.explosionSize;
+        HashSet var2 = new HashSet();
+        int var3;
+        int var4;
+        int var5;
+        double var15;
+        double var17;
+        double var19;
+
+        if ( !explosion.impact )
+    	{ 
+    		explosion.explosionSize *= 2.0F;
+	        var3 = MathHelper.floor_double(explosion.explosionX - (double)explosion.explosionSize - 1.0D);
+	        var4 = MathHelper.floor_double(explosion.explosionX + (double)explosion.explosionSize + 1.0D);
+	        var5 = MathHelper.floor_double(explosion.explosionY - (double)explosion.explosionSize - 1.0D);
+	        int var27 = MathHelper.floor_double(explosion.explosionY + (double)explosion.explosionSize + 1.0D);
+	        int var7 = MathHelper.floor_double(explosion.explosionZ - (double)explosion.explosionSize - 1.0D);
+	        int var28 = MathHelper.floor_double(explosion.explosionZ + (double)explosion.explosionSize + 1.0D);
+	        //TODO Hope this is right....
+	        List var9 = world.getEntitiesWithinAABBExcludingEntity(explosion.exploder, AxisAlignedBB.getBoundingBox((double)var3, (double)var5, (double)var7, (double)var4, (double)var27, (double)var28));
+	        //TODO I hope this is right....
+	        Vec3 var29 = Vec3.createVectorHelper(explosion.explosionX, explosion.explosionY, explosion.explosionZ);
+
+	        for (int var11 = 0; var11 < var9.size(); ++var11)
+	        {
+	            Entity var30 = (Entity)var9.get(var11);
+	            double var13 = var30.getDistance(explosion.explosionX, explosion.explosionY, explosion.explosionZ) / (double)explosion.explosionSize;
+	
+	            if (var13 <= 1.0D)
+	            {
+	                var15 = var30.posX - explosion.explosionX;
+	                var17 = var30.posY + (double)var30.getEyeHeight() - explosion.explosionY;
+	                var19 = var30.posZ - explosion.explosionZ;
+	                double var32 = (double)MathHelper.sqrt_double(var15 * var15 + var17 * var17 + var19 * var19);
+	
+	                if (var32 != 0.0D)
+	                {
+	                    var15 /= var32;
+	                    var17 /= var32;
+	                    var19 /= var32;
+	                    double var31 = (double)world.getBlockDensity(var29, var30.boundingBox);
+	                    double var33 = (1.0D - var13) * var31;
+	                    
+	                    if ( var30 instanceof EntityFallingBlock )
+	                    {
+	                    	var33 *= (double)MathHelper.sqrt_double( 1500D / (double)DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(((EntityFallingBlock) var30).func_145805_f()),((EntityFallingBlock) var30).field_145814_a).mass);
+	                    	if (((EntityFallingBlock)var30).func_145805_f() == Blocks.tnt && !(var30 instanceof EntityTNTPrimed))
+		                    {
+		                    	EntityTNTPrimed entitytnt = new EntityTNTPrimed(world, var30.posX, var30.posY, var30.posZ, null);
+	    		                entitytnt.motionX = bSpeedR(var30.motionX + var15 * var33);
+	    		                entitytnt.motionY = bSpeedR(var30.motionY + var17 * var33);
+	    		                entitytnt.motionZ = bSpeedR(var30.motionZ + var19 * var33);
+	    		                entitytnt.fuse = 20 + prandnextint(40);
+	    		                world.spawnEntityInWorld(entitytnt);
+	    		                var30.setDead();
+		                    }
+	                    	else
+	                    	{
+	                    		var30.motionX = bSpeedR(var30.motionX + var15 * var33);
+			                    var30.motionY = bSpeedR(var30.motionY + var17 * var33);
+			                    var30.motionZ = bSpeedR(var30.motionZ + var19 * var33);
+			                    var30.velocityChanged = true;
+	                    	}
+	                    }
+	                    else
+	                    {
+		                    var30.attackEntityFrom(DamageSource.setExplosionSource(explosion), (float)((int)((var33 * var33 + var33) / 2.0D * 8.0D * (double)explosion.explosionSize + 1.0D)));
+		                    double var36 = EnchantmentProtection.func_92092_a(var30, var33);
+							var30.motionX = bSpeedR(var30.motionX + var15 * var36);
+		                    var30.motionY = bSpeedR(var30.motionY + var17 * var36);
+		                    var30.motionZ = bSpeedR(var30.motionZ + var19 * var36);
+		                    var30.velocityChanged = true;
+
+		                    if (var30 instanceof EntityPlayer)
+		                    {
+		                    	//TODO Hope this is right still....
+		                        explosion.func_77277_b().put((EntityPlayer)var30, Vec3.createVectorHelper(var15 * var33, var17 * var33, var19 * var33));
+							}
+	                    }
+	                }
+	            }
+	        }
+	
+	        explosion.explosionSize = var1 * (float) ModConfig.explosionStrength / 100F;
+    	}
+        
+        
+        for (var3 = 0; var3 < 16; ++var3)
+        {
+            for (var4 = 0; var4 < 16; ++var4)
+            {
+                for (var5 = 0; var5 < 16; ++var5)
+                {
+                    if (var3 == 0 || var3 == 16 - 1 || var4 == 0 || var4 == 16 - 1 || var5 == 0 || var5 == 16 - 1)
+                    {
+                        double var6 = (double)((float)var3 / ((float)16 - 1.0F) * 2.0F - 1.0F);
+                        double var8 = (double)((float)var4 / ((float)16 - 1.0F) * 2.0F - 1.0F);
+                        double var10 = (double)((float)var5 / ((float)16 - 1.0F) * 2.0F - 1.0F);
+                        double var12 = Math.sqrt(var6 * var6 + var8 * var8 + var10 * var10);
+                        var6 /= var12;
+                        var8 /= var12;
+                        var10 /= var12;
+                        float var14 = explosion.explosionSize * (0.7F + world.rand.nextFloat() * 0.6F);
+                        var15 = explosion.explosionX;
+                        var17 = explosion.explosionY;
+                        var19 = explosion.explosionZ;
+
+                        for (float var21 = 0.3F; var14 > 0.0F; var14 -= var21 * 0.75F)
+                        {
+                            int var22 = MathHelper.floor_double(var15);
+                            int var23 = MathHelper.floor_double(var17);
+                            int var24 = MathHelper.floor_double(var19);
+                            String var25 = Block.blockRegistry.getNameForObject(world.getBlock(var22, var23, var24));
+                            
+                            if (!var25.equals(Block.blockRegistry.getNameForObject(Blocks.air)) )
+                            {
+                            	int m = world.getBlockMetadata(var22, var23, var24);
+                            	Block var26 = (Block)Block.blockRegistry.getObject(var25);
+                                float var27 = explosion.exploder != null ? explosion.exploder.func_145772_a(explosion, world, var24, var22, var23, var26) : var26.getExplosionResistance(explosion.exploder);
+                                var14 -= (var27 + 0.3F) * var21;
+                            	
+	                            if (var14 > 0.0F)
+	                            {
+	                            	if ( !skipMove && ((WorldServer)world).getEntityTracker().movingblocks < ModConfig.maxMovingBlocks && (DefinitionMaps.getBlockDef(var25,m).pushtype == 1 || DefinitionMaps.getBlockDef(var25,m).pushtype == 3 ) )
+	            	            	{	            	            		
+	                            		/*double speed = (double)MathHelper.sqrt_double( exploder.motionX * exploder.motionX + exploder.motionY * exploder.motionY + exploder.motionZ * exploder.motionZ );
+	                            		double d6 = var22 + 0.5F - explosionX - (exploder.motionX / speed) * 4;
+	            	                    double d8 = var23 + 0.5F - explosionY - (exploder.motionY / speed) * 4;
+	            	                    double d10 = var24 + 0.5F - explosionZ - (exploder.motionZ / speed) * 4;*/
+	                            		double d6 = var22 + 0.5F - explosion.explosionX;
+	            	                    double d8 = var23 + 0.5F - explosion.explosionY;
+	            	                    double d10 = var24 + 0.5F - explosion.explosionZ;
+	            	                    double d11 = (double)MathHelper.sqrt_double(d6 * d6 + d8 * d8 + d10 * d10);
+	            	                    d6 /= d11;
+	            	                    d8 /= d11;
+	            	                    d10 /= d11;
+	            	                    
+	            	                    if (var25.equals(Block.blockRegistry.getNameForObject(Blocks.stone))) var25 = Block.blockRegistry.getNameForObject(Blocks.stone);
+	            	                    else if ( var25.equals(Block.blockRegistry.getNameForObject(Blocks.grass)) || var25.equals(Block.blockRegistry.getNameForObject(Blocks.farmland)) || var25.equals(Block.blockRegistry.getNameForObject(Blocks.mycelium)) ) var25 = Block.blockRegistry.getNameForObject(Blocks.dirt);
+	            	                    
+	            	                    double sm = (double)MathHelper.sqrt_double( 1500D / (double)DefinitionMaps.getBlockDef(var25,m).mass);
+	            	                    double d7 = (0.5D * sm) / (d11 / (double)explosion.explosionSize + 0.10000000000000001D);
+
+	            	                    d7 *= rand.nextFloat() * rand.nextFloat() + 0.6F;
+	            	                    d6 *= d7;
+	            	                    d8 *= d7;
+	            	                    d10 *= d7;
+	            	                    
+	            	                    
+	            	                    
+	            	                    int bpdata = 0;
+	            	                    if ( DefinitionMaps.getBlockDef(var25,m).movenum == 2 && DefinitionMaps.getBlockDef(var25,m).movechanger > 1 ) bpdata = 15;
+	            		                else bpdata = getBlockBPdata( world,var22, var23, var24);
+	            		                	
+	            		                int meta = world.getBlockMetadata(var22, var23, var24);
+										
+	            	                    if ( !explosion.impact && var25.equals(Block.blockRegistry.getNameForObject(Blocks.tnt)) )
+	            	                    {
+	            	                    	EntityTNTPrimed entitytnt = new EntityTNTPrimed(world, (float)var22 + 0.5F, (float)var23 + 0.5F, (float)var24 + 0.5F, null);
+		            		                entitytnt.motionX = bSpeedR(d6 - rand.nextGaussian() * 0.05D);
+		            		                entitytnt.motionY = bSpeedR(d8 - rand.nextGaussian() * 0.05D);
+		            		                entitytnt.motionZ = bSpeedR(d10 - rand.nextGaussian() * 0.05D);
+		            		                entitytnt.fuse = 20 + prandnextint(40);
+		            		                world.spawnEntityInWorld(entitytnt);
+	            	                    }
+	            	                    else
+	            	                    {
+	            	                    	EntityFallingBlock entityfallingsand = new EntityFallingBlock(world, (float)var22 + 0.5F, (float)var23 + 0.5F, (float)var24 + 0.5F, (Block)Block.blockRegistry.getObject(var25), meta);
+		            		                entityfallingsand.motionX = bSpeedR(d6 - rand.nextGaussian() * 0.05D);
+		            		                entityfallingsand.motionY = bSpeedR(d8 - rand.nextGaussian() * 0.05D);
+		            		                entityfallingsand.motionZ = bSpeedR(d10 - rand.nextGaussian() * 0.05D);
+		            		                if ( ModConfig.explosionFire && ( !explosion.impact || explosion.isFlaming ) && prandnextint(5) == 0 && canBurn(var25) ) entityfallingsand.setFire(60);
+		            		                entityfallingsand.bpdata = bpdata;
+		            		                if ( ((Block)Block.blockRegistry.getObject(var25)).hasTileEntity(meta) ) 
+		                	                {
+		            		                	entityfallingsand.field_145810_d = new NBTTagCompound();
+		            		                	world.getTileEntity(var22, var23, var24).writeToNBT(entityfallingsand.field_145810_d);
+		                	                	world.removeTileEntity(var22, var23, var24);
+		                	                }
+		            		                world.spawnEntityInWorld(entityfallingsand);
+	            	                    }   
+	            		                
+	            	                    if ( ModConfig.explosionFire && ( !explosion.impact || explosion.isFlaming ) )
+	            	        	        {
+		            	            		String k2 = Block.blockRegistry.getNameForObject(world.getBlock(var22, var23 - 1, var24));
+		            	            		//TODO Hope this is right....
+		            	            		if (((Block)Block.blockRegistry.getObject(k2)).func_149730_j() && prandnextint(5) == 0)
+		            		                {
+		            	            			 world.setBlock(var22, var23, var24, Blocks.fire ,0 ,3);
+		            		                }
+		            	            		else 
+		            	            		{
+		            	            			world.setBlockToAir(var22, var23, var24);
+		            	            		}
+	            	        	        }
+		            	            	else 
+	            	            		{
+		            	            		world.setBlockToAir(var22, var23, var24);
+	            	            		}
+	            	                }
+	            	            	else
+	            	            	{
+	            	                    Block block = (Block)Block.blockRegistry.getObject(var25);
+	            	            		if (block.canDropFromExplosion(explosion)) block.dropBlockAsItemWithChance(world, var22, var23, var24, world.getBlockMetadata(var22, var23, var24), 1.0F / explosion.explosionSize, 0);
+	            	            		block.onBlockExploded(world, var22, var23, var24, explosion);
+
+	            	            		if ( ModConfig.explosionFire && ( !explosion.impact || explosion.isFlaming ) )
+	            	        	        {
+		            	            		String k2 = Block.blockRegistry.getNameForObject(world.getBlock(var22, var23 - 1, var24));
+		            	            		if (((Block)Block.blockRegistry.getObject(k2)).func_149730_j() && prandnextint(5) == 0)
+		            		                {
+		            		                    world.setBlock(var22, var23, var24, Blocks.fire ,0 ,3);
+		            		                }
+		            	            		else 
+		            	            		{
+		            	                        world.setBlockToAir(var22, var23, var24);
+		            	            		}
+	            	        	        }
+		            	            	else 
+	            	            		{
+		            	            		world.setBlockToAir(var22, var23, var24);
+	            	            		}
+	            	            	}
+	                            	setBlockBPdata( world,var22, var23, var24, 0);
+	                            	if ( !explosion.impact ) var2.add(new ChunkPosition(var22, var23, var24));
+	                            }
+                            }
+                            var15 += var6 * (double)var21;
+                            var17 += var8 * (double)var21;
+                            var19 += var10 * (double)var21;
+                        }
+                    }
+                }
+            }
+        }
+
+        explosion.affectedBlockPositions.addAll(var2);
+   	
+        moveChangeMechanic(world, MathHelper.floor_double(explosion.explosionX), MathHelper.floor_double(explosion.explosionY), MathHelper.floor_double(explosion.explosionZ), Block.blockRegistry.getNameForObject(Blocks.air), 2, 12);
+    }
+	
+	public static double bSpeedR(double speed)
+    {
+    	return (double)((int)(speed * 8000D)) / 8000D;
+    }
+	
+	public static void doExplosionB(World world, Explosion explosion, boolean par1)
+    {
+    	if (explosion.impact) return;
+    	
+    	world.playSoundEffect(explosion.explosionX, explosion.explosionY, explosion.explosionZ, "random.explode", 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
+        if (explosion.explosionSize >= 2.0F && explosion.isSmoking)
+        {
+            world.spawnParticle("hugeexplosion", explosion.explosionX, explosion.explosionY, explosion.explosionZ, 1.0D, 0.0D, 0.0D);
+        }
+        else
+        {
+            world.spawnParticle("largeexplode", explosion.explosionX, explosion.explosionY, explosion.explosionZ, 1.0D, 0.0D, 0.0D);
+        }
+	
+		
+        ChunkPosition var3;
+        int var4;
+        int var5;
+        int var6;
+        String var7;
+		
+		if (explosion.isSmoking)
+        {
+            Iterator var2 = explosion.affectedBlockPositions.iterator();
+
+			while (var2.hasNext())
+			{
+				var3 = (ChunkPosition)var2.next();
+				var4 = var3.chunkPosX;
+				var5 = var3.chunkPosY;
+				var6 = var3.chunkPosZ;
+				var7 = Block.blockRegistry.getNameForObject(world.getBlock(var4, var5, var6));
+
+				if (par1)
+				{
+					double var8 = (double)((float)var4 + world.rand.nextFloat());
+					double var10 = (double)((float)var5 + world.rand.nextFloat());
+					double var12 = (double)((float)var6 + world.rand.nextFloat());
+					double var14 = var8 - explosion.explosionX;
+					double var16 = var10 - explosion.explosionY;
+					double var18 = var12 - explosion.explosionZ;
+					double var20 = (double)MathHelper.sqrt_double(var14 * var14 + var16 * var16 + var18 * var18);
+					var14 /= var20;
+					var16 /= var20;
+					var18 /= var20;
+					double var22 = 0.5D / (var20 / (double)explosion.explosionSize + 0.1D);
+					var22 *= (double)(world.rand.nextFloat() * world.rand.nextFloat() + 0.3F);
+					var14 *= var22;
+					var16 *= var22;
+					var18 *= var22;
+					world.spawnParticle("explode", (var8 + explosion.explosionX * 1.0D) / 2.0D, (var10 + explosion.explosionY * 1.0D) / 2.0D, (var12 + explosion.explosionZ * 1.0D) / 2.0D, var14, var16, var18);
+					world.spawnParticle("smoke", var8, var10, var12, var14, var16, var18);
+				}
+			}
+		}
+    }
+	
+	public static S0EPacketSpawnObject spawnFallingSandPacket(EntityFallingBlock ent)
+    {
+	    int burn = 0;
+	    if (ent.isBurning()) burn = 32768; 
+	    int slide = ((int)ent.slideDir ) << 12;
+    	
+	    return new S0EPacketSpawnObject(ent, 70, Block.getIdFromBlock(ent.func_145805_f()) | ent.field_145814_a << 16 | burn | slide);
+    }
+	
+	public static void fallingSandUpdate(World world, EntityFallingBlock fsand)
+    {
+	    fsand.field_145812_b++;
+    	if (fsand.field_145812_b < 3) 
+    	{
+    		if (fsand.field_145812_b == 1) fsand.field_145814_a &= 15;
+    		return;
+    	}
+    	    	
+    	int i = MathHelper.floor_double(fsand.posX);
+    	int j = MathHelper.floor_double(fsand.posY);
+    	int k = MathHelper.floor_double(fsand.posZ);
+    	
+    	if (fsand.field_145812_b == 4) notifyMove(world,i,j,k);
+    	
+    	if (!world.isRemote && fsand.dead < 4 )
+	    {
+	    	fsand.dead--;
+	    	if (fsand.dead <= 0) fsand.setDead();
+	    	return;
+	    }
+    	Material mt;
+    	fsand.noClip = true;
+    	fsand.onGround = false;
+    	
+    	if ( j < -3  || fsand.field_145812_b > 600)
+        {
+        	fsand.setDead();
+            if ( !world.isRemote ) dropFallingSand( fsand );
+        }   	    	    	    				
+   	    
+    	fsand.media = Block.blockRegistry.getNameForObject(world.getBlock(i,j, k));
+
+        if (fsand.slideDir != 0)
+        {
+        	if (fsand.field_145812_b < 8)
+        	{
+	        	int stime = fsand.field_145812_b - 3;
+	        	int sdir = fsand.slideDir - 1;
+	        	
+        		if (stime == 0)
+	        	{
+	        		switch ( sdir )
+	    	    	{
+    	    			case 0:	fsand.setPosition((double)i - 0.0625D  + 0.5D, (double)j - 0.0625D  + 0.5D, (double)k  + 0.5D); break;
+    	    			case 1:	fsand.setPosition((double)i  + 0.5D, (double)j - 0.0625D  + 0.5D, (double)k - 0.0625D  + 0.5D); break;
+    	    			case 2: fsand.setPosition((double)i  + 0.5D, (double)j - 0.0625D  + 0.5D, (double)k + 0.0625D  + 0.5D); break;
+    	    			case 3:	fsand.setPosition((double)i + 0.0625D  + 0.5D, (double)j - 0.0625D  + 0.5D, (double)k  + 0.5D); break;
+	    	    		default:
+	    	    	}
+	        	}
+	        	
+        		fsand.motionX = slideSpeedz[stime][sdir][0];
+        		fsand.motionY = slideSpeedz[stime][sdir][1];
+        		fsand.motionZ = slideSpeedz[stime][sdir][2];
+	        	fsand.accelerationX = 0D;
+		    	fsand.accelerationY = 0D;
+		    	fsand.accelerationZ = 0D;
+        	}
+        	else
+        	{
+        		fsand.slideDir = 0;
+        	}
+        }
+        
+        if (fsand.motionX > 3.9D) fsand.motionX = 3.9D;
+        else if (fsand.motionX < -3.9D) fsand.motionX = -3.9D;
+        if (fsand.motionY > 3.9D) fsand.motionY = 3.9D;
+        else if (fsand.motionY < -3.9D) fsand.motionY = -3.9D;
+        if (fsand.motionZ > 3.9D) fsand.motionZ = 3.9D;
+        else if (fsand.motionZ < -3.9D) fsand.motionZ = -3.9D;
+        
+       	//writetoLog(";"+world.isRemote+";ID: ;"+fsand.entityId+";slidedir: ;"+fsand.slideDir+";mass: ;"+fsand.mass+"; field_145812_b: ;"+fsand.field_145812_b+";pos: ;"+fsand.posX+"; "+fsand.posY+"; "+fsand.posZ+";speed: ;"+fsand.motionX+"; "+fsand.motionY+"; "+fsand.motionZ+"; acceleration: ;"+fsand.accelerationX+"; "+fsand.accelerationY+"; "+fsand.accelerationZ);
+        
+        double cmotionX = fsand.motionX; 
+        double cmotionY = fsand.motionY;
+        double cmotionZ = fsand.motionZ;
+    	
+        double caccelerationX = fsand.accelerationX;
+        double caccelerationY = fsand.accelerationY;
+        double caccelerationZ = fsand.accelerationZ;
+        
+        fsand.accelerationX = 0;
+    	fsand.accelerationY = 0;
+    	fsand.accelerationZ = 0;
+	
+    	if ( fsand.slideDir == 0 )
+        {
+    		fsand.motionX = bSpeedR(fsand.motionX + caccelerationX);
+    		fsand.motionY = bSpeedR(fsand.motionY + caccelerationY);
+    		fsand.motionZ = bSpeedR(fsand.motionZ + caccelerationZ);
+        }
+    	
+    	double moveX = cmotionX + caccelerationX * 0.5D; 
+        double moveY = cmotionY + caccelerationY * 0.5D;
+        double moveZ = cmotionZ + caccelerationZ * 0.5D;
+        
+        double axisaligned_maxmove = MathHelper.abs_max(MathHelper.abs_max(moveX, moveZ),moveY);
+        double blockofsX, blockofsY, blockofsZ;  // point on the face of the block in the direction of moving
+        if (axisaligned_maxmove != 0)
+        {
+        	blockofsX = 0.498D * moveX / axisaligned_maxmove;
+        	blockofsY = 0.498D * moveY / axisaligned_maxmove;
+        	blockofsZ = 0.498D * moveZ / axisaligned_maxmove;
+        }
+        else 
+    	{
+        	blockofsX = 0D;
+        	blockofsY = 0D;
+           	blockofsZ = 0D;
+    	}
+        
+        double djumpdist2 = blockofsX * blockofsX + blockofsY * blockofsY + blockofsZ *blockofsZ;
+        double jumpdist2 = moveX * moveX + moveY * moveY + moveZ * moveZ;
+       
+        int mass = DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).mass;
+        int em = mass / 10 + (int)(0.5D * (double)mass * jumpdist2 );
+        //if (!world.isRemote) writetoLog(";"+em);
+        
+        if ( fsand.isBurning() && jumpdist2 > 4D && fsand.func_145805_f() != Blocks.netherrack ) fsand.extinguish();
+        
+        AxisAlignedBB Sandbbox = null;
+        	
+        int ii;
+        if ( djumpdist2 == 0 ) ii = 0;
+        else ii = ( int ) Math.ceil((double)MathHelper.sqrt_double(jumpdist2/djumpdist2));
+        
+    	double jumpPosX = 0;
+    	double jumpPosY = 0;
+    	double jumpPosZ = 0;
+
+    	int in = 0;
+    	int jn = 0;
+    	int kn = 0;
+    	int ip = i;
+    	int jp = j;
+    	int kp = k;
+    			
+    	for (int i1 = 1; i1 <= ii ; i1++)
+    	{
+    		if (i1 == ii)
+    		{
+    			jumpPosX = fsand.posX + moveX;
+				jumpPosY = fsand.posY + moveY;
+				jumpPosZ = fsand.posZ + moveZ;
+    				
+				Sandbbox = fsand.boundingBox.copy();
+	            Sandbbox.offset(moveX,moveY,moveZ);
+    		}
+    		else if (i1 == 1)
+    		{
+    			jumpPosX = fsand.posX + blockofsX;
+		    	jumpPosY = fsand.posY + blockofsY;
+		    	jumpPosZ = fsand.posZ + blockofsZ;
+		    	
+		    	Sandbbox = fsand.boundingBox.copy();
+		    	Sandbbox.offset(blockofsX,blockofsY,blockofsZ);
+    		}
+    		else
+    		{
+    			jumpPosX += blockofsX;
+    			jumpPosY += blockofsY;
+    			jumpPosZ += blockofsZ;
+    			
+    			Sandbbox.offset(blockofsX,blockofsY,blockofsZ);
+    		}
+    		
+    		//writetoLog(";"+world.isRemote+";ID: ;"+fsand.entityId+";slidedir: ;"+fsand.slideDir+";onground: ;"+fsand.onGround+";mass: ;"+blockSet[fsand.blockID][fsand.metadata].mass+"; field_145812_b: ;"+fsand.field_145812_b+";pos: ;"+jumpPosX+"; "+jumpPosY+"; "+jumpPosZ+";speed: ;"+fsand.motionX+"; "+fsand.motionY+"; "+fsand.motionZ+"; acceleration: ;"+fsand.accelerationX+"; "+fsand.accelerationY+"; "+fsand.accelerationZ);
+        	
+    		in = MathHelper.floor_double(jumpPosX);
+		    jn = MathHelper.floor_double(jumpPosY);
+		    kn = MathHelper.floor_double(jumpPosZ);
+		    
+		    if (jp != jn || ip != in || kp != kn)
+			{
+	        	String bidn = Block.blockRegistry.getNameForObject(world.getBlock(in, jn, kn));
+				int metan = world.getBlockMetadata(in, jn, kn);
+	        	
+				
+				if (  DefinitionMaps.getBlockDef(bidn,metan).fragile > 0 ) 
+				{
+	        		Block block = (Block)Block.blockRegistry.getObject(bidn);
+    	    		
+	        		if (  !world.isRemote )
+	        		{
+	        			if ( DefinitionMaps.getBlockDef(bidn,metan).fragile > 0 )
+	                	{
+	                		if ( ((Block)Block.blockRegistry.getObject(bidn)).hasTileEntity(metan) ) 
+	                		{
+	                			NBTTagCompound nnn = new NBTTagCompound();
+	                			world.getTileEntity(in, jn, kn).writeToNBT(nnn);
+	                			dropItemsNBT(world, in, jn, kn, nnn);            			
+	                			world.removeTileEntity(in, jn, kn);
+	                		}
+	                	
+	                		if ( DefinitionMaps.getBlockDef(bidn,metan).fragile == 2 ) ((Block)Block.blockRegistry.getObject(bidn)).dropBlockAsItem( world, in, jn, kn, metan, 0 );
+	                		
+	                		world.setBlockToAir(in, jn, kn);
+	                	}
+	        		}
+	        		bidn = Block.blockRegistry.getNameForObject(Blocks.air);
+	        		
+	        		world.playSoundEffect((double)((float)in + 0.5F), (double)((float)jn + 0.5F), (double)((float)kn + 0.5F), block.stepSound.getBreakSound(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
+	        		
+	        		double sl = 1D - (double)DefinitionMaps.getBlockDef(bidn,metan).strength / 64000D;
+	        		fsand.motionX *= sl;
+	        		fsand.motionY *= sl;
+	        		fsand.motionZ *= sl;
+				}
+	    		
+	        	if ( fsand.isBurning() && bidn.equals(Block.blockRegistry.getNameForObject(Blocks.air)) ) 
+	        	{
+	        		world.spawnParticle("largesmoke", (float)jumpPosX + rand.nextFloat(),(float)jumpPosY + rand.nextFloat(), (float)jumpPosZ + rand.nextFloat(), 0D, 0D, 0D);
+	            	world.spawnParticle("flame", (float)jumpPosX + rand.nextFloat(), (float)jumpPosY + rand.nextFloat(), (float)jumpPosZ + rand.nextFloat(), 0D, 0.2D, 0D);
+	        	}
+	        	
+	        	if (fsand.media != bidn)
+	        	{        		
+	        		if (!bidn.equals(Block.blockRegistry.getNameForObject(Blocks.air)))
+	        		{
+		        		mt = ((Block)Block.blockRegistry.getObject(bidn)).getMaterial();
+		        		if ( mt.isLiquid() )
+		        		{
+		        			if ( mt == Material.lava )
+		        			{
+		        				if (canBurn(Block.blockRegistry.getNameForObject(fsand.func_145805_f()))) fsand.setFire(60);
+			        			else fsand.setFire(1);
+			        			world.playSoundAtEntity(fsand, "random.fizz", 1F, 1.0F + (rand.nextFloat() - rand.nextFloat()) * 0.4F);
+		        			}
+		        			else
+		        			{
+		        				fsand.extinguish();
+			        			world.playSoundAtEntity(fsand, "random.splash", 1F, 1.0F + (rand.nextFloat() - rand.nextFloat()) * 0.4F);
+		        			}	        			
+		        		}
+		        		else if ( bidn.equals(Block.blockRegistry.getNameForObject(Blocks.fire)))
+		        		{
+		        			world.playSoundAtEntity(fsand, "random.fizz", 0.5F, 1.0F + (rand.nextFloat() - rand.nextFloat()) * 0.4F);
+		        		}
+	        		}
+	        		
+	        		fsand.media = bidn;
+	        		
+	        		if ( fsand.slideDir == 0 && !bidn.equals(Block.blockRegistry.getNameForObject(Blocks.fire)))
+	        		{
+	        			moveX = jumpPosX - fsand.posX;
+		    			moveY = jumpPosY - fsand.posY;
+		    			moveZ = jumpPosZ - fsand.posZ;
+		    		
+		    			break;
+	        		}	
+	        	}
+           	    			
+				ip = in;
+				jp = jn;
+				kp = kn;
+			}
+		    
+		    if ( fsand.slideDir == 0 )
+		    {
+		    
+			    if ( (!canMoveTo(world, MathHelper.floor_double(jumpPosX + 0.499D), MathHelper.floor_double(jumpPosY +  0.499D),MathHelper.floor_double(jumpPosZ +  0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX +  0.499D), MathHelper.floor_double(jumpPosY + 0.499D),MathHelper.floor_double(jumpPosZ -  0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX + 0.499D), MathHelper.floor_double(jumpPosY - 0.499D),MathHelper.floor_double(jumpPosZ + 0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX + 0.499D), MathHelper.floor_double(jumpPosY - 0.499D),MathHelper.floor_double(jumpPosZ - 0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX - 0.499D), MathHelper.floor_double(jumpPosY + 0.499D), MathHelper.floor_double(jumpPosZ + 0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX - 0.499D), MathHelper.floor_double(jumpPosY + 0.499D),MathHelper.floor_double(jumpPosZ - 0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX - 0.499D), MathHelper.floor_double(jumpPosY - 0.499D),MathHelper.floor_double(jumpPosZ + 0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX - 0.499D), MathHelper.floor_double(jumpPosY - 0.499D),MathHelper.floor_double(jumpPosZ - 0.499D), em)))
+	    		{
+			    	
+					double eimp = 0.0005D * jumpdist2 * DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).mass;
+	    			
+	    			if ( eimp > 0.5D )
+	    			{
+	    				if ( !world.isRemote ) 
+						{
+		    				if ( eimp > 3.5D ) eimp = 3.5D;
+	    					//writetoLog(""+Math.sqrt(jumpdist2)+"       "+eimp);
+		    				Explosion var10 = new Explosion( world, fsand, jumpPosX, jumpPosY, jumpPosZ, (float) eimp );
+		    			    if ( fsand.isBurning() ) var10.isFlaming = true;
+		    			    var10.impact = true;
+		    			    world.explosionQueue.add(var10);
+		    			}
+	    				
+	    			    fsand.motionX *= 0.7D;
+				    	fsand.motionY *= 0.7D;
+				    	fsand.motionZ *= 0.7D;
+				    	fsand.velocityChanged = true;
+	    			}
+	    			
+	    			if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).fragile > 0 && em > DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).strength)
+	    			{
+	    				Block block = fsand.func_145805_f();
+	    	    		world.playSoundEffect(jumpPosX, jumpPosY, jumpPosZ, block.stepSound.getBreakSound(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
+	    	    		
+	    	    		fsand.dead--;
+	    	    		if (!world.isRemote)
+	    	    		{
+	    	    			if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).fragile == 2 ) 
+	    	    			{
+	    	    				fsand.posX = jumpPosX;
+	    	    				fsand.posY = jumpPosY;
+	    	    				fsand.posZ = jumpPosZ;
+	    	    				dropFallingSand(fsand);
+	    	    			}
+	    	    			else if( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).fragile == 1 && fsand.field_145810_d != null ) dropItemsNBT(world, MathHelper.floor_double(jumpPosX),  MathHelper.floor_double(jumpPosY),  MathHelper.floor_double(jumpPosZ), fsand.field_145810_d);
+	    	    		}
+	    				return;
+	    			}
+	    			
+			    	moveX = jumpPosX - fsand.posX;
+	    			moveY = jumpPosY - fsand.posY;
+	    			moveZ = jumpPosZ - fsand.posZ;
+	    			
+	    			fsand.noClip = false;
+	    			
+	    			break;
+				}
+
+			    Entity collent = world.findNearestEntityWithinAABB(Entity.class, Sandbbox, fsand);
+			    
+			    if ( collent != null )
+		        {
+			    	if ( collent instanceof EntityFallingBlock)
+			    	{
+			    		
+			    		double m1 = (double)DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).mass;
+			        	double m2 = DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(((EntityFallingBlock)collent).func_145805_f()),((EntityFallingBlock)collent).field_145814_a).mass;
+			    		double smass =  m1 + m2;
+			    		double vv;
+			    		
+			    		double is = m1 * fsand.motionX + m2 * collent.motionX;
+			    		vv = bSpeedR( (0.98D * is) / smass );
+			    		
+			    		fsand.motionX = vv;
+			    		collent.motionX = vv;
+			    		
+			    		is = m1 * fsand.motionZ + m2 * collent.motionZ;
+			    		vv = bSpeedR( (0.98D * is) / smass );
+			    		
+			    		fsand.motionZ = vv;
+			    		collent.motionZ = vv;
+			    		
+			    		is = m1 * fsand.motionY + m2 * collent.motionY;
+			    		vv = bSpeedR( (0.98D * is) / smass );
+			    		
+			    		fsand.motionY = vv;
+			    		collent.motionY = vv;
+
+			    		fsand.velocityChanged = true;
+			    		collent.velocityChanged = true;
+			    		
+			    		if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(((EntityFallingBlock)collent).func_145805_f()),((EntityFallingBlock)collent).field_145814_a).fragile > 0 && em > DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(((EntityFallingBlock)collent).func_145805_f()),((EntityFallingBlock)collent).field_145814_a).strength)
+		    			{
+		    				Block block = ((EntityFallingBlock)collent).func_145805_f();
+		    	    		world.playSoundEffect(collent.posX, collent.posY, collent.posZ, block.stepSound.getBreakSound(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
+		    	    		
+		    	    		((EntityFallingBlock)collent).dead--;
+		    	    		if (!world.isRemote)
+		    	    		{
+		    	    			if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(((EntityFallingBlock)collent).func_145805_f()),((EntityFallingBlock)collent).field_145814_a).fragile == 2 ) dropFallingSand(((EntityFallingBlock)collent));
+		    	    			else if( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(((EntityFallingBlock)collent).func_145805_f()),((EntityFallingBlock)collent).field_145814_a).fragile == 1 && ((EntityFallingBlock)collent).field_145810_d != null ) dropItemsNBT(world, MathHelper.floor_double(collent.posX),  MathHelper.floor_double(collent.posY),  MathHelper.floor_double(collent.posZ), ((EntityFallingBlock)collent).field_145810_d);
+		    	    		}
+		    			}
+			    		
+			    		if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).fragile > 0 && em > DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).strength)
+		    			{
+		    				Block block = fsand.func_145805_f();
+		    	    		world.playSoundEffect(jumpPosX, jumpPosY, jumpPosZ, block.stepSound.getBreakSound(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
+		    	    		
+		    	    		fsand.dead--;
+		    	    		if (!world.isRemote)
+		    	    		{
+		    	    			if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).fragile == 2 ) 
+		    	    			{
+		    	    				fsand.posX = jumpPosX;
+		    	    				fsand.posY = jumpPosY;
+		    	    				fsand.posZ = jumpPosZ;
+		    	    				dropFallingSand(fsand);
+		    	    			}
+		    	    			else if( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).fragile == 1 && fsand.field_145810_d != null ) dropItemsNBT(world, MathHelper.floor_double(jumpPosX),  MathHelper.floor_double(jumpPosY),  MathHelper.floor_double(jumpPosZ), fsand.field_145810_d);
+		    	    		}
+		    				return;
+		    			}
+
+			    		fsand.noClip = false;
+		    			
+				    	moveX = jumpPosX - fsand.posX;
+			    		moveY = jumpPosY - fsand.posY;
+			    		moveZ = jumpPosZ - fsand.posZ;
+				    	break;
+			    	}
+			    	else if ( collent instanceof EntityLiving )
+			    	{
+			    		//entityCollide(world, fsand, collent, (double)((EntityLiving) collent).getMaxHealth() * 3.0D, true);
+			    		
+			    		double m1 = (double)DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).mass;
+			        	double m2 = (double)((EntityLiving) collent).getMaxHealth() * 3.0D;
+			        	double smass =  m1 + m2;
+			    		double vv;
+			    		double damage = fsand.motionX*fsand.motionX + fsand.motionY*fsand.motionY + fsand.motionZ*fsand.motionZ;
+			    		
+			    		double is = m1 * fsand.motionX + m2 * ( collent.posX - collent.prevPosX );
+			    		vv = bSpeedR( (0.98D * is) / smass );
+			    		damage -= vv * vv;
+			    		fsand.motionX = vv;
+			    		collent.motionX = vv;
+			    		
+			    		is = m1 * fsand.motionZ + m2 * ( collent.posZ - collent.prevPosZ );
+			    		vv = bSpeedR( (0.98D * is) / smass );
+			    		damage -= vv * vv;
+			    		fsand.motionZ = vv;
+			    		collent.motionZ = vv;
+			    		
+			    		if ( fsand.motionY < 0 && collent.onGround) 
+			    		{
+			    			if (fsand.motionY < - 0.3D) vv = bSpeedR(0.5D * fsand.motionY);
+			    			else vv = fsand.motionY;
+			    		}
+			    		else
+			    		{
+			    			is = m1 * fsand.motionY + m2 * ( collent.posY - collent.prevPosY );
+			    			vv = bSpeedR( (0.98D * is) / smass );
+			    		}
+			    		
+			    		damage -= vv * vv;
+			    		fsand.motionY = vv;
+			    		collent.motionY = vv;
+			    		
+			    		fsand.velocityChanged = true;
+			    		collent.velocityChanged = true;
+			    		
+			    		int d = (int)(0.083D * m1 * damage);
+						if ( d > 0 )
+						{
+							//if ( !world.isRemote ) writetoLog(""+d);
+							if ( d > 4 )
+				            {
+				                world.playSoundAtEntity(collent, "damage.fallbig", 1.0F, 1.0F);
+				            }
+				           
+				    		if ( !world.isRemote ) ((EntityLiving)collent).attackEntityFrom(DamageSource.fallingBlock, d);	
+						}				    		
+			    		
+			    		if ( !world.isRemote )
+			            {
+				            if ( collent instanceof EntityPlayerMP  )
+				            {	
+				            	//TODO Hopefully this is right
+				            	((EntityPlayerMP)collent).playerNetServerHandler.sendPacket(new S12PacketEntityVelocity(collent.getEntityId(), collent.motionX, collent.motionY, collent.motionZ));
+				            }
+				        }    	
+
+		    			moveX = jumpPosX - fsand.posX;
+			    		moveY = jumpPosY - fsand.posY;
+			    		moveZ = jumpPosZ - fsand.posZ;
+		    			break;
+			    	}
+			    	else if ( collent instanceof EntityItem )
+			    	{
+			    		collent.motionX = fsand.motionX;
+				    	collent.motionY = fsand.motionY;
+				    	collent.motionZ = fsand.motionZ;
+				    	collent.velocityChanged = true;
+			    	}
+			    	else
+			    	{
+			    		fsand.accelerationX -= fsand.motionX;
+			    		fsand.accelerationY -= fsand.motionY;
+			    		fsand.accelerationZ -= fsand.motionZ;
+			    		//fsand.velocityChanged = true;
+			    		
+			    		moveX = jumpPosX - fsand.posX;
+		    			moveY = jumpPosY - fsand.posY;
+		    			moveZ = jumpPosZ - fsand.posZ;
+		    			break;
+			    	}
+		        }
+		    }
+		    else
+		    {
+		    	Entity collent = world.findNearestEntityWithinAABB(Entity.class, Sandbbox, fsand);
+			    
+			    if ( collent != null && ( collent instanceof EntityLiving || collent instanceof EntityItem ) )
+		        {
+			    	collent.motionX = collent.motionX * 0.2D + fsand.motionX * 0.8D;
+			    	collent.motionY = collent.motionY * 0.2D + fsand.motionY * 0.8D;
+			    	collent.motionZ = collent.motionZ * 0.2D + fsand.motionZ * 0.8D;
+			    	collent.velocityChanged = true;
+			    	if ( !world.isRemote )
+		            {
+			            if ( collent instanceof EntityPlayerMP  )
+			            {	
+			            	((EntityPlayerMP)collent).playerNetServerHandler.sendPacket(new S12PacketEntityVelocity(collent.getEntityId(), collent.motionX, collent.motionY, collent.motionZ));
+			            }
+			        }  
+		        }
+		    }
+		    
+		    
+    	}
+    	
+    	double density = 1.25D;
+    			
+    	if (!fsand.media.equals(Block.blockRegistry.getNameForObject(Blocks.air)) )
+    	{
+    		mt = ((Block)Block.blockRegistry.getObject(fsand.media)).getMaterial();
+    		if ( mt.isLiquid() )
+			{
+				if ( mt == Material.lava)
+				{
+					density = 2000D;
+	    			//fsand.accelerationY += 49.05D / (double)fsand.mass;
+				}
+				else
+				{
+					density = 1000D;
+		    		//fsand.accelerationY += 24.525D / (double)fsand.mass;
+				}
+			}
+			else if ( !world.isRemote && !(fsand instanceof EntityTNTPrimed) )
+			{
+				placeBlock( world, fsand, jumpPosX, jumpPosY, jumpPosZ, in, jn, kn);
+				return;
+			}
+    	}
+    	    	
+    	density = -0.5D * 0.8D * density / (double)DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).mass;    	   	
+    	double aaccX = density * fsand.motionX * Math.abs(fsand.motionX);
+    	double aaccY = density * fsand.motionY * Math.abs(fsand.motionY);
+    	double aaccZ = density * fsand.motionZ * Math.abs(fsand.motionZ);
+    	
+    	fsand.accelerationY -= 0.024525D;
+    	
+    	double mmot = fsand.motionX + aaccX;
+    	if ( (fsand.motionX < 0 && mmot > 0) || (fsand.motionX > 0 && mmot < 0) )
+    	{
+    		aaccX = -0.9D * fsand.motionX;
+    	}
+    	
+    	mmot = fsand.motionY + aaccY;
+    	if ( (fsand.motionY < 0 && mmot > 0) || (fsand.motionY > 0 && mmot < 0))
+    	{
+    		aaccY = -0.9D * fsand.motionY;
+    	}
+    	
+    	mmot = fsand.motionZ + aaccZ;
+    	if ( (fsand.motionZ < 0 && mmot > 0) || (fsand.motionZ > 0 && mmot < 0) )
+    	{
+    		aaccZ = -0.9D * fsand.motionZ;
+    	}
+
+    	fsand.accelerationX = fsand.accelerationX + aaccX;
+    	fsand.accelerationY = fsand.accelerationY + aaccY;
+    	fsand.accelerationZ = fsand.accelerationZ + aaccZ;
+    	
+    	fsand.prevPosX = fsand.posX;
+    	fsand.prevPosY = fsand.posY;
+    	fsand.prevPosZ = fsand.posZ;
+    	
+    	moveEntity(world, fsand, moveX, moveY, moveZ);
+    	
+    	i = MathHelper.floor_double(fsand.posX);
+		j = MathHelper.floor_double(fsand.posY);
+		k = MathHelper.floor_double(fsand.posZ);
+
+		if (fsand.onGround)
+        {
+            fsand.motionX *= 0.9D;
+            fsand.motionZ *= 0.9D;
+            //fsand.motionY *= -0.5D;
+        }
+		
+		if ( fsand instanceof EntityTNTPrimed)
+    	{
+            if (!world.isRemote && ((EntityTNTPrimed)fsand).fuse-- <= 0 )
+            {
+                fsand.setDead();
+            	((EntityTNTPrimed)fsand).explode();
+            }
+            
+            world.spawnParticle("smoke", fsand.posX, fsand.posY + 0.5D, fsand.posZ, 0.0D, 0.0D, 0.0D);
+            
+    	}
+    	else if ( fsand.onGround )
+    	{
+    		if ( jumpdist2 < 0.05D && canMoveTo(world, i, j, k, em) )
+    		{
+    			Block block = fsand.func_145805_f();
+	    		world.playSoundEffect(fsand.posX, fsand.posY, fsand.posZ, block.stepSound.func_150496_b(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
+	    		
+	    		fsand.dead--;
+	    		if (!world.isRemote)
+	    		{
+	    			world.setBlock(i, j, k, fsand.func_145805_f(), fsand.field_145814_a, 3);
+	    			setBlockBPdata( world,i, j, k, fsand.bpdata);
+	    			if (fsand.field_145810_d != null)
+	    			{
+	    				TileEntity tile = fsand.func_145805_f().createTileEntity(world, fsand.field_145814_a);
+	    				tile.readFromNBT(fsand.field_145810_d);
+	    				world.setTileEntity(i, j, k, tile);
+	    			}
+	    			if (fsand.isBurning() && world.getBlock(i, j+1, k) == Blocks.air) world.setBlock(i, j +1, k, Blocks.fire, 0, 3);
+	    			world.moveTickList.scheduleBlockMoveUpdate(world, i, j, k, Block.blockRegistry.getNameForObject(fsand.func_145805_f()), fsand.field_145814_a, true);
+		    		notifyMove(world, i,j,k);
+	    		}
+	    		
+    		}
+    	}
+
+    }
+	
+	public static void dropFallingSand( EntityFallingBlock fsand )
+	{
+		if ( fsand.field_145810_d != null ) dropItemsNBT(fsand.worldObj, MathHelper.floor_double(fsand.posX), MathHelper.floor_double(fsand.posY), MathHelper.floor_double(fsand.posZ), fsand.field_145810_d );
+		fsand.entityDropItem(new ItemStack(fsand.func_145805_f(), 1, fsand.func_145805_f().damageDropped(fsand.field_145814_a)), 0.0F);
+	}
+	
+	protected static void placeBlock(World world, EntityFallingBlock fsand, double jumpPosX, double jumpPosY, double jumpPosZ,  int i, int j, int k)
+    {
+	    double dist2 = 100;
+	    double dist22, s1 = 0, s2 = 0, s3 = 0;
+    	int x = 0;
+    	int y = 0;
+    	int z = 0;
+    	
+	    for (int ii = i-1; ii < i+2; ii++)
+	    {
+	    	for (int jj = j-1; jj < j+2; jj++)
+		    {
+	    		for (int kk = k-1; kk < k+2; kk++)
+			    {
+	    			if (canMoveTo(world, ii, jj, kk, 0))
+	    			{
+	    				s1 = ((0.5D + (double)ii) - jumpPosX);
+	    				s2 = ((0.5D + (double)jj) - jumpPosY);
+	    				s3 = ((0.5D + (double)kk) - jumpPosZ);
+	    				dist22 = s1 * s1 + s2 * s2 + s3 * s3;
+	    				if (dist22 < dist2 )
+	    				{
+	    					dist2 = dist22;
+	    					x = ii;
+	    					y = jj;
+	    					z = kk;
+	    				}
+	    			}
+			    }
+		    }
+	    }
+    	
+	    fsand.setDead();
+    	//if (world.isRemote) return; 
+    	
+    	if ( dist2 < 100 ) 
+    	{
+    		world.setBlock(x, y, z, fsand.func_145805_f(), fsand.field_145814_a, 3);
+    		setBlockBPdata( world,x, y, z, fsand.bpdata);
+    		if (fsand.field_145810_d != null)
+			{
+				TileEntity tile = fsand.func_145805_f().createTileEntity(world, fsand.field_145814_a);
+				tile.readFromNBT(fsand.field_145810_d);
+				world.setTileEntity(x, y, z, tile);
+			}
+    		world.moveTickList.scheduleBlockMoveUpdate(world, x, y, z, Block.blockRegistry.getNameForObject(fsand.func_145805_f()), fsand.field_145814_a, true);
+    	}
+    	else 
+    	{
+    		fsand.posX = 0.5D + (double)i;
+    		fsand.posY = 0.5D + (double)j;
+    		fsand.posZ = 0.5D + (double)k;
+    		dropFallingSand ( fsand );
+    	}
+    }
+	
+	public static void moveEntity(World world, EntityFallingBlock fsand, double par1, double par3, double par5)
+    {
+        if (fsand.noClip)
+        {
+            fsand.boundingBox.offset(par1, par3, par5);
+            fsand.posX = (fsand.boundingBox.minX + fsand.boundingBox.maxX) / 2.0D;
+            fsand.posY = fsand.boundingBox.minY + (double)fsand.yOffset - (double)fsand.ySize;
+            fsand.posZ = (fsand.boundingBox.minZ + fsand.boundingBox.maxZ) / 2.0D;
+        }
+        else
+        {
+            fsand.ySize *= 0.4F;
+            double d3 = fsand.posX;
+            double d4 = fsand.posY;
+            double d5 = fsand.posZ;
+
+            double d6 = par1;
+            double d7 = par3;
+            double d8 = par5;
+            AxisAlignedBB axisalignedbb = fsand.boundingBox.copy();
+
+            List list = world.getCollidingBoundingBoxes(fsand, fsand.boundingBox.addCoord(par1, par3, par5));
+
+            for (int i = 0; i < list.size(); ++i)
+            {
+                par3 = ((AxisAlignedBB)list.get(i)).calculateYOffset(fsand.boundingBox, par3);
+            }
+
+            fsand.boundingBox.offset(0.0D, par3, 0.0D);
+
+            if (!fsand.field_70135_K && d7 != par3)
+            {
+                par5 = 0.0D;
+                par3 = 0.0D;
+                par1 = 0.0D;
+            }
+
+            boolean flag1 = fsand.onGround || d7 != par3 && d7 < 0.0D;
+            int j;
+
+            for (j = 0; j < list.size(); ++j)
+            {
+                par1 = ((AxisAlignedBB)list.get(j)).calculateXOffset(fsand.boundingBox, par1);
+            }
+
+            fsand.boundingBox.offset(par1, 0.0D, 0.0D);
+
+            if (!fsand.field_70135_K && d6 != par1)
+            {
+                par5 = 0.0D;
+                par3 = 0.0D;
+                par1 = 0.0D;
+            }
+
+            for (j = 0; j < list.size(); ++j)
+            {
+                par5 = ((AxisAlignedBB)list.get(j)).calculateZOffset(fsand.boundingBox, par5);
+            }
+
+            fsand.boundingBox.offset(0.0D, 0.0D, par5);
+
+            if (!fsand.field_70135_K && d8 != par5)
+            {
+                par5 = 0.0D;
+                par3 = 0.0D;
+                par1 = 0.0D;
+            }
+
+            double d10;
+            double d11;
+            int k;
+            double d12;
+
+            if (fsand.stepHeight > 0.0F && flag1 && fsand.ySize < 0.05F && (d6 != par1 || d8 != par5))
+            {
+                d12 = par1;
+                d10 = par3;
+                d11 = par5;
+                par1 = d6;
+                par3 = (double)fsand.stepHeight;
+                par5 = d8;
+                AxisAlignedBB axisalignedbb1 = fsand.boundingBox.copy();
+                fsand.boundingBox.setBB(axisalignedbb);
+                list = world.getCollidingBoundingBoxes(fsand, fsand.boundingBox.addCoord(d6, par3, d8));
+
+                for (k = 0; k < list.size(); ++k)
+                {
+                    par3 = ((AxisAlignedBB)list.get(k)).calculateYOffset(fsand.boundingBox, par3);
+                }
+
+                fsand.boundingBox.offset(0.0D, par3, 0.0D);
+
+                if (!fsand.field_70135_K && d7 != par3)
+                {
+                    par5 = 0.0D;
+                    par3 = 0.0D;
+                    par1 = 0.0D;
+                }
+
+                for (k = 0; k < list.size(); ++k)
+                {
+                    par1 = ((AxisAlignedBB)list.get(k)).calculateXOffset(fsand.boundingBox, par1);
+                }
+
+                fsand.boundingBox.offset(par1, 0.0D, 0.0D);
+
+                if (!fsand.field_70135_K && d6 != par1)
+                {
+                    par5 = 0.0D;
+                    par3 = 0.0D;
+                    par1 = 0.0D;
+                }
+
+                for (k = 0; k < list.size(); ++k)
+                {
+                    par5 = ((AxisAlignedBB)list.get(k)).calculateZOffset(fsand.boundingBox, par5);
+                }
+
+                fsand.boundingBox.offset(0.0D, 0.0D, par5);
+
+                if (!fsand.field_70135_K && d8 != par5)
+                {
+                    par5 = 0.0D;
+                    par3 = 0.0D;
+                    par1 = 0.0D;
+                }
+
+                if (!fsand.field_70135_K && d7 != par3)
+                {
+                    par5 = 0.0D;
+                    par3 = 0.0D;
+                    par1 = 0.0D;
+                }
+                else
+                {
+                    par3 = (double)(-fsand.stepHeight);
+
+                    for (k = 0; k < list.size(); ++k)
+                    {
+                        par3 = ((AxisAlignedBB)list.get(k)).calculateYOffset(fsand.boundingBox, par3);
+                    }
+
+                    fsand.boundingBox.offset(0.0D, par3, 0.0D);
+                }
+
+                if (d12 * d12 + d11 * d11 >= par1 * par1 + par5 * par5)
+                {
+                    par1 = d12;
+                    par3 = d10;
+                    par5 = d11;
+                    fsand.boundingBox.setBB(axisalignedbb1);
+                }
+            }
+
+            fsand.posX = (fsand.boundingBox.minX + fsand.boundingBox.maxX) / 2.0D;
+            fsand.posY = fsand.boundingBox.minY + (double)fsand.yOffset - (double)fsand.ySize;
+            fsand.posZ = (fsand.boundingBox.minZ + fsand.boundingBox.maxZ) / 2.0D;
+            fsand.isCollidedHorizontally = d6 != par1 || d8 != par5;
+            fsand.isCollidedVertically = d7 != par3;
+            fsand.onGround = d7 != par3 && d7 < 0.0D;
+            fsand.isCollided = fsand.isCollidedHorizontally || fsand.isCollidedVertically;
+            //fsand.updateFallState(par3, fsand.onGround);
+
+            if (d6 != par1)
+            {
+                fsand.motionX = 0.0D;
+            }
+
+            if (d7 != par3)
+            {
+                fsand.motionY = 0.0D;
+            }
+
+            if (d8 != par5)
+            {
+                fsand.motionZ = 0.0D;
+            }
+
+            d12 = fsand.posX - d3;
+            d10 = fsand.posY - d4;
+            d11 = fsand.posZ - d5;
+        }
+    }
+	
+	public static void tickBlocksRandomMove(WorldServer wserver)
+    {
+        if ( skipMove ) return;
+        
+        Iterator var3 = wserver.activeChunkSet.iterator();
+        
+        while (var3.hasNext())
+        {
+            ChunkCoordIntPair var4 = (ChunkCoordIntPair)var3.next();
+            int var5 = var4.chunkXPos * 16;
+            int var6 = var4.chunkZPos * 16;
+            Chunk var7 = wserver.getChunkFromChunkCoords(var4.chunkXPos, var4.chunkZPos);
+
+            int var9;
+            int var10;
+            int var13;
+            
+            ExtendedBlockStorage[] var19 = var7.getBlockStorageArray();
+            var9 = var19.length;
+
+            for (var10 = 0; var10 < var9; ++var10)
+            {
+                ExtendedBlockStorage var21 = var19[var10];
+
+                if (var21 != null )
+                {
+                    for (int var20 = 0; var20 < 3; ++var20)
+                    {
+                    	updateLCG = updateLCG * 3 + 1013904223;
+                        var13 = updateLCG >> 2;
+                        int var14 = var13 & 15;
+                        int var15 = var13 >> 8 & 15;
+                        int var16 = var13 >> 16 & 15;
+                        String var17 = Block.blockRegistry.getNameForObject(var21.getBlockByExtId(var14, var16, var15));
+                        int m = var21.getExtBlockMetadata(var14, var16, var15);
+                        
+                        if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(var17),m).randomtick)
+                        {
+                        	BlockPhysics.tryToMove(wserver, var14 + var5, var16 + var21.getYLocation(), var15 + var6, var17, m, false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+	
+	public static void setSkipMove(long tickTime)
+    {
+    	
+    	if ( tickTime > ModConfig.maxTickTime )
+    	{
+    		if ( skipMove == false ) 
+    		{
+    			ModInfo.Log.info("Switching off physics ( "+tickTime+" ).",2 );
+    			skipMove = true;
+    		}
+    	}
+    	else 
+    	{
+    		if ( skipMove == true ) 
+    		{
+    			ModInfo.Log.info("Physics are working again ( "+tickTime+" ).",2);
+	    		skipMove = false;
+	    		nextrand = rand.nextInt(100);
+    		}
+    	}
+    }
+	
+	public static Block readFallingSandID(NBTTagCompound nbt)
+    {
+    	int bid;
+        if (nbt.hasKey("TileID")) bid = nbt.getInteger("TileID");
+    	else if (nbt.hasKey("BlockID")) bid = (int)nbt.getShort("BlockID");
+		else bid = nbt.getByte("Tile") & 255;
+    	if (bid < 1 || bid > 4095 ) bid = 3;
+		return (Block) Block.blockRegistry.getObjectById(bid);
+    }
+	
+	public static EntityFallingBlock createFallingsand(World world, double var2, double var4, double var6, S0EPacketSpawnObject par1Packet23VehicleSpawn )
+    {
+		EntityFallingBlock var8 = new EntityFallingBlock(world, var2, var4, var6, Block.getBlockById(par1Packet23VehicleSpawn.func_149009_m() & 4095), par1Packet23VehicleSpawn.func_149009_m() >> 16);
+        if (((par1Packet23VehicleSpawn.func_149009_m() >> 15) & 1) == 1) ((EntityFallingBlock)var8).setFire(60);
+        ((EntityFallingBlock)var8).slideDir = (byte) ((par1Packet23VehicleSpawn.func_149009_m() >> 12) & 7);
+        return var8;
+    }
+	
+	public static void onNeighborBlockChange(World par1World, int par2, int par3, int par4, String blockID)
+    {
+    	if (par1World.isRemote ) return;
+    	if (par1World.moveTickList == null)
+    	{
+    		ModInfo.Log.info("World tickList null - " + par1World.provider.dimensionId); 
+    		return;
+    	}
+    	
+    	par1World
+    	.moveTickList
+    	.scheduleBlockMoveUpdate(par1World, par2, par3, par4, blockID, 
+    			par1World
+    			.getBlockMetadata(par2, par3, par4), false);
+    }
+	
+	public static void onEntityCollidedWithBlock( World world, int par1, int par2, int par3, String blockID, Entity par5Entity)
+    {
+     	if ( DefinitionMaps.getBlockDef(blockID,world.getBlockMetadata(par1, par2, par3)).trapping ) par5Entity.setInWeb();
+	}
+	
+	public static void onPostBlockPlaced(World par1World, int par2, int par3, int par4, String blockID, int meta)
+    {
+    	if (!par1World.isRemote)
+    	{
+    		meta = meta & 15;
+    		if (DefinitionMaps.getBlockDef(blockID,meta).movenum == 2 ) setBlockBPdata( par1World,par2, par3, par4, 15 * DefinitionMaps.getBlockDef(blockID,meta).placedmove);
+    		notifyMove(par1World, par2, par3, par4);
+    	}
+    }
+	
+	public static void updatePistonState(World par1World, int par2, int par3, int par4, BlockPistonBase par1block, boolean isSticky)
+    {   
+		//ModInfo.Log.info("Attempting to update piston state");
+    	if (par1World.isRemote) return;
+		int var5 = par1World.getBlockMetadata(par2, par3, par4);
+        int var6 = par1block.getPistonOrientation(var5);
+        if ( var6 > 5 ) var6 = 0;
+        
+        int vv = 0;
+        if ( par1block.isIndirectlyPowered(par1World, par2, par3, par4, var6)) vv = 8;
+
+        if (vv == (var5 & 8)) return;
+        
+        int i2 = par2 + Facing.offsetsXForSide[var6];
+    	int j2 = par3 + Facing.offsetsYForSide[var6];
+    	int k2 = par4 + Facing.offsetsZForSide[var6];
+    	
+    	if ( par1World.getBlock(i2, j2, k2) == Blocks.piston_extension || par1World.pistonMoveBlocks.contains(""+par2+"."+par3+"."+par4)) return;
+
+    	int meta;
+    	String blid2;
+               
+        if ( vv == 8 )  //extending
+        {
+            int ext = 0;
+   		
+    		if (ModConfig.catapult && !skipMove && ((WorldServer)par1World).getEntityTracker().movingblocks < ModConfig.maxMovingBlocks)
+    		{
+    			//ModInfo.Log.info("Attempting to check for dispensers");
+    			boolean catapultpowered = false;
+    			boolean catapultprecise = true;
+    			int[] power = {0,0,0,0,0,0,0,0,0};
+    			int xpw = par2 - Facing.offsetsXForSide[var6];
+    			int ypw = par3 - Facing.offsetsYForSide[var6];
+    			int zpw = par4 - Facing.offsetsZForSide[var6];
+    			
+    			if ( par1World.getBlock(xpw,ypw,zpw) == Blocks.dispenser )
+    			{
+    	        	TileEntityDispenser tileentitydispenser = (TileEntityDispenser)par1World.getTileEntity(xpw, ypw, zpw);	
+    	        	if (tileentitydispenser != null)
+    	        	{
+    	        		//ModInfo.Log.info("Found tile entity dispenser");
+    	        		ItemStack powstack;
+    	        		for ( int pp = 0; pp < 9; pp++)
+    	        		{
+    	        			powstack = tileentitydispenser.getStackInSlot(pp);
+    	        			
+    	        			if ( catapultprecise && (pp == 0 || pp == 2 || pp == 6 || pp == 8) && ( powstack == null || powstack.getItem() != Items.gold_ingot || powstack.stackSize < 4 ) ) catapultprecise = false;
+	                		
+    	        			if ( powstack != null && powstack.getItem() == Items.redstone)
+    	        			{
+    	        				catapultpowered = true;
+    	        				power[pp] = powstack.stackSize;
+    	        				//ModInfo.Log.info("Found redstone in dispenser");
+    	        			}
+    	        		}
+    	        	}
+    	    	}
+    			
+    			if ( catapultpowered )
+    			{
+    				ext = canExtend(par1World, par2, par3, par4, var6, par1block, true);
+    	        	if ( ext == 0 ) return;
+    	        	//ModInfo.Log.info("Piston is powered and can extend");
+    				double pspX = 0, pspY = 0, pspZ = 0;
+    				switch ( var6 )
+            		{
+            			case 0:
+            			{
+            				pspX = -(double)power[0] / 3D + (double)power[2] / 3D - (double)power[6] / 3D + (double)power[8] / 3D - power[3] / 2D + power[5] / 2D;
+            				pspY = -( (double)power[4] + (double)power[0] / 3D + (double)power[6] / 3D + (double)power[2] / 3D + (double)power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D);
+            				pspZ = -(double)power[0] / 3D - (double)power[2] / 3D + (double)power[6] / 3D + (double)power[8] / 3D - power[1] / 2D + power[7] / 2D;
+            				break;
+            			}
+            			case 1:
+            			{
+            				pspX = -(double)power[0] / 3D + (double)power[2] / 3D - (double)power[6] / 3D + (double)power[8] / 3D - power[3] / 2D + power[5] / 2D;
+            				pspY = ( (double)power[4] + (double)power[0] / 3D + (double)power[6] / 3D + (double)power[2] / 3D + (double)power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D);
+            				pspZ = -(double)power[0] / 3D - (double)power[2] / 3D + (double)power[6] / 3D + (double)power[8] / 3D - power[1] / 2D + power[7] / 2D;
+            				break;
+            			}
+            			case 2:   	// - Z
+            			{
+            				pspX = (double)power[0] / 3D - (double)power[2] / 3D + (double)power[6] / 3D - (double)power[8] / 3D + power[3] / 2D - power[5] / 2D;
+            				pspY = (double)power[0] / 3D - (double)power[6] / 3D + (double)power[2] / 3D - (double)power[8] / 3D + power[1] / 2D - power[7] / 2D;
+            				pspZ = -( (double)power[4] + (double)power[0] / 3D + (double)power[6] / 3D + (double)power[2] / 3D + (double)power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D);
+            				break;
+            			}
+            			case 3:		// + Z
+            			{
+            				pspX = -( (double)power[0] / 3D - (double)power[2] / 3D + (double)power[6] / 3D - (double)power[8] / 3D + power[3] / 2D - power[5] / 2D );
+            				pspY = (double)power[0] / 3D - (double)power[6] / 3D + (double)power[2] / 3D - (double)power[8] / 3D + power[1] / 2D - power[7] / 2D;
+            				pspZ = (double)power[4] + (double)power[0] / 3D + (double)power[6] / 3D + (double)power[2] / 3D + (double)power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D;
+            				break;
+            			}
+            			case 4:		// - X
+            			{
+            				pspX = -( (double)power[4] + (double)power[0] / 3D + (double)power[6] / 3D + (double)power[2] / 3D + (double)power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D);
+            				pspY = (double)power[0] / 3D - (double)power[6] / 3D + (double)power[2] / 3D - (double)power[8] / 3D + power[1] / 2D - power[7] / 2D;
+            				pspZ = -( (double)power[0] / 3D - (double)power[2] / 3D + (double)power[6] / 3D - (double)power[8] / 3D + power[3] / 2D - power[5] / 2D );
+            				break;
+            			}
+            			case 5:		// + X
+            			{
+            				pspX = (double)power[4] + (double)power[0] / 3D + (double)power[6] / 3D + (double)power[2] / 3D + (double)power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D;
+            				pspY = (double)power[0] / 3D - (double)power[6] / 3D + (double)power[2] / 3D - (double)power[8] / 3D + power[1] / 2D - power[7] / 2D;
+            				pspZ = (double)power[0] / 3D - (double)power[2] / 3D + (double)power[6] / 3D - (double)power[8] / 3D + power[3] / 2D - power[5] / 2D;
+            				break;
+            			}
+            		}	
+    				
+    				pspX = pspX * 40D;
+	            	pspY = pspY * 40D;
+	            	pspZ = pspZ * 40D;
+	            	
+	            	double dirX = 1D;
+	            	if (pspX < 0) dirX = -1D;
+	            	double dirY = 1D;
+	            	if (pspY < 0) dirY = -1D;
+	            	double dirZ = 1D;
+	            	if (pspZ < 0) dirZ = -1D;
+	            	
+    	            double error = 1D;
+    	        	if ( catapultprecise ) error = 0D;
+    	        	        				
+    				int sticky = 0;
+    	    		if ( isSticky ) sticky = 1;
+    	    		
+    				int xx = par2 + ext * Facing.offsetsXForSide[var6];
+    	            int yy = par3 + ext * Facing.offsetsYForSide[var6];
+    	            int zz = par4 + ext * Facing.offsetsZForSide[var6];
+    	        	            	            
+	            	String blid = Block.blockRegistry.getNameForObject(par1World.getBlock(xx, yy, zz));
+	            	meta = par1World.getBlockMetadata(xx, yy, zz);
+	            		            	
+	            	if ( DefinitionMaps.getBlockDef(blid,meta).fragile > 0 )
+	            	{
+	            		if ( ((Block)Block.blockRegistry.getObject(blid)).hasTileEntity(meta) ) 
+	            		{
+	            			NBTTagCompound nnn = new NBTTagCompound();
+	            			par1World.getTileEntity(xx, yy, zz).writeToNBT(nnn);
+	            			dropItemsNBT(par1World, xx, yy, zz, nnn);            			
+	            			par1World.removeTileEntity(xx, yy, zz);
+	            		}
+	            	
+	            		if ( DefinitionMaps.getBlockDef(blid,meta).fragile == 2 ) ((Block)Block.blockRegistry.getObject(blid)).dropBlockAsItem( par1World, xx, yy, zz, meta, 0 );
+	            		
+	            		par1World.setBlockToAir(xx, yy, zz);
+	            	}
+	            		            	
+    	            int sstick = 1;
+    	            if (ext == 1) sstick = 0;
+    	            
+    	            int bxx = par2 + (ext + sticky * sstick) * Facing.offsetsXForSide[var6];
+    	            int byy = par3 + (ext + sticky * sstick) * Facing.offsetsYForSide[var6];
+    	            int bzz = par4 + (ext + sticky * sstick) * Facing.offsetsZForSide[var6];
+    	            
+    	            double smass = 0;
+    	            
+    	            for (int i = ext-1; i > sticky; i--)
+    	            {
+    	            	xx -= Facing.offsetsXForSide[var6]; 
+    	                yy -= Facing.offsetsYForSide[var6];
+    	                zz -= Facing.offsetsZForSide[var6];
+    	                blid2 = Block.blockRegistry.getNameForObject(par1World.getBlock(xx, yy, zz ));
+    	                meta = par1World.getBlockMetadata(xx, yy, zz);
+    	                Block bb = (Block)Block.blockRegistry.getObject(blid2);
+    	                if ( bb == Blocks.grass || bb == Blocks.farmland || bb == Blocks.mycelium ) blid2 = Block.blockRegistry.getNameForObject(Blocks.dirt);
+    	                smass += DefinitionMaps.getBlockDef(blid2,meta).mass;
+    	            }
+
+    	            if ( canMoveTo(par1World, bxx + Facing.offsetsXForSide[var6], byy + Facing.offsetsYForSide[var6], bzz + Facing.offsetsZForSide[var6], 0) )
+    	            {
+	    	            AxisAlignedBB axisalignedbb = AxisAlignedBB.getBoundingBox(bxx, byy, bzz, bxx + 1, byy + 1, bzz + 1 );
+	    	            List list = par1World.getEntitiesWithinAABBExcludingEntity(null, axisalignedbb);
+	    	            for (Iterator iterator = list.iterator(); iterator.hasNext(); )
+	    	            {
+    	            		if ( ((Entity)iterator.next()).ticksExisted < 6  ) iterator.remove();
+    	            	}	
+	    	            	    	            
+	    	            if (!list.isEmpty())
+	    	            {
+	    	            	Entity entity;
+	    	                
+	    	            	for (Iterator iterator = list.iterator(); iterator.hasNext(); )
+	    	                {
+	    	            		entity = (Entity)iterator.next();
+	    	            		if (entity instanceof EntityFallingBlock ) smass += DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(((EntityFallingBlock)entity).func_145805_f()),((EntityFallingBlock)entity).field_145814_a).mass;
+	    	            		else if (entity instanceof EntityLiving ) smass += ((double)((EntityLiving)entity).getMaxHealth() * 3D);
+	    	            		else smass += 25D;
+	    	                }	    	            	
+	    	            	
+	    	            	double sx,sy,sz;
+	    	            	for (Iterator iterator = list.iterator(); iterator.hasNext(); )
+	    	                {
+	    	                    entity = (Entity)iterator.next();	//optimize!
+
+	    	                    sx = (double)MathHelper.sqrt_double(Math.abs(pspX) / smass) * dirX + (error * rand.nextGaussian() * 0.02D);
+	    	                    sy = (double)MathHelper.sqrt_double(Math.abs(pspY) / smass) * dirY + (error * rand.nextGaussian() * 0.02D);
+	    	                    sz = (double)MathHelper.sqrt_double(Math.abs(pspZ) / smass) * dirZ + (error * rand.nextGaussian() * 0.02D);
+	    	                    entity.setPosition(entity.posX + (double)Facing.offsetsXForSide[var6], entity.posY + (double)Facing.offsetsYForSide[var6], entity.posZ + (double)Facing.offsetsZForSide[var6]);
+	    	                    entity.addVelocity(bSpeedR(sx), bSpeedR(sy), bSpeedR(sz));
+	    	                    entity.velocityChanged = true;
+	    	                    if ( entity instanceof net.minecraft.entity.player.EntityPlayerMP  )
+	    			            {	
+	    	                    	((EntityPlayerMP)entity).playerNetServerHandler.sendPacket(new S12PacketEntityVelocity(entity.getEntityId(), bSpeedR(sx), bSpeedR(sy), bSpeedR(sz)));
+	     			            }
+	    	                }
+	    	            }
+    	            }
+    	            
+    	            xx = par2 + ext * Facing.offsetsXForSide[var6];
+    	            yy = par3 + ext * Facing.offsetsYForSide[var6];
+    	            zz = par4 + ext * Facing.offsetsZForSide[var6];
+ 
+    	            pspX = (double)MathHelper.sqrt_double(Math.abs(pspX) / smass) * dirX + (error * rand.nextGaussian() * 0.02D);
+    	            pspY = (double)MathHelper.sqrt_double(Math.abs(pspY) / smass) * dirY + (error * rand.nextGaussian() * 0.02D);
+    	            pspZ = (double)MathHelper.sqrt_double(Math.abs(pspZ) / smass) * dirZ + (error * rand.nextGaussian() * 0.02D);
+    	            
+    	            for (int i = ext-1; i > sticky; i--)
+    	            {
+    	            	xx -= Facing.offsetsXForSide[var6]; 
+    	                yy -= Facing.offsetsYForSide[var6];
+    	                zz -= Facing.offsetsZForSide[var6];
+    	                blid2 = Block.blockRegistry.getNameForObject(par1World.getBlock(xx, yy, zz ));
+    	                meta = par1World.getBlockMetadata(xx , yy, zz);
+    	                Block bb = (Block)Block.blockRegistry.getObject(blid2);
+    	                if ( bb == Blocks.grass || bb == Blocks.farmland || bb == Blocks.mycelium ) blid2 = Block.blockRegistry.getNameForObject(Blocks.dirt);
+    	                if ( bb == Blocks.piston || bb == Blocks.sticky_piston ) meta = meta & 7;   	                
+    	                
+    	                EntityFallingBlock entityfallingsand = new EntityFallingBlock(par1World, 0.5D + xx + Facing.offsetsXForSide[var6], 0.5D + yy + Facing.offsetsYForSide[var6], 0.5D + zz + Facing.offsetsZForSide[var6], (Block)Block.blockRegistry.getObject(blid2), meta);
+	                  	entityfallingsand.motionX = bSpeedR(pspX + ( error * rand.nextGaussian() * 0.01D));
+    	                entityfallingsand.motionY = bSpeedR(pspY + ( error * rand.nextGaussian() * 0.01D));
+    	                entityfallingsand.motionZ = bSpeedR(pspZ + ( error * rand.nextGaussian() * 0.01D));
+    	                if (canBurn(blid2) )
+    	                {
+    	                	if ( i == ext - 1 && blid.equals(Block.blockRegistry.getNameForObject(Blocks.fire)) ) entityfallingsand.setFire(60);
+    	                	if ( par1World.getBlock(xx, yy+1, zz) == Blocks.fire ) entityfallingsand.setFire(60);
+    	                }
+    	                entityfallingsand.bpdata = getBlockBPdata( par1World, xx, yy, zz );
+    	                if ( ((Block)Block.blockRegistry.getObject(blid2)).hasTileEntity(meta) ) 
+    	                {
+    	                	entityfallingsand.field_145810_d = new NBTTagCompound();
+    	                	par1World.getTileEntity(xx, yy, zz).writeToNBT(entityfallingsand.field_145810_d);
+    	                	par1World.removeTileEntity(xx, yy, zz);
+    	                }
+    	                par1World.setBlockToAir( xx, yy, zz);
+    	                setBlockBPdata( par1World, xx, yy, zz, 0 );
+    	                par1World.spawnEntityInWorld(entityfallingsand);
+    	            }
+   	                           
+    	            if ( sticky == 1 ) 
+    	            {
+    	            	par1World.addBlockEvent(par2, par3, par4, par1block, 3, var6);   // var5??
+    	            	pistonMoveMark(par1World, par2, par3, par4, 2, var6);
+    	            }
+    	            else
+    	            {
+    	            	par1World.addBlockEvent(par2, par3, par4, par1block, 2, var6);
+    	            	pistonMoveMark(par1World, par2, par3, par4, 1, var6);
+    	            }
+    			}
+    			else
+    			{
+    				ext = canExtend(par1World, par2, par3, par4, var6, par1block, false);
+    				if ( ext == 0 )	return;
+    				par1World.addBlockEvent(par2, par3, par4, par1block, ext+1, var6);
+    				pistonMoveMark(par1World, par2, par3, par4, ext, var6);
+    			}
+    		}
+    		else
+    		{	
+    			ext = canExtend(par1World, par2, par3, par4, var6, par1block, false);
+    			if ( ext == 0 ) return;
+    			par1World.addBlockEvent(par2, par3, par4, par1block, ext+1, var6);
+    			pistonMoveMark(par1World, par2, par3, par4, ext, var6);
+    		}
+    		
+    		par1World.setBlockMetadataWithNotify(par2, par3, par4, (var5 | 8), 0);
+        }
+        else
+        {
+        	
+        	if ( isSticky )
+        	{
+        		int xx = par2 + 2 * Facing.offsetsXForSide[var6];
+        		int yy = par3 + 2 * Facing.offsetsYForSide[var6];
+        		int zz = par4 + 2 * Facing.offsetsZForSide[var6];
+        		blid2 = Block.blockRegistry.getNameForObject(par1World.getBlock(xx, yy, zz));
+        		meta = par1World.getBlockMetadata(xx, yy, zz);
+        		boolean pull = true;
+        		Block bb = ((Block)Block.blockRegistry.getObject(blid2));
+        		boolean empty = (bb == Blocks.air || bb == Blocks.water || bb == Blocks.flowing_water || bb == Blocks.lava || bb == Blocks.flowing_lava || bb == Blocks.fire || bb.getMaterial().isLiquid() );
+        		if (par1World.pistonMoveBlocks.contains(""+xx+"."+yy+"."+zz) || empty || (DefinitionMaps.getBlockDef(blid2,meta).pushtype != 1 && DefinitionMaps.getBlockDef(blid2,meta).pushtype != 2) ) pull = false;
+                else if ( ( bb == Blocks.piston || bb == Blocks.sticky_piston ) && !canmove(par1World, xx, yy, zz, par1block)) pull = false;
+                                
+                if ( pull )
+                {
+                	par1World.addBlockEvent(par2, par3, par4, par1block, 1, var6);
+                	pistonMoveMark(par1World, par2, par3, par4, 2, var6);
+                }
+                else
+                {
+                	par1World.addBlockEvent(par2, par3, par4, par1block, 0, var6);
+                	pistonMoveMark(par1World, par2, par3, par4, 1, var6);
+                }
+          	}
+        	else
+        	{
+        		par1World.addBlockEvent(par2, par3, par4, par1block, 0, var6);
+        		pistonMoveMark(par1World, par2, par3, par4, 1, var6);
+        	}
+        	
+        	par1World.setBlockMetadataWithNotify(par2, par3, par4, var5 & 7, 0);
+        }
+    }
+	
+	private static int canExtend(World par0World, int par1, int par2, int par3, int par4, BlockPistonBase par1block, boolean catp)
+    {	
+    	if (par0World.pistonMoveBlocks.contains(""+par1+"."+par2+"."+par3)) return 0;
+    	int var8, meta;
+    	String blid;
+        boolean empty;
+        //TileEntity ent;
+        for ( var8 = 1; var8 < 14; var8++ )
+        {
+        	
+        	par1 += Facing.offsetsXForSide[par4];
+            par2 += Facing.offsetsYForSide[par4];
+            par3 += Facing.offsetsZForSide[par4];
+            
+            if (par0World.pistonMoveBlocks.contains(""+par1+"."+par2+"."+par3)) return 0;
+            
+            blid = Block.blockRegistry.getNameForObject(par0World.getBlock(par1, par2, par3));
+            Block bb = (Block)Block.blockRegistry.getObject(blid);
+    		empty = (bb == Blocks.air || bb == Blocks.water || bb == Blocks.flowing_water || bb == Blocks.lava || bb == Blocks.flowing_lava || bb == Blocks.fire || bb.getMaterial().isLiquid() );
+    		if ( empty )
+			{
+				
+				if (par2 <= 0 || par2 >= par0World.getHeight() - 1) return 0;
+				else return var8;
+				
+			}
+    		
+    		meta = par0World.getBlockMetadata(par1, par2, par3);            
+            if ( DefinitionMaps.getBlockDef(blid,meta).pushtype == 0 ) 
+            {
+            	if (DefinitionMaps.getBlockDef(blid,meta).fragile == 0) return 0;
+            	else if (DefinitionMaps.getBlockDef(blid,meta).strength > 10) return 0;
+            	else return var8;
+            }
+            if (catp)
+            {
+            	if ( DefinitionMaps.getBlockDef(blid,meta).pushtype == 2 ) return 0;
+            }
+            else
+            {
+            	if ( DefinitionMaps.getBlockDef(blid,meta).pushtype == 3 ) return 0;
+            }
+            
+            
+            //ent =  par0World.getBlockTileEntity(par1, par2, par3);
+            //if ( ent != null ) return 0;
+                        
+            if ( (bb == Blocks.piston || bb == Blocks.sticky_piston) && !canmove(par0World, par1, par2, par3, par1block)) return 0;
+        }
+        return 0;
+    }
+	
+	static void pistonMoveMark(World world, int i, int j, int k, int lngth, int orient )
+    {
+    	int io = Facing.offsetsXForSide[orient];
+    	int jo = Facing.offsetsYForSide[orient];
+    	int ko = Facing.offsetsZForSide[orient];
+    	for (int l = 0; l <= lngth; l++)
+    	{
+    		world.pistonMoveBlocks.add(""+i+"."+j+"."+k);
+    		i = i + io;
+    		j = j + jo;
+    		k = k + ko;
+    	}
+    }
+	
+	public static boolean onBlockPistonEventReceived(World par1World, int par2, int par3, int par4, int par5, int par6, BlockPistonBase par1block, boolean isSticky)
+    {
+    	if ( par5 > 1 )	//extending
+        {
+            par5--;
+            int xx = par2 + par5 * Facing.offsetsXForSide[par6];
+            int yy = par3 + par5 * Facing.offsetsYForSide[par6];
+            int zz = par4 + par5 * Facing.offsetsZForSide[par6];
+        	
+            if (!par1World.isRemote)
+            {
+            	String blid = Block.blockRegistry.getNameForObject(par1World.getBlock(xx, yy, zz));
+            	int meta = par1World.getBlockMetadata(xx, yy, zz);
+            	            	
+            	if ( DefinitionMaps.getBlockDef(blid,meta).fragile > 0 )
+            	{
+            		if ( ((Block)Block.blockRegistry.getObject(blid)).hasTileEntity(meta) ) 
+            		{
+            			NBTTagCompound nnn = new NBTTagCompound();
+            			par1World.getTileEntity(xx, yy, zz).writeToNBT(nnn);
+            			dropItemsNBT(par1World, xx, yy, zz, nnn);            			
+            			par1World.removeTileEntity(xx, yy, zz);
+            		}
+            	
+            		if ( DefinitionMaps.getBlockDef(blid,meta).fragile == 2 ) ((Block)Block.blockRegistry.getObject(blid)).dropBlockAsItem( par1World, xx, yy, zz, meta, 0 );
+            		
+            		par1World.setBlockToAir(xx, yy, zz);
+            	}
+            }
+        	
+            for (int i = par5; i > 1; i--)
+            {
+            	int xxf =  xx - Facing.offsetsXForSide[par6];
+            	int yyf =  yy - Facing.offsetsYForSide[par6];
+            	int zzf =  zz - Facing.offsetsZForSide[par6];
+            	
+            	String var12 = Block.blockRegistry.getNameForObject(par1World.getBlock(xxf, yyf, zzf));
+                int var13 = par1World.getBlockMetadata(xxf, yyf, zzf);
+                int bpmeta = getBlockBPdata(par1World, xxf, yyf, zzf);
+                
+                Block bb = (Block)Block.blockRegistry.getObject(var12);
+                
+                if ( bb == Blocks.piston || bb == Blocks.sticky_piston )  var13 = var13 & 7;       
+                
+                TileEntityPiston tePiston = new TileEntityPiston(bb, var13, par6, true, false);
+                tePiston.bpmeta = bpmeta;
+                
+                if ( ((Block)Block.blockRegistry.getObject(var12)).hasTileEntity(var13) )
+                {
+                	tePiston.movingBlockTileEntityData = new NBTTagCompound();
+                	par1World.getTileEntity(xxf, yyf, zzf).writeToNBT(tePiston.movingBlockTileEntityData);
+                	par1World.removeTileEntity(xxf, yyf, zzf);
+                }
+                
+                par1World.setBlock(xx, yy, zz, Blocks.piston_extension, var13, 2);
+                par1World.setTileEntity(xx, yy, zz, tePiston);
+                xx -= Facing.offsetsXForSide[par6];
+                yy -= Facing.offsetsYForSide[par6];
+                zz -= Facing.offsetsZForSide[par6];
+            }
+            par1World.setBlock(par2 + Facing.offsetsXForSide[par6], par3 + Facing.offsetsYForSide[par6], par4 + Facing.offsetsZForSide[par6], Blocks.piston_extension, par6 | (isSticky ? 8 : 0), 2);
+            par1World.setTileEntity(par2 + Facing.offsetsXForSide[par6], par3 + Facing.offsetsYForSide[par6], par4 + Facing.offsetsZForSide[par6], BlockPistonMoving.getTileEntity(Blocks.piston_head, par6 | (isSticky ? 8 : 0), par6, true, true));
+            par1World.setBlock(par2, par3, par4, par1block, par6 | 8, 2);
+           
+            par1World.playSoundEffect((double)par2 + 0.5D, (double)par3 + 0.5D, (double)par4 + 0.5D, "tile.piston.out", 0.5F, rand.nextFloat() * 0.25F + 0.6F);
+        }
+        else				//retracting  (0 normal, 1 sticky )
+        {
+            par1World.setBlock(par2, par3, par4, Blocks.piston_extension, par6, 2);
+            par1World.setTileEntity(par2, par3, par4, BlockPistonMoving.getTileEntity(par1block, par6, par6, false, true));
+
+            if ( par5 == 0 )    
+            {
+            	par1World.setBlockToAir(par2 + Facing.offsetsXForSide[par6], par3 + Facing.offsetsYForSide[par6], par4 + Facing.offsetsZForSide[par6]);
+            }
+            else
+            {
+            	int var8 = par2 + Facing.offsetsXForSide[par6] * 2;
+                int var9 = par3 + Facing.offsetsYForSide[par6] * 2;
+                int var10 = par4 + Facing.offsetsZForSide[par6] * 2;
+                String var11 = Block.blockRegistry.getNameForObject(par1World.getBlock(var8, var9, var10));
+                int var12 = par1World.getBlockMetadata(var8, var9, var10);
+                int bpmeta = getBlockBPdata(par1World, var8, var9, var10);
+                
+                TileEntityPiston tePiston = new TileEntityPiston((Block)Block.blockRegistry.getObject(var11), var12, par6, false, false);
+                tePiston.bpmeta = bpmeta;
+                
+                if ( ((Block)Block.blockRegistry.getObject(var11)).hasTileEntity(var12) )
+                {
+                	tePiston.movingBlockTileEntityData = new NBTTagCompound();
+                	par1World.getTileEntity(var8, var9, var10).writeToNBT(tePiston.movingBlockTileEntityData);
+                	par1World.removeTileEntity(var8, var9, var10);
+                }
+                               
+                par2 += Facing.offsetsXForSide[par6];
+                par3 += Facing.offsetsYForSide[par6];
+                par4 += Facing.offsetsZForSide[par6];
+                par1World.setBlock(par2, par3, par4, Blocks.piston_extension, var12, 0);
+                par1World.setTileEntity(par2, par3, par4, tePiston);
+                par1World.setBlockToAir(var8, var9, var10);
+            }
+            par1World.playSoundEffect((double)par2 + 0.5D, (double)par3 + 0.5D, (double)par4 + 0.5D, "tile.piston.in", 0.5F, rand.nextFloat() * 0.15F + 0.6F);
+        }
+    	return true;
+    }
+}
