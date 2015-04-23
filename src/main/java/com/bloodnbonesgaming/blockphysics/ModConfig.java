@@ -189,7 +189,7 @@ public class ModConfig
             config.get("block definitions", "glass", new String[]{"movenum:2", "movedef1:default", "movedef2:glass", "moveflipnumber:10", "movechanger:2", "supportingblock:1", "fragile:1", "trapping:false", "pushtype:1", "randomtick:false", "tickrate:4", "placedmove:1", "mass:500", "strength:1000"}).getStringList();
             config.get("block definitions", "grass", new String[]{"movenum:1", "movedef1:grass", "movedef2:default", "moveflipnumber:0", "movechanger:0", "supportingblock:0", "fragile:0", "trapping:true", "pushtype:1", "randomtick:true", "tickrate:5", "placedmove:0", "mass:1500", "strength:64000"}).getStringList();
             config.get("block definitions", "ice", new String[]{"movenum:0", "movedef1:default", "movedef2:default", "moveflipnumber:0", "movechanger:0", "supportingblock:0", "fragile:1", "trapping:false", "pushtype:1", "randomtick:false", "tickrate:4", "placedmove:0", "mass:1000", "strength:500"}).getStringList();
-            config.get("block definitions", "leaves", new String[]{"movenum:0", "movedef1:leaves", "movedef2:leaves2", "moveflipnumber:15", "movechanger:0", "supportingblock:0", "fragile:1", "trapping:false", "pushtype:1", "randomtick:true", "tickrate:4", "placedmove:1", "mass:40", "strength:10"}).getStringList();
+            config.get("block definitions", "leaves", new String[]{"movenum:1", "movedef1:leaves", "movedef2:leaves2", "moveflipnumber:15", "movechanger:0", "supportingblock:0", "fragile:1", "trapping:false", "pushtype:1", "randomtick:true", "tickrate:4", "placedmove:1", "mass:40", "strength:10"}).getStringList();
             config.get("block definitions", "litpumpkin", new String[]{"movenum:1", "movedef1:litpumpkin", "movedef2:default", "moveflipnumber:0", "movechanger:0", "supportingblock:0", "fragile:1", "trapping:false", "pushtype:1", "randomtick:true", "tickrate:4", "placedmove:0", "mass:50", "strength:20"}).getStringList();
             config.get("block definitions", "metalblock", new String[]{"movenum:0", "movedef1:default", "movedef2:default", "moveflipnumber:0", "movechanger:0", "supportingblock:1", "fragile:0", "trapping:false", "pushtype:1", "randomtick:false", "tickrate:4", "placedmove:0", "mass:6000", "strength:64000"}).getStringList();
             config.get("block definitions", "misc", new String[]{"movenum:0", "movedef1:default", "movedef2:default", "moveflipnumber:0", "movechanger:0", "supportingblock:0", "fragile:2", "trapping:false", "pushtype:0", "randomtick:false", "tickrate:4", "placedmove:0", "mass:10", "strength:0"}).getStringList();
@@ -351,7 +351,11 @@ public class ModConfig
             config.get("blocks", "stonebrick", new String[]{"minecraft:stonebrick", "minecraft:quartz_block", "minecraft:quartz_stairs", "minecraft:monster_egg", "minecraft:double_stone_slab", "minecraft:stone_slab", "minecraft:stone_brick_stairs", "minecraft:iron_bars"}).getStringList();
             config.get("blocks", "tnt", new String[]{"minecraft:tnt"}).getStringList();
             config.get("blocks", "unconfigured", new String[]{"minecraft:water", "minecraft:air", "minecraft:bedrock", "minecraft:flowing_water", "minecraft:flowing_lava", "minecraft:lava", "minecraft:fire", "minecraft:mob_spawner", "minecraft:bed", "minecraft:wooden_door", "minecraft:iron_door", "minecraft:portal", "minecraft:trapdoor", "minecraft:end_portal", "minecraft:end_portal_frame", "minecraft:command_block", "minecraft:fence_gate"}).getStringList();
-			
+            config.get("blocks", "wall", new String[]{"minecraft:cobblestone_wall"}).getStringList();
+            config.get("blocks", "web", new String[]{"minecraft:web"}).getStringList();
+            config.get("blocks", "wood", new String[]{"minecraft:log", "minecraft:log2"}).getStringList();
+            config.get("blocks", "wool", new String[]{"minecraft:wool", "minecraft:sponge"}).getStringList();
+            
 			categoryMap = config.getCategory("blocks");
 		}
 

@@ -14,6 +14,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentProtection;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityTNTPrimed;
@@ -1823,12 +1824,12 @@ public class BlockPhysics
 			    		moveZ = jumpPosZ - fsand.posZ;
 				    	break;
 			    	}
-			    	else if ( collent instanceof EntityLiving )
+			    	else if ( collent instanceof EntityLivingBase )
 			    	{
 			    		//entityCollide(world, fsand, collent, (double)((EntityLiving) collent).getMaxHealth() * 3.0D, true);
 			    		
 			    		double m1 = (double)DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).mass;
-			        	double m2 = (double)((EntityLiving) collent).getMaxHealth() * 3.0D;
+			        	double m2 = (double)((EntityLivingBase) collent).getMaxHealth() * 3.0D;
 			        	double smass =  m1 + m2;
 			    		double vv;
 			    		double damage = fsand.motionX*fsand.motionX + fsand.motionY*fsand.motionY + fsand.motionZ*fsand.motionZ;
@@ -1872,7 +1873,11 @@ public class BlockPhysics
 				                world.playSoundAtEntity(collent, "damage.fallbig", 1.0F, 1.0F);
 				            }
 				           
-				    		if ( !world.isRemote ) ((EntityLiving)collent).attackEntityFrom(DamageSource.fallingBlock, d);	
+				    		if ( !world.isRemote )
+				    		{
+				    		    ModInfo.Log.info("Attacking entity for " + d + " damage.");
+				    		    ((EntityLivingBase)collent).attackEntityFrom(DamageSource.fallingBlock, d);
+				    		}
 						}				    		
 			    		
 			    		if ( !world.isRemote )
@@ -2289,9 +2294,9 @@ public class BlockPhysics
         }
     }
 	
-	public static void tickBlocksRandomMove(WorldServer wserver)
+	public static void tickBlocksRandomMove(WorldServer worldServer)
     {
-        if ( skipMove ) return;
+        /*if ( skipMove ) return;
         
         Iterator var3 = wserver.activeChunkSet.iterator();
         
@@ -2332,7 +2337,53 @@ public class BlockPhysics
                     }
                 }
             }
-        }
+        }*/
+	    ModInfo.Log.info("Attempting to run random ticks.");
+	    if (skipMove)
+	        return;
+	    
+	    Iterator chunkIterator = worldServer.activeChunkSet.iterator();
+	    
+	    while (chunkIterator.hasNext())
+	    {
+	        ModInfo.Log.info("Iterating through active chunks.");
+	        ChunkCoordIntPair chunkCoords = (ChunkCoordIntPair)chunkIterator.next();
+	        int x = chunkCoords.chunkXPos * 16;
+	        int z = chunkCoords.chunkXPos * 16;
+	        
+	        Chunk chunk = worldServer.getChunkFromChunkCoords(chunkCoords.chunkXPos, chunkCoords.chunkZPos);
+
+            int var13;
+            
+            ExtendedBlockStorage[] blockStorageArray = chunk.getBlockStorageArray();
+            int storageArrayLength = blockStorageArray.length;
+
+            for (int i = 0; i < storageArrayLength; i++)
+            {
+                ExtendedBlockStorage blockStorage = blockStorageArray[i];
+
+                if (blockStorage != null )
+                {
+                    for (int var20 = 0; var20 < 3; ++var20)
+                    {
+                        ModInfo.Log.info("Iterating through blocks.");
+                        updateLCG = updateLCG * 3 + 1013904223;
+                        var13 = updateLCG >> 2;
+                        int xx = var13 & 15;
+                        int zz = var13 >> 8 & 15;
+                        int yy = var13 >> 16 & 15;
+                        String blockName = Block.blockRegistry.getNameForObject(blockStorage.getBlockByExtId(xx, yy, zz));
+                        int m = blockStorage.getExtBlockMetadata(xx, yy, zz);
+                        
+                        if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(blockName),m).randomtick)
+                        {
+                            ModInfo.Log.info("Attempting to move block.");
+                            BlockPhysics.tryToMove(worldServer, xx + x, yy + blockStorage.getYLocation(), zz + z, blockName, m, false);
+                        }
+                    }
+                }
+            }
+	    }
     }
 	
 	public static void setSkipMove(long tickTime)
