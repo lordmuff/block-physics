@@ -2338,7 +2338,6 @@ public class BlockPhysics
                 }
             }
         }*/
-	    ModInfo.Log.info("Attempting to run random ticks.");
 	    if (skipMove)
 	        return;
 	    
@@ -2346,7 +2345,6 @@ public class BlockPhysics
 	    
 	    while (chunkIterator.hasNext())
 	    {
-	        ModInfo.Log.info("Iterating through active chunks.");
 	        ChunkCoordIntPair chunkCoords = (ChunkCoordIntPair)chunkIterator.next();
 	        int x = chunkCoords.chunkXPos * 16;
 	        int z = chunkCoords.chunkXPos * 16;
@@ -2366,7 +2364,6 @@ public class BlockPhysics
                 {
                     for (int var20 = 0; var20 < 3; ++var20)
                     {
-                        ModInfo.Log.info("Iterating through blocks.");
                         updateLCG = updateLCG * 3 + 1013904223;
                         var13 = updateLCG >> 2;
                         int xx = var13 & 15;
@@ -2374,10 +2371,9 @@ public class BlockPhysics
                         int yy = var13 >> 16 & 15;
                         String blockName = Block.blockRegistry.getNameForObject(blockStorage.getBlockByExtId(xx, yy, zz));
                         int m = blockStorage.getExtBlockMetadata(xx, yy, zz);
-                        
-                        if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(blockName),m).randomtick)
+
+                        if (DefinitionMaps.getBlockDef(blockName, m).randomtick)
                         {
-                            ModInfo.Log.info("Attempting to move block.");
                             BlockPhysics.tryToMove(worldServer, xx + x, yy + blockStorage.getYLocation(), zz + z, blockName, m, false);
                         }
                     }
