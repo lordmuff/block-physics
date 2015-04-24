@@ -1,9 +1,6 @@
 package com.bloodnbonesgaming.blockphysics.asm;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import net.minecraft.launchwrapper.IClassTransformer;
 
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -39,85 +36,12 @@ import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleRenderFallingBlockCl
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleTileEntityPistonClass;
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleWorldClass;
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleWorldServerClass;
+import com.bnbgaming.lib.core.BNBGamingClassTransformer;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
+import com.google.common.collect.Lists;
 
-public class ClassTransformer implements IClassTransformer
+public class ClassTransformer extends BNBGamingClassTransformer
 {
-	private static final List<IClassTransformerModule> transformerModules = new ArrayList<IClassTransformerModule>();
-	static
-	{
-		registerTransformerModule(new ModuleBlockClass());
-		registerTransformerModule(new ModuleBlockAnvilClass());
-		registerTransformerModule(new ModuleBlockChestClass());
-		registerTransformerModule(new ModuleBlockDispenserClass());
-		registerTransformerModule(new ModuleBlockDragonEggClass());
-		registerTransformerModule(new ModuleBlockFallingClass());
-		registerTransformerModule(new ModuleBlockFarmlandClass());
-		registerTransformerModule(new ModuleBlockFurnaceClass());
-		registerTransformerModule(new ModuleBlockPistonBaseClass());
-		registerTransformerModule(new ModuleBlockRailBaseClass());
-		registerTransformerModule(new ModuleBlockRedstoneLightClass());
-		registerTransformerModule(new ModuleBlockTNTClass());
-		registerTransformerModule(new ModuleBlockWebClass());
-		registerTransformerModule(new ModuleNetHandlerPlayClientClass());
-		registerTransformerModule(new ModuleRenderFallingBlockClass());
-		registerTransformerModule(new ModuleEntityBoatClass());
-		registerTransformerModule(new ModuleEntityFallingBlockClass());
-		registerTransformerModule(new ModuleEntityMinecartClass());
-		registerTransformerModule(new ModuleEntityTNTPrimedClass());
-		registerTransformerModule(new ModuleEntityXPOrbClass());
-		registerTransformerModule(new ModuleEntityClass());
-		registerTransformerModule(new ModuleEntityTrackerClass());
-		registerTransformerModule(new ModuleEntityTrackerEntryClass());
-		registerTransformerModule(new ModuleMinecraftServerClass());
-		registerTransformerModule(new ModuleTileEntityPistonClass());
-		registerTransformerModule(new ModuleAnvilChunkLoaderClass());
-		registerTransformerModule(new ModuleExtendedBlockStorageClass());
-		registerTransformerModule(new ModuleChunkClass());
-		registerTransformerModule(new ModuleExplosionClass());
-		registerTransformerModule(new ModuleWorldClass());
-		registerTransformerModule(new ModuleWorldServerClass());
-	}
-
-	public static void registerTransformerModule(IClassTransformerModule transformerModule)
-	{
-		transformerModules.add(transformerModule);
-	}
-
-	public static void disableTransformerModule(String name)
-	{
-		IClassTransformerModule moduleToRemove = null;
-		for (IClassTransformerModule transformerModule : transformerModules)
-		{
-			if (transformerModule.getModuleName().equals(name))
-			{
-				moduleToRemove = transformerModule;
-				break;
-			}
-		}
-		if (moduleToRemove != null)
-			transformerModules.remove(moduleToRemove);
-	}
-
-	public static IClassTransformerModule[] getTransformerModules()
-	{
-		return transformerModules.toArray(new IClassTransformerModule[0]);
-	}
-
-	@Override
-	public byte[] transform(String name, String transformedName, byte[] basicClass)
-	{
-		for (IClassTransformerModule transformerModule : transformerModules)
-		{
-			for (String classToTransform : transformerModule.getClassesToTransform())
-			{
-				if (classToTransform.equals(transformedName))
-				{
-					basicClass = transformerModule.transform(name, transformedName, basicClass);
-				}
-			}
-		}
-		return basicClass;
-	}
 	
 	public static FieldNode findFieldNodeOfClass(ClassNode classNode, String fieldName, String fieldDesc)
 	{
@@ -129,5 +53,45 @@ public class ClassTransformer implements IClassTransformer
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public List<IClassTransformerModule> createModules() {
+		return Lists.newArrayList(new ModuleBlockClass(),
+				new ModuleBlockAnvilClass(),
+				new ModuleBlockChestClass(),
+				new ModuleBlockDispenserClass(),
+				new ModuleBlockDragonEggClass(),
+				new ModuleBlockFallingClass(),
+				new ModuleBlockFarmlandClass(),
+				new ModuleBlockFurnaceClass(),
+				new ModuleBlockPistonBaseClass(),
+				new ModuleBlockRailBaseClass(),
+				new ModuleBlockRedstoneLightClass(),
+				new ModuleBlockTNTClass(),
+				new ModuleBlockWebClass(),
+				new ModuleNetHandlerPlayClientClass(),
+				new ModuleRenderFallingBlockClass(),
+				new ModuleEntityBoatClass(),
+				new ModuleEntityFallingBlockClass(),
+				new ModuleEntityMinecartClass(),
+				new ModuleEntityTNTPrimedClass(),
+				new ModuleEntityXPOrbClass(),
+				new ModuleEntityClass(),
+				new ModuleEntityTrackerClass(),
+				new ModuleEntityTrackerEntryClass(),
+				new ModuleMinecraftServerClass(),
+				new ModuleTileEntityPistonClass(),
+				new ModuleAnvilChunkLoaderClass(),
+				new ModuleExtendedBlockStorageClass(),
+				new ModuleChunkClass(),
+				new ModuleExplosionClass(),
+				new ModuleWorldClass(),
+				new ModuleWorldServerClass());
+	}
+
+	@Override
+	public byte[] transform(String name, String transformedName, byte[] basicClass) {
+		return basicClass;
 	}
 }

@@ -15,7 +15,6 @@ import static org.objectweb.asm.Opcodes.POP;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import static org.objectweb.asm.Opcodes.RETURN;
 
-import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
@@ -30,8 +29,9 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.ClassTransformer;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -64,13 +64,7 @@ public class ModuleTileEntityPistonClass implements IClassTransformerModule
 		
 		if (transformedName.equals("net.minecraft.tileentity.TileEntityPiston"))
 		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
-			
-			createMovingBlockTileEntityData(classNode);
-			createBPMeta(classNode);
-			
-			verifyFieldAdded(classNode, "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;");
-			verifyFieldAdded(classNode, "bpmeta", "I");
+			ASMPlugin.log.info("Transforming class: " + transformedName);
 			
 			//"<init>", "(Lnet/minecraft/block/Block;IIZZ)V"
 			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "(Lnet/minecraft/block/Block;IIZZ)V");
@@ -120,28 +114,6 @@ public class ModuleTileEntityPistonClass implements IClassTransformerModule
             return ASMHelper.writeClassToBytes(classNode);
 		}
 		return bytes;
-	}
-	
-	public void verifyFieldAdded(ClassNode classNode, String name, String desc)
-	{
-		FieldNode fieldNode = ClassTransformer.findFieldNodeOfClass(classNode, name, desc);
-		if (fieldNode != null)
-		{
-			ModInfo.Log.info("Successfully added field: " + fieldNode.name + fieldNode.desc + " in " + classNode.name);
-		} else
-			throw new RuntimeException("Could not create field: " + name + desc + " in " + classNode.name);
-	}
-	
-	public void createMovingBlockTileEntityData(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", null, null);
-		fieldVisitor.visitEnd();
-	}
-	
-	public void createBPMeta(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "bpmeta", "I", null, null);
-		fieldVisitor.visitEnd();
 	}
 	
 	public void transformInit(MethodNode method)
@@ -323,5 +295,11 @@ public class ModuleTileEntityPistonClass implements IClassTransformerModule
 		toInject.add(label1);
 		
 		method.instructions.insertBefore(target, toInject);
+	}
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry registry) {
+		registry.registerFieldAddition("net.minecraft.tileentity.TileEntityPiston", new FieldNode(ACC_PUBLIC, "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", null, null));
+		registry.registerFieldAddition("net.minecraft.tileentity.TileEntityPiston", new FieldNode(ACC_PUBLIC, "bpmeta", "I", null, null));
 	}
 }

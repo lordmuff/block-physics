@@ -25,11 +25,8 @@ import static org.objectweb.asm.Opcodes.PUTFIELD;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.MethodNode;
-
-import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -58,31 +55,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] bytes)
 	{
-		ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
-		
-		if (transformedName.equals("net.minecraft.world.chunk.Chunk"))
-		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
-			
-			createGetBlockBPdata(classNode);
-			createSetBlockBPdata(classNode);
-			
-			verifyMethodAdded(classNode, "getBlockBPdata", "(III)I");
-			verifyMethodAdded(classNode, "setBlockBPdata", "(IIII)Z");
-            
-            return ASMHelper.writeClassToBytes(classNode);
-		}
 		return bytes;
-	}
-
-	public void verifyMethodAdded(ClassNode classNode, String name, String desc)
-	{
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, name, desc);
-		if (methodNode != null)
-		{
-			ModInfo.Log.info("Successfully added method: " + methodNode.name + methodNode.desc + " in " + classNode.name);
-		} else
-			throw new RuntimeException("Could not create method: " + name + desc + " in " + classNode.name);
 	}
 	
 	public void createSetBlockBPdata(ClassNode classNode)
@@ -212,5 +185,16 @@ public class ModuleChunkClass implements IClassTransformerModule
 		methodVisitor.visitInsn(IRETURN);
 		methodVisitor.visitMaxs(4, 5);
 		methodVisitor.visitEnd();
+	}
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry registry) {
+		ClassNode classNode = new ClassNode();
+		
+		createGetBlockBPdata(classNode);
+		createSetBlockBPdata(classNode);
+		
+		registry.registerMethodAddition("net.minecraft.world.chunk.Chunk", ASMHelper.findMethodNodeOfClass(classNode, "getBlockBPdata", "(III)I"));
+		registry.registerMethodAddition("net.minecraft.world.chunk.Chunk", ASMHelper.findMethodNodeOfClass(classNode, "setBlockBPdata", "(IIII)Z"));
 	}
 }

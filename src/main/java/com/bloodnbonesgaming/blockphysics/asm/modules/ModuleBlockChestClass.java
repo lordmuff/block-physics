@@ -6,14 +6,14 @@ import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -46,7 +46,7 @@ public class ModuleBlockChestClass implements IClassTransformerModule
 		
 		if (transformedName.equals("net.minecraft.block.BlockChest"))
 		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
+			ASMPlugin.log.info("Transforming class: " + transformedName);
 			
 			//"onBlockAdded", "(Lnet/minecraft/world/World;III)V"
 			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149726_b", "(Lnet/minecraft/world/World;III)V");
@@ -81,4 +81,7 @@ public class ModuleBlockChestClass implements IClassTransformerModule
 		
 		ASMHelper.removeFromInsnListUntil(method.instructions, start, end);
 	}
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry arg0) {}
 }

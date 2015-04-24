@@ -2,8 +2,6 @@ package com.bloodnbonesgaming.blockphysics.util;
 
 import java.util.HashMap;
 
-import com.bloodnbonesgaming.blockphysics.ModInfo;
-
 public class DefinitionMaps
 {
 	private static HashMap<String, MoveDef> moveDefMap = new HashMap<String, MoveDef>();

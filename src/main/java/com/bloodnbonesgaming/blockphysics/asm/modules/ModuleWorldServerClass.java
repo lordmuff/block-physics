@@ -11,7 +11,6 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
@@ -20,7 +19,9 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -53,7 +54,7 @@ public class ModuleWorldServerClass implements IClassTransformerModule
 		
 		if (transformedName.equals("net.minecraft.world.WorldServer"))
 		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
+			ASMPlugin.log.info("Transforming class: " + transformedName);
 							
 			//"tick", "()V"
 			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_72835_b", "()V");
@@ -145,4 +146,7 @@ public class ModuleWorldServerClass implements IClassTransformerModule
 		
 		method.instructions.insert(target, toInject);
 	}
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry arg0) {}
 }

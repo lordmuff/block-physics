@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.BlockPistonMoving;
@@ -57,6 +56,9 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.util.DefinitionMaps;
+import com.bloodnbonesgaming.blockphysics.util.TypeHelper;
+import com.bnbgaming.lib.BNBGamingMod;
+import com.bnbgaming.lib.core.ASMAdditionHelper;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -67,7 +69,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
 @Mod(modid = ModInfo.MODID, version = ModInfo.VERSION, dependencies = "")
-public class BlockPhysics
+public class BlockPhysics extends BNBGamingMod
 {
 	@Instance("BlockPhysics")
 	public static BlockPhysics instance;
@@ -97,7 +99,7 @@ public class BlockPhysics
 	
 	public static void printMethod(MethodNode method)
 	{
-		ModInfo.Log.info("Printing: " + method.name);
+		BlockPhysics.instance.log.info("Printing: " + method.name);
 		for (int i = 0; i < method.instructions.size() - 1; i++)
 		{
 			AbstractInsnNode node = method.instructions.get(i);
@@ -105,56 +107,56 @@ public class BlockPhysics
 			if (node instanceof LineNumberNode)
 			{
 				LineNumberNode nodey = (LineNumberNode)node;
-				ModInfo.Log.info("DEBUG111 - LineNumber: " + nodey.line);
+				BlockPhysics.instance.log.info("DEBUG111 - LineNumber: " + nodey.line);
 			}
 			else if (node instanceof MethodInsnNode)
 			{
 				MethodInsnNode nodey = (MethodInsnNode)node;
-				ModInfo.Log.info("DEBUG111 - MethodNode: " + nodey.owner + " : " + nodey.name + " : " + nodey.desc);
+				BlockPhysics.instance.log.info("DEBUG111 - MethodNode: " + nodey.owner + " : " + nodey.name + " : " + nodey.desc);
 			}
 			else if (node instanceof VarInsnNode)
 			{
 				VarInsnNode nodey = (VarInsnNode)node;
-				ModInfo.Log.info("DEBUG111 - VarNode: " + nodey.getOpcode() + " : " + nodey.var);
+				BlockPhysics.instance.log.info("DEBUG111 - VarNode: " + nodey.getOpcode() + " : " + nodey.var);
 			}
 			else if (node instanceof FieldInsnNode)
 			{
 				FieldInsnNode nodey = (FieldInsnNode)node;
-				ModInfo.Log.info("DEBUG111 - FieldNode: " + nodey.owner + " : " + nodey.name + " : " + nodey.desc);
+				BlockPhysics.instance.log.info("DEBUG111 - FieldNode: " + nodey.owner + " : " + nodey.name + " : " + nodey.desc);
 			}
 			else if (node instanceof LdcInsnNode)
 			{
 				LdcInsnNode nodey = (LdcInsnNode)node;
-				ModInfo.Log.info("DEBUG111 - LdcNode: " + nodey.getOpcode() + " : " + nodey.cst);
+				BlockPhysics.instance.log.info("DEBUG111 - LdcNode: " + nodey.getOpcode() + " : " + nodey.cst);
 			}
 			else if (node instanceof TypeInsnNode)
 			{
 				TypeInsnNode nodey = (TypeInsnNode)node;
-				ModInfo.Log.info("DEBUG111 - TypeNode: " + nodey.getOpcode() + " : " + nodey.desc);
+				BlockPhysics.instance.log.info("DEBUG111 - TypeNode: " + nodey.getOpcode() + " : " + nodey.desc);
 			}
 			else if (node instanceof FrameNode)
 			{
 				FrameNode nodey = (FrameNode)node;
-				ModInfo.Log.info("DEBUG111 - FrameNode: " + nodey.getOpcode() + " : " + nodey.type);
+				BlockPhysics.instance.log.info("DEBUG111 - FrameNode: " + nodey.getOpcode() + " : " + nodey.type);
 			}
 			else if (node instanceof JumpInsnNode)
 			{
 				JumpInsnNode nodey = (JumpInsnNode)node;
-				ModInfo.Log.info("DEBUG111 - JumpNode: " + nodey.getOpcode() + " : " + nodey.label);
+				BlockPhysics.instance.log.info("DEBUG111 - JumpNode: " + nodey.getOpcode() + " : " + nodey.label);
 			}
 			else if (node instanceof LabelNode)
 			{
 				LabelNode nodey = (LabelNode)node;
-				ModInfo.Log.info("DEBUG111 - LabelNode: " + nodey);
+				BlockPhysics.instance.log.info("DEBUG111 - LabelNode: " + nodey);
 			}
 			else if (node instanceof IntInsnNode)
 			{
 				IntInsnNode nodey = (IntInsnNode)node;
-				ModInfo.Log.info("DEBUG111 - IntNode: " + nodey.getOpcode() + " : " + nodey.operand);
+				BlockPhysics.instance.log.info("DEBUG111 - IntNode: " + nodey.getOpcode() + " : " + nodey.operand);
 			}
 			else
 			{
-				ModInfo.Log.info("DEBUG111 - SomethingElse");
+				BlockPhysics.instance.log.info("DEBUG111 - SomethingElse");
 			}
 		}
 	}
@@ -223,7 +225,7 @@ public class BlockPhysics
                 Chunk chunk = world.getChunkFromChunkCoords(par1 >> 4, par3 >> 4);
                 int j1 = par1 & 15;
                 int k1 = par3 & 15;
-                return chunk.setBlockBPdata(j1, par2, k1, par4);
+                return (Boolean) ASMAdditionHelper.invoke(chunk, "setBlockBPdata", j1, par2, k1, par4);
             }
         }
         else
@@ -248,7 +250,7 @@ public class BlockPhysics
 	  	{
 	  		for (int j1 = j-1; j1 <= j + 1; j1++)
 	  		{
-	  			for (int k1 = k-1; k1 <= k + 1; k1++) world.moveTickList.scheduleBlockMoveUpdate(world, i1, j1, k1, Block.blockRegistry.getNameForObject(world.getBlock(i1, j1, k1)), world.getBlockMetadata(i1, j1, k1), false);
+	  			for (int k1 = k-1; k1 <= k + 1; k1++) ((BTickList)ASMAdditionHelper.get(world, "moveTickList")).scheduleBlockMoveUpdate(world, i1, j1, k1, Block.blockRegistry.getNameForObject(world.getBlock(i1, j1, k1)), world.getBlockMetadata(i1, j1, k1), false);
 	  		}					
 	  	}
 	}
@@ -350,8 +352,8 @@ public class BlockPhysics
 				}
     		}
     	}
-    	    			
-		if ( !outofRenderRange && ((WorldServer)world).getEntityTracker().movingblocks >= ModConfig.maxMovingBlocks ) return false;
+    	
+		if ( !outofRenderRange && ((Integer)ASMAdditionHelper.get(((WorldServer)world).getEntityTracker(), "movingblocks")) >= ModConfig.maxMovingBlocks ) return false;
     			
 		int movetype;
 		if ( contslide ) movetype = 2;
@@ -481,7 +483,7 @@ public class BlockPhysics
     			world.removeTileEntity(i, j, k);
     		}
     		if (canBurn(blid) && world.getBlock(i, j+1, k) == Blocks.fire) entityfallingsand.setFire(60);
-            entityfallingsand.bpdata = getBlockBPdata( world,i, j, k);
+    		ASMAdditionHelper.set(entityfallingsand, "bpdata", getBlockBPdata( world,i, j, k));
     		world.spawnEntityInWorld(entityfallingsand);
      	}
     	else
@@ -531,9 +533,9 @@ public class BlockPhysics
             	world.removeTileEntity(i, j, k);
             }
     		
-            entityfallingsand.slideDir = (byte) (slide[rr]+1);
+            ASMAdditionHelper.set(entityfallingsand, "slideDir", (byte) (slide[rr]+1));
             if (canBurn(blid) && world.getBlock(i, j+1, k) == Blocks.fire) entityfallingsand.setFire(60);
-            entityfallingsand.bpdata = getBlockBPdata( world,i, j, k);
+            ASMAdditionHelper.set(entityfallingsand, "bpdata", getBlockBPdata( world,i, j, k));
             world.spawnEntityInWorld(entityfallingsand);
     	}
     	world.setBlockToAir(i, j, k);
@@ -619,7 +621,7 @@ public class BlockPhysics
                 Chunk chunk = world.getChunkFromChunkCoords(par1 >> 4, par3 >> 4);
                 par1 &= 15;
                 par3 &= 15;
-                return chunk.getBlockBPdata(par1, par2, par3);
+                return (Integer) ASMAdditionHelper.invoke(chunk, "getBlockBPdata", par1, par2, par3);
             }
         }
         else
@@ -1135,7 +1137,7 @@ public class BlockPhysics
         double var17;
         double var19;
 
-        if ( !explosion.impact )
+        if ( !((Boolean) ASMAdditionHelper.get(explosion, "impact")) )
     	{ 
     		explosion.explosionSize *= 2.0F;
 	        var3 = MathHelper.floor_double(explosion.explosionX - (double)explosion.explosionSize - 1.0D);
@@ -1249,7 +1251,7 @@ public class BlockPhysics
                             	
 	                            if (var14 > 0.0F)
 	                            {
-	                            	if ( !skipMove && ((WorldServer)world).getEntityTracker().movingblocks < ModConfig.maxMovingBlocks && (DefinitionMaps.getBlockDef(var25,m).pushtype == 1 || DefinitionMaps.getBlockDef(var25,m).pushtype == 3 ) )
+	                            	if ( !skipMove && ((Integer)ASMAdditionHelper.get(((WorldServer)world).getEntityTracker(), "movingblocks")) < ModConfig.maxMovingBlocks && (DefinitionMaps.getBlockDef(var25,m).pushtype == 1 || DefinitionMaps.getBlockDef(var25,m).pushtype == 3 ) )
 	            	            	{	            	            		
 	                            		/*double speed = (double)MathHelper.sqrt_double( exploder.motionX * exploder.motionX + exploder.motionY * exploder.motionY + exploder.motionZ * exploder.motionZ );
 	                            		double d6 = var22 + 0.5F - explosionX - (exploder.motionX / speed) * 4;
@@ -1282,7 +1284,7 @@ public class BlockPhysics
 	            		                	
 	            		                int meta = world.getBlockMetadata(var22, var23, var24);
 										
-	            	                    if ( !explosion.impact && var25.equals(Block.blockRegistry.getNameForObject(Blocks.tnt)) )
+	            	                    if ( !((Boolean) ASMAdditionHelper.get(explosion, "impact")) && var25.equals(Block.blockRegistry.getNameForObject(Blocks.tnt)) )
 	            	                    {
 	            	                    	EntityTNTPrimed entitytnt = new EntityTNTPrimed(world, (float)var22 + 0.5F, (float)var23 + 0.5F, (float)var24 + 0.5F, null);
 		            		                entitytnt.motionX = bSpeedR(d6 - rand.nextGaussian() * 0.05D);
@@ -1297,8 +1299,8 @@ public class BlockPhysics
 		            		                entityfallingsand.motionX = bSpeedR(d6 - rand.nextGaussian() * 0.05D);
 		            		                entityfallingsand.motionY = bSpeedR(d8 - rand.nextGaussian() * 0.05D);
 		            		                entityfallingsand.motionZ = bSpeedR(d10 - rand.nextGaussian() * 0.05D);
-		            		                if ( ModConfig.explosionFire && ( !explosion.impact || explosion.isFlaming ) && prandnextint(5) == 0 && canBurn(var25) ) entityfallingsand.setFire(60);
-		            		                entityfallingsand.bpdata = bpdata;
+		            		                if ( ModConfig.explosionFire && ( !((Boolean) ASMAdditionHelper.get(explosion, "impact")) || explosion.isFlaming ) && prandnextint(5) == 0 && canBurn(var25) ) entityfallingsand.setFire(60);
+		            		                ASMAdditionHelper.set(entityfallingsand, "bpdata", bpdata);
 		            		                if ( ((Block)Block.blockRegistry.getObject(var25)).hasTileEntity(meta) ) 
 		                	                {
 		            		                	entityfallingsand.field_145810_d = new NBTTagCompound();
@@ -1308,7 +1310,7 @@ public class BlockPhysics
 		            		                world.spawnEntityInWorld(entityfallingsand);
 	            	                    }   
 	            		                
-	            	                    if ( ModConfig.explosionFire && ( !explosion.impact || explosion.isFlaming ) )
+	            	                    if ( ModConfig.explosionFire && ( !((Boolean) ASMAdditionHelper.get(explosion, "impact")) || explosion.isFlaming ) )
 	            	        	        {
 		            	            		String k2 = Block.blockRegistry.getNameForObject(world.getBlock(var22, var23 - 1, var24));
 		            	            		//TODO Hope this is right....
@@ -1332,7 +1334,7 @@ public class BlockPhysics
 	            	            		if (block.canDropFromExplosion(explosion)) block.dropBlockAsItemWithChance(world, var22, var23, var24, world.getBlockMetadata(var22, var23, var24), 1.0F / explosion.explosionSize, 0);
 	            	            		block.onBlockExploded(world, var22, var23, var24, explosion);
 
-	            	            		if ( ModConfig.explosionFire && ( !explosion.impact || explosion.isFlaming ) )
+	            	            		if ( ModConfig.explosionFire && ( !((Boolean) ASMAdditionHelper.get(explosion, "impact")) || explosion.isFlaming ) )
 	            	        	        {
 		            	            		String k2 = Block.blockRegistry.getNameForObject(world.getBlock(var22, var23 - 1, var24));
 		            	            		if (((Block)Block.blockRegistry.getObject(k2)).func_149730_j() && prandnextint(5) == 0)
@@ -1350,7 +1352,7 @@ public class BlockPhysics
 	            	            		}
 	            	            	}
 	                            	setBlockBPdata( world,var22, var23, var24, 0);
-	                            	if ( !explosion.impact ) var2.add(new ChunkPosition(var22, var23, var24));
+	                            	if ( !((Boolean) ASMAdditionHelper.get(explosion, "impact")) ) var2.add(new ChunkPosition(var22, var23, var24));
 	                            }
                             }
                             var15 += var6 * (double)var21;
@@ -1374,7 +1376,7 @@ public class BlockPhysics
 	
 	public static void doExplosionB(World world, Explosion explosion, boolean par1)
     {
-    	if (explosion.impact) return;
+    	if (((Boolean) ASMAdditionHelper.get(explosion, "impact"))) return;
     	
     	world.playSoundEffect(explosion.explosionX, explosion.explosionY, explosion.explosionZ, "random.explode", 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
         if (explosion.explosionSize >= 2.0F && explosion.isSmoking)
@@ -1433,7 +1435,7 @@ public class BlockPhysics
     {
 	    int burn = 0;
 	    if (ent.isBurning()) burn = 32768; 
-	    int slide = ((int)ent.slideDir ) << 12;
+	    int slide = ((int)((Byte)ASMAdditionHelper.get(ent, "slideDir")) ) << 12;
     	
 	    return new S0EPacketSpawnObject(ent, 70, Block.getIdFromBlock(ent.func_145805_f()) | ent.field_145814_a << 16 | burn | slide);
     }
@@ -1453,10 +1455,10 @@ public class BlockPhysics
     	
     	if (fsand.field_145812_b == 4) notifyMove(world,i,j,k);
     	
-    	if (!world.isRemote && fsand.dead < 4 )
+    	if (!world.isRemote && ((Byte)ASMAdditionHelper.get(fsand, "dead")) < 4 )
 	    {
-	    	fsand.dead--;
-	    	if (fsand.dead <= 0) fsand.setDead();
+    		ASMAdditionHelper.set(fsand, "dead", ((Byte)ASMAdditionHelper.get(fsand, "dead"))-1);
+	    	if (((Byte)ASMAdditionHelper.get(fsand, "dead")) <= 0) fsand.setDead();
 	    	return;
 	    }
     	Material mt;
@@ -1468,15 +1470,14 @@ public class BlockPhysics
         	fsand.setDead();
             if ( !world.isRemote ) dropFallingSand( fsand );
         }   	    	    	    				
-   	    
-    	fsand.media = Block.blockRegistry.getNameForObject(world.getBlock(i,j, k));
+   	    ASMAdditionHelper.set(fsand, "media", Block.blockRegistry.getNameForObject(world.getBlock(i,j, k)));
 
-        if (fsand.slideDir != 0)
+        if (((Byte)ASMAdditionHelper.get(fsand, "slideDir")) != 0)
         {
         	if (fsand.field_145812_b < 8)
         	{
 	        	int stime = fsand.field_145812_b - 3;
-	        	int sdir = fsand.slideDir - 1;
+	        	int sdir = ((Byte)ASMAdditionHelper.get(fsand, "slideDir")) - 1;
 	        	
         		if (stime == 0)
 	        	{
@@ -1493,13 +1494,13 @@ public class BlockPhysics
         		fsand.motionX = slideSpeedz[stime][sdir][0];
         		fsand.motionY = slideSpeedz[stime][sdir][1];
         		fsand.motionZ = slideSpeedz[stime][sdir][2];
-	        	fsand.accelerationX = 0D;
-		    	fsand.accelerationY = 0D;
-		    	fsand.accelerationZ = 0D;
+        		ASMAdditionHelper.set(fsand, "accelerationX", 0D);
+        		ASMAdditionHelper.set(fsand, "accelerationY", 0D);
+        		ASMAdditionHelper.set(fsand, "accelerationZ", 0D);
         	}
         	else
         	{
-        		fsand.slideDir = 0;
+        		ASMAdditionHelper.set(fsand, "slideDir", 0);
         	}
         }
         
@@ -1516,15 +1517,15 @@ public class BlockPhysics
         double cmotionY = fsand.motionY;
         double cmotionZ = fsand.motionZ;
     	
-        double caccelerationX = fsand.accelerationX;
-        double caccelerationY = fsand.accelerationY;
-        double caccelerationZ = fsand.accelerationZ;
+        double caccelerationX = ((Double)ASMAdditionHelper.get(fsand, "accelerationX"));
+        double caccelerationY = ((Double)ASMAdditionHelper.get(fsand, "accelerationY"));
+        double caccelerationZ = ((Double)ASMAdditionHelper.get(fsand, "accelerationZ"));
         
-        fsand.accelerationX = 0;
-    	fsand.accelerationY = 0;
-    	fsand.accelerationZ = 0;
+        ASMAdditionHelper.set(fsand, "accelerationX", 0D);
+		ASMAdditionHelper.set(fsand, "accelerationY", 0D);
+		ASMAdditionHelper.set(fsand, "accelerationZ", 0D);
 	
-    	if ( fsand.slideDir == 0 )
+    	if ( ((Byte)ASMAdditionHelper.get(fsand, "slideDir")) == 0 )
         {
     		fsand.motionX = bSpeedR(fsand.motionX + caccelerationX);
     		fsand.motionY = bSpeedR(fsand.motionY + caccelerationY);
@@ -1654,7 +1655,7 @@ public class BlockPhysics
 	            	world.spawnParticle("flame", (float)jumpPosX + rand.nextFloat(), (float)jumpPosY + rand.nextFloat(), (float)jumpPosZ + rand.nextFloat(), 0D, 0.2D, 0D);
 	        	}
 	        	
-	        	if (fsand.media != bidn)
+	        	if (ASMAdditionHelper.get(fsand, "media") != bidn)
 	        	{        		
 	        		if (!bidn.equals(Block.blockRegistry.getNameForObject(Blocks.air)))
 	        		{
@@ -1678,10 +1679,9 @@ public class BlockPhysics
 		        			world.playSoundAtEntity(fsand, "random.fizz", 0.5F, 1.0F + (rand.nextFloat() - rand.nextFloat()) * 0.4F);
 		        		}
 	        		}
+	        		ASMAdditionHelper.set(fsand, "media", bidn);
 	        		
-	        		fsand.media = bidn;
-	        		
-	        		if ( fsand.slideDir == 0 && !bidn.equals(Block.blockRegistry.getNameForObject(Blocks.fire)))
+	        		if ( ((Byte)ASMAdditionHelper.get(fsand, "slideDir")) == 0 && !bidn.equals(Block.blockRegistry.getNameForObject(Blocks.fire)))
 	        		{
 	        			moveX = jumpPosX - fsand.posX;
 		    			moveY = jumpPosY - fsand.posY;
@@ -1696,7 +1696,7 @@ public class BlockPhysics
 				kp = kn;
 			}
 		    
-		    if ( fsand.slideDir == 0 )
+		    if ( ((Byte)ASMAdditionHelper.get(fsand, "slideDir")) == 0 )
 		    {
 		    
 			    if ( (!canMoveTo(world, MathHelper.floor_double(jumpPosX + 0.499D), MathHelper.floor_double(jumpPosY +  0.499D),MathHelper.floor_double(jumpPosZ +  0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX +  0.499D), MathHelper.floor_double(jumpPosY + 0.499D),MathHelper.floor_double(jumpPosZ -  0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX + 0.499D), MathHelper.floor_double(jumpPosY - 0.499D),MathHelper.floor_double(jumpPosZ + 0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX + 0.499D), MathHelper.floor_double(jumpPosY - 0.499D),MathHelper.floor_double(jumpPosZ - 0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX - 0.499D), MathHelper.floor_double(jumpPosY + 0.499D), MathHelper.floor_double(jumpPosZ + 0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX - 0.499D), MathHelper.floor_double(jumpPosY + 0.499D),MathHelper.floor_double(jumpPosZ - 0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX - 0.499D), MathHelper.floor_double(jumpPosY - 0.499D),MathHelper.floor_double(jumpPosZ + 0.499D), em) || !canMoveTo(world, MathHelper.floor_double(jumpPosX - 0.499D), MathHelper.floor_double(jumpPosY - 0.499D),MathHelper.floor_double(jumpPosZ - 0.499D), em)))
@@ -1712,8 +1712,8 @@ public class BlockPhysics
 	    					//writetoLog(""+Math.sqrt(jumpdist2)+"       "+eimp);
 		    				Explosion var10 = new Explosion( world, fsand, jumpPosX, jumpPosY, jumpPosZ, (float) eimp );
 		    			    if ( fsand.isBurning() ) var10.isFlaming = true;
-		    			    var10.impact = true;
-		    			    world.explosionQueue.add(var10);
+		    			    ASMAdditionHelper.set(var10, "impact", true);
+		    			    ((ExplosionQueue)ASMAdditionHelper.get(world, "explosionQueue")).add(var10);
 		    			}
 	    				
 	    			    fsand.motionX *= 0.7D;
@@ -1726,8 +1726,7 @@ public class BlockPhysics
 	    			{
 	    				Block block = fsand.func_145805_f();
 	    	    		world.playSoundEffect(jumpPosX, jumpPosY, jumpPosZ, block.stepSound.getBreakSound(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
-	    	    		
-	    	    		fsand.dead--;
+	    	    		ASMAdditionHelper.set(fsand, "dead", ((Byte)ASMAdditionHelper.get(fsand, "dead"))-1);
 	    	    		if (!world.isRemote)
 	    	    		{
 	    	    			if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).fragile == 2 ) 
@@ -1789,7 +1788,7 @@ public class BlockPhysics
 		    				Block block = ((EntityFallingBlock)collent).func_145805_f();
 		    	    		world.playSoundEffect(collent.posX, collent.posY, collent.posZ, block.stepSound.getBreakSound(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
 		    	    		
-		    	    		((EntityFallingBlock)collent).dead--;
+		    	    		ASMAdditionHelper.set(((EntityFallingBlock)collent), "dead", ((Byte)ASMAdditionHelper.get(((EntityFallingBlock)collent), "dead"))-1);
 		    	    		if (!world.isRemote)
 		    	    		{
 		    	    			if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(((EntityFallingBlock)collent).func_145805_f()),((EntityFallingBlock)collent).field_145814_a).fragile == 2 ) dropFallingSand(((EntityFallingBlock)collent));
@@ -1802,7 +1801,7 @@ public class BlockPhysics
 		    				Block block = fsand.func_145805_f();
 		    	    		world.playSoundEffect(jumpPosX, jumpPosY, jumpPosZ, block.stepSound.getBreakSound(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
 		    	    		
-		    	    		fsand.dead--;
+		    	    		ASMAdditionHelper.set(fsand, "dead", ((Byte)ASMAdditionHelper.get(fsand, "dead"))-1);
 		    	    		if (!world.isRemote)
 		    	    		{
 		    	    			if ( DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(fsand.func_145805_f()),fsand.field_145814_a).fragile == 2 ) 
@@ -1875,7 +1874,7 @@ public class BlockPhysics
 				           
 				    		if ( !world.isRemote )
 				    		{
-				    		    ModInfo.Log.info("Attacking entity for " + d + " damage.");
+				    		    BlockPhysics.instance.log.info("Attacking entity for " + d + " damage.");
 				    		    ((EntityLivingBase)collent).attackEntityFrom(DamageSource.fallingBlock, d);
 				    		}
 						}				    		
@@ -1903,9 +1902,9 @@ public class BlockPhysics
 			    	}
 			    	else
 			    	{
-			    		fsand.accelerationX -= fsand.motionX;
-			    		fsand.accelerationY -= fsand.motionY;
-			    		fsand.accelerationZ -= fsand.motionZ;
+			    		ASMAdditionHelper.set(fsand, "accelerationX", ((Double)ASMAdditionHelper.get(fsand, "accelerationX"))-fsand.motionX);
+			    		ASMAdditionHelper.set(fsand, "accelerationY", ((Double)ASMAdditionHelper.get(fsand, "accelerationY"))-fsand.motionY);
+			    		ASMAdditionHelper.set(fsand, "accelerationZ", ((Double)ASMAdditionHelper.get(fsand, "accelerationZ"))-fsand.motionZ);
 			    		//fsand.velocityChanged = true;
 			    		
 			    		moveX = jumpPosX - fsand.posX;
@@ -1940,9 +1939,9 @@ public class BlockPhysics
     	
     	double density = 1.25D;
     			
-    	if (!fsand.media.equals(Block.blockRegistry.getNameForObject(Blocks.air)) )
+    	if (!((String)ASMAdditionHelper.get(fsand, "media")).equals(Block.blockRegistry.getNameForObject(Blocks.air)) )
     	{
-    		mt = ((Block)Block.blockRegistry.getObject(fsand.media)).getMaterial();
+    		mt = ((Block)Block.blockRegistry.getObject((String)ASMAdditionHelper.get(fsand, "media"))).getMaterial();
     		if ( mt.isLiquid() )
 			{
 				if ( mt == Material.lava)
@@ -1956,7 +1955,7 @@ public class BlockPhysics
 		    		//fsand.accelerationY += 24.525D / (double)fsand.mass;
 				}
 			}
-			else if ( !world.isRemote && !(fsand instanceof EntityTNTPrimed) )
+			else if ( !world.isRemote && !TypeHelper.instanceOf(EntityTNTPrimed.class, fsand) )
 			{
 				placeBlock( world, fsand, jumpPosX, jumpPosY, jumpPosZ, in, jn, kn);
 				return;
@@ -1968,7 +1967,7 @@ public class BlockPhysics
     	double aaccY = density * fsand.motionY * Math.abs(fsand.motionY);
     	double aaccZ = density * fsand.motionZ * Math.abs(fsand.motionZ);
     	
-    	fsand.accelerationY -= 0.024525D;
+    	ASMAdditionHelper.set(fsand, "accelerationY", ((Double)ASMAdditionHelper.get(fsand, "accelerationY"))-0.024525D);
     	
     	double mmot = fsand.motionX + aaccX;
     	if ( (fsand.motionX < 0 && mmot > 0) || (fsand.motionX > 0 && mmot < 0) )
@@ -1987,10 +1986,9 @@ public class BlockPhysics
     	{
     		aaccZ = -0.9D * fsand.motionZ;
     	}
-
-    	fsand.accelerationX = fsand.accelerationX + aaccX;
-    	fsand.accelerationY = fsand.accelerationY + aaccY;
-    	fsand.accelerationZ = fsand.accelerationZ + aaccZ;
+    	ASMAdditionHelper.set(fsand, "accelerationX", ((Double)ASMAdditionHelper.get(fsand, "accelerationX")) + aaccX);
+    	ASMAdditionHelper.set(fsand, "accelerationY", ((Double)ASMAdditionHelper.get(fsand, "accelerationY")) + aaccY);
+    	ASMAdditionHelper.set(fsand, "accelerationZ", ((Double)ASMAdditionHelper.get(fsand, "accelerationZ")) + aaccZ);
     	
     	fsand.prevPosX = fsand.posX;
     	fsand.prevPosY = fsand.posY;
@@ -2009,12 +2007,13 @@ public class BlockPhysics
             //fsand.motionY *= -0.5D;
         }
 		
-		if ( fsand instanceof EntityTNTPrimed)
+		if (TypeHelper.instanceOf(EntityTNTPrimed.class, fsand))
     	{
-            if (!world.isRemote && ((EntityTNTPrimed)fsand).fuse-- <= 0 )
+			EntityTNTPrimed primed = TypeHelper.cast(EntityTNTPrimed.class, fsand);
+            if (!world.isRemote && primed.fuse-- <= 0 )
             {
                 fsand.setDead();
-            	((EntityTNTPrimed)fsand).explode();
+            	primed.explode();
             }
             
             world.spawnParticle("smoke", fsand.posX, fsand.posY + 0.5D, fsand.posZ, 0.0D, 0.0D, 0.0D);
@@ -2027,11 +2026,11 @@ public class BlockPhysics
     			Block block = fsand.func_145805_f();
 	    		world.playSoundEffect(fsand.posX, fsand.posY, fsand.posZ, block.stepSound.func_150496_b(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
 	    		
-	    		fsand.dead--;
+	    		ASMAdditionHelper.set(fsand, "dead", ((Byte)ASMAdditionHelper.get(fsand, "dead"))-1);
 	    		if (!world.isRemote)
 	    		{
 	    			world.setBlock(i, j, k, fsand.func_145805_f(), fsand.field_145814_a, 3);
-	    			setBlockBPdata( world,i, j, k, fsand.bpdata);
+	    			setBlockBPdata( world,i, j, k, ((Integer)ASMAdditionHelper.get(fsand, "bpdata")));
 	    			if (fsand.field_145810_d != null)
 	    			{
 	    				TileEntity tile = fsand.func_145805_f().createTileEntity(world, fsand.field_145814_a);
@@ -2039,7 +2038,7 @@ public class BlockPhysics
 	    				world.setTileEntity(i, j, k, tile);
 	    			}
 	    			if (fsand.isBurning() && world.getBlock(i, j+1, k) == Blocks.air) world.setBlock(i, j +1, k, Blocks.fire, 0, 3);
-	    			world.moveTickList.scheduleBlockMoveUpdate(world, i, j, k, Block.blockRegistry.getNameForObject(fsand.func_145805_f()), fsand.field_145814_a, true);
+	    			((BTickList)ASMAdditionHelper.get(world, "moveTickList")).scheduleBlockMoveUpdate(world, i, j, k, Block.blockRegistry.getNameForObject(fsand.func_145805_f()), fsand.field_145814_a, true);
 		    		notifyMove(world, i,j,k);
 	    		}
 	    		
@@ -2092,14 +2091,14 @@ public class BlockPhysics
     	if ( dist2 < 100 ) 
     	{
     		world.setBlock(x, y, z, fsand.func_145805_f(), fsand.field_145814_a, 3);
-    		setBlockBPdata( world,x, y, z, fsand.bpdata);
+    		setBlockBPdata( world,x, y, z, ((Integer)ASMAdditionHelper.get(fsand, "bpdata")));
     		if (fsand.field_145810_d != null)
 			{
 				TileEntity tile = fsand.func_145805_f().createTileEntity(world, fsand.field_145814_a);
 				tile.readFromNBT(fsand.field_145810_d);
 				world.setTileEntity(x, y, z, tile);
 			}
-    		world.moveTickList.scheduleBlockMoveUpdate(world, x, y, z, Block.blockRegistry.getNameForObject(fsand.func_145805_f()), fsand.field_145814_a, true);
+    		((BTickList)ASMAdditionHelper.get(world, "moveTickList")).scheduleBlockMoveUpdate(world, x, y, z, Block.blockRegistry.getNameForObject(fsand.func_145805_f()), fsand.field_145814_a, true);
     	}
     	else 
     	{
@@ -2389,7 +2388,7 @@ public class BlockPhysics
     	{
     		if ( skipMove == false ) 
     		{
-    			ModInfo.Log.info("Switching off physics ( "+tickTime+" ).",2 );
+    			BlockPhysics.instance.log.info("Switching off physics ( "+tickTime+" ).");
     			skipMove = true;
     		}
     	}
@@ -2397,7 +2396,7 @@ public class BlockPhysics
     	{
     		if ( skipMove == true ) 
     		{
-    			ModInfo.Log.info("Physics are working again ( "+tickTime+" ).",2);
+    			BlockPhysics.instance.log.info("Physics are working again ( "+tickTime+" ).");
 	    		skipMove = false;
 	    		nextrand = rand.nextInt(100);
     		}
@@ -2418,24 +2417,22 @@ public class BlockPhysics
     {
 		EntityFallingBlock var8 = new EntityFallingBlock(world, var2, var4, var6, Block.getBlockById(par1Packet23VehicleSpawn.func_149009_m() & 4095), par1Packet23VehicleSpawn.func_149009_m() >> 16);
         if (((par1Packet23VehicleSpawn.func_149009_m() >> 15) & 1) == 1) ((EntityFallingBlock)var8).setFire(60);
-        ((EntityFallingBlock)var8).slideDir = (byte) ((par1Packet23VehicleSpawn.func_149009_m() >> 12) & 7);
+        ASMAdditionHelper.set(var8, "slideDir", (byte) ((par1Packet23VehicleSpawn.func_149009_m() >> 12) & 7));
+
         return var8;
     }
 	
 	public static void onNeighborBlockChange(World par1World, int par2, int par3, int par4, String blockID)
     {
     	if (par1World.isRemote ) return;
-    	if (par1World.moveTickList == null)
+    	if (((BTickList)ASMAdditionHelper.get(par1World, "moveTickList")) == null)
     	{
-    		ModInfo.Log.info("World tickList null - " + par1World.provider.dimensionId); 
+    		BlockPhysics.instance.log.info("World tickList null - " + par1World.provider.dimensionId); 
     		return;
     	}
     	
-    	par1World
-    	.moveTickList
-    	.scheduleBlockMoveUpdate(par1World, par2, par3, par4, blockID, 
-    			par1World
-    			.getBlockMetadata(par2, par3, par4), false);
+    	((BTickList)ASMAdditionHelper.get(par1World, "moveTickList")).scheduleBlockMoveUpdate(par1World, par2, par3, par4, blockID, 
+    			par1World.getBlockMetadata(par2, par3, par4), false);
     }
 	
 	public static void onEntityCollidedWithBlock( World world, int par1, int par2, int par3, String blockID, Entity par5Entity)
@@ -2455,7 +2452,7 @@ public class BlockPhysics
 	
 	public static void updatePistonState(World par1World, int par2, int par3, int par4, BlockPistonBase par1block, boolean isSticky)
     {   
-		//ModInfo.Log.info("Attempting to update piston state");
+		//BlockPhysics.instance.log.info("Attempting to update piston state");
     	if (par1World.isRemote) return;
 		int var5 = par1World.getBlockMetadata(par2, par3, par4);
         int var6 = par1block.getPistonOrientation(var5);
@@ -2470,7 +2467,7 @@ public class BlockPhysics
     	int j2 = par3 + Facing.offsetsYForSide[var6];
     	int k2 = par4 + Facing.offsetsZForSide[var6];
     	
-    	if ( par1World.getBlock(i2, j2, k2) == Blocks.piston_extension || par1World.pistonMoveBlocks.contains(""+par2+"."+par3+"."+par4)) return;
+    	if ( par1World.getBlock(i2, j2, k2) == Blocks.piston_extension || ((HashSet<String>)ASMAdditionHelper.get(par1World, "pistonMoveBlocks")).contains(""+par2+"."+par3+"."+par4)) return;
 
     	int meta;
     	String blid2;
@@ -2479,9 +2476,9 @@ public class BlockPhysics
         {
             int ext = 0;
    		
-    		if (ModConfig.catapult && !skipMove && ((WorldServer)par1World).getEntityTracker().movingblocks < ModConfig.maxMovingBlocks)
+    		if (ModConfig.catapult && !skipMove && ((Integer)ASMAdditionHelper.get(((WorldServer)par1World).getEntityTracker(), "movingblocks")) < ModConfig.maxMovingBlocks)
     		{
-    			//ModInfo.Log.info("Attempting to check for dispensers");
+    			//BlockPhysics.instance.log.info("Attempting to check for dispensers");
     			boolean catapultpowered = false;
     			boolean catapultprecise = true;
     			int[] power = {0,0,0,0,0,0,0,0,0};
@@ -2494,7 +2491,7 @@ public class BlockPhysics
     	        	TileEntityDispenser tileentitydispenser = (TileEntityDispenser)par1World.getTileEntity(xpw, ypw, zpw);	
     	        	if (tileentitydispenser != null)
     	        	{
-    	        		//ModInfo.Log.info("Found tile entity dispenser");
+    	        		//BlockPhysics.instance.log.info("Found tile entity dispenser");
     	        		ItemStack powstack;
     	        		for ( int pp = 0; pp < 9; pp++)
     	        		{
@@ -2506,7 +2503,7 @@ public class BlockPhysics
     	        			{
     	        				catapultpowered = true;
     	        				power[pp] = powstack.stackSize;
-    	        				//ModInfo.Log.info("Found redstone in dispenser");
+    	        				//BlockPhysics.instance.log.info("Found redstone in dispenser");
     	        			}
     	        		}
     	        	}
@@ -2516,7 +2513,7 @@ public class BlockPhysics
     			{
     				ext = canExtend(par1World, par2, par3, par4, var6, par1block, true);
     	        	if ( ext == 0 ) return;
-    	        	//ModInfo.Log.info("Piston is powered and can extend");
+    	        	//BlockPhysics.instance.log.info("Piston is powered and can extend");
     				double pspX = 0, pspY = 0, pspZ = 0;
     				switch ( var6 )
             		{
@@ -2692,7 +2689,7 @@ public class BlockPhysics
     	                	if ( i == ext - 1 && blid.equals(Block.blockRegistry.getNameForObject(Blocks.fire)) ) entityfallingsand.setFire(60);
     	                	if ( par1World.getBlock(xx, yy+1, zz) == Blocks.fire ) entityfallingsand.setFire(60);
     	                }
-    	                entityfallingsand.bpdata = getBlockBPdata( par1World, xx, yy, zz );
+    	                ASMAdditionHelper.set(entityfallingsand, "bpdata", getBlockBPdata( par1World, xx, yy, zz ));
     	                if ( ((Block)Block.blockRegistry.getObject(blid2)).hasTileEntity(meta) ) 
     	                {
     	                	entityfallingsand.field_145810_d = new NBTTagCompound();
@@ -2746,7 +2743,7 @@ public class BlockPhysics
         		boolean pull = true;
         		Block bb = ((Block)Block.blockRegistry.getObject(blid2));
         		boolean empty = (bb == Blocks.air || bb == Blocks.water || bb == Blocks.flowing_water || bb == Blocks.lava || bb == Blocks.flowing_lava || bb == Blocks.fire || bb.getMaterial().isLiquid() );
-        		if (par1World.pistonMoveBlocks.contains(""+xx+"."+yy+"."+zz) || empty || (DefinitionMaps.getBlockDef(blid2,meta).pushtype != 1 && DefinitionMaps.getBlockDef(blid2,meta).pushtype != 2) ) pull = false;
+        		if (((HashSet<String>)ASMAdditionHelper.get(par1World, "pistonMoveBlocks")).contains(""+xx+"."+yy+"."+zz) || empty || (DefinitionMaps.getBlockDef(blid2,meta).pushtype != 1 && DefinitionMaps.getBlockDef(blid2,meta).pushtype != 2) ) pull = false;
                 else if ( ( bb == Blocks.piston || bb == Blocks.sticky_piston ) && !canmove(par1World, xx, yy, zz, par1block)) pull = false;
                                 
                 if ( pull )
@@ -2772,7 +2769,7 @@ public class BlockPhysics
 	
 	private static int canExtend(World par0World, int par1, int par2, int par3, int par4, BlockPistonBase par1block, boolean catp)
     {	
-    	if (par0World.pistonMoveBlocks.contains(""+par1+"."+par2+"."+par3)) return 0;
+    	if (((HashSet<String>)ASMAdditionHelper.get(par0World, "pistonMoveBlocks")).contains(""+par1+"."+par2+"."+par3)) return 0;
     	int var8, meta;
     	String blid;
         boolean empty;
@@ -2784,7 +2781,7 @@ public class BlockPhysics
             par2 += Facing.offsetsYForSide[par4];
             par3 += Facing.offsetsZForSide[par4];
             
-            if (par0World.pistonMoveBlocks.contains(""+par1+"."+par2+"."+par3)) return 0;
+            if (((HashSet<String>)ASMAdditionHelper.get(par0World, "pistonMoveBlocks")).contains(""+par1+"."+par2+"."+par3)) return 0;
             
             blid = Block.blockRegistry.getNameForObject(par0World.getBlock(par1, par2, par3));
             Block bb = (Block)Block.blockRegistry.getObject(blid);
@@ -2829,7 +2826,7 @@ public class BlockPhysics
     	int ko = Facing.offsetsZForSide[orient];
     	for (int l = 0; l <= lngth; l++)
     	{
-    		world.pistonMoveBlocks.add(""+i+"."+j+"."+k);
+    		((HashSet<String>)ASMAdditionHelper.get(world, "pistonMoveBlocks")).add(""+i+"."+j+"."+k);
     		i = i + io;
     		j = j + jo;
     		k = k + ko;
@@ -2881,12 +2878,13 @@ public class BlockPhysics
                 if ( bb == Blocks.piston || bb == Blocks.sticky_piston )  var13 = var13 & 7;       
                 
                 TileEntityPiston tePiston = new TileEntityPiston(bb, var13, par6, true, false);
-                tePiston.bpmeta = bpmeta;
+                ASMAdditionHelper.set(tePiston, "bpmeta", bpmeta);
                 
                 if ( ((Block)Block.blockRegistry.getObject(var12)).hasTileEntity(var13) )
                 {
-                	tePiston.movingBlockTileEntityData = new NBTTagCompound();
-                	par1World.getTileEntity(xxf, yyf, zzf).writeToNBT(tePiston.movingBlockTileEntityData);
+                	NBTTagCompound compound = new NBTTagCompound();
+                	ASMAdditionHelper.set(tePiston, "movingBlockTileEntityData", compound);
+                	par1World.getTileEntity(xxf, yyf, zzf).writeToNBT(compound);
                 	par1World.removeTileEntity(xxf, yyf, zzf);
                 }
                 
@@ -2921,12 +2919,13 @@ public class BlockPhysics
                 int bpmeta = getBlockBPdata(par1World, var8, var9, var10);
                 
                 TileEntityPiston tePiston = new TileEntityPiston((Block)Block.blockRegistry.getObject(var11), var12, par6, false, false);
-                tePiston.bpmeta = bpmeta;
+                ASMAdditionHelper.set(tePiston, "bpmeta", bpmeta);
                 
                 if ( ((Block)Block.blockRegistry.getObject(var11)).hasTileEntity(var12) )
                 {
-                	tePiston.movingBlockTileEntityData = new NBTTagCompound();
-                	par1World.getTileEntity(var8, var9, var10).writeToNBT(tePiston.movingBlockTileEntityData);
+                	NBTTagCompound compound = new NBTTagCompound();
+                	ASMAdditionHelper.set(tePiston, "movingBlockTileEntityData", compound);
+                	par1World.getTileEntity(var8, var9, var10).writeToNBT(compound);
                 	par1World.removeTileEntity(var8, var9, var10);
                 }
                                

@@ -11,7 +11,6 @@ import static org.objectweb.asm.Opcodes.T_BYTE;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
@@ -22,8 +21,9 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -56,7 +56,7 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		
 		if (transformedName.equals("net.minecraft.world.chunk.storage.AnvilChunkLoader"))
 		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
+			ASMPlugin.log.info("Transforming class: " + transformedName);
 			//writeChunkToNBT
 			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_75820_a", "(Lnet/minecraft/world/chunk/Chunk;Lnet/minecraft/world/World;Lnet/minecraft/nbt/NBTTagCompound;)V");
             if (methodNode != null)
@@ -147,4 +147,7 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		
 		method.instructions.insertBefore(target, toInject);
 	}
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry arg0) {}
 }

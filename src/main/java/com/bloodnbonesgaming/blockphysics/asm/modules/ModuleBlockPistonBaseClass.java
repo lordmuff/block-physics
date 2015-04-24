@@ -1,6 +1,5 @@
 package com.bloodnbonesgaming.blockphysics.asm.modules;
 
-import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.GETSTATIC;
@@ -13,14 +12,15 @@ import static org.objectweb.asm.Opcodes.RETURN;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -53,7 +53,7 @@ public class ModuleBlockPistonBaseClass implements IClassTransformerModule
 		
 		if (transformedName.equals("net.minecraft.block.BlockPistonBase"))
 		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
+			ASMPlugin.log.info("Transforming class: " + transformedName);
 			
 			//"onNeighborBlockChange", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V"
 			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149695_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V");
@@ -72,15 +72,6 @@ public class ModuleBlockPistonBaseClass implements IClassTransformerModule
             }
             else
             	throw new RuntimeException("Could not find updatePistonState method in " + transformedName);
-            
-            //"isIndirectlyPowered", "(Lnet/minecraft/world/World;IIII)Z"
-            methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_150072_a", "(Lnet/minecraft/world/World;IIII)Z");
-            if (methodNode != null)
-            {
-            	transformIsIndirectlyPowered(methodNode);
-            }
-            else
-            	throw new RuntimeException("Could not find isIndirectlyPowered method in " + transformedName);
             
             //"onBlockEventReceived", "(Lnet/minecraft/world/World;IIIII)Z"
             methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149696_a", "(Lnet/minecraft/world/World;IIIII)Z");
@@ -144,11 +135,6 @@ public class ModuleBlockPistonBaseClass implements IClassTransformerModule
 		method.instructions.insertBefore(target, toInject);
 	}
 	
-	public void transformIsIndirectlyPowered(MethodNode method)
-	{
-		method.access = ACC_PUBLIC;
-	}
-	
 	public void transformOnBlockEventReceived(MethodNode method)
 	{
 		//Clear method of everything except end RETURN instruction
@@ -177,4 +163,7 @@ public class ModuleBlockPistonBaseClass implements IClassTransformerModule
 		
 		method.instructions.insertBefore(target, toInject);
 	}
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry arg0) {}
 }

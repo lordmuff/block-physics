@@ -18,7 +18,9 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -51,7 +53,7 @@ public class ModuleEntityTrackerEntryClass implements IClassTransformerModule
 		
 		if (transformedName.equals("net.minecraft.entity.EntityTrackerEntry"))
 		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
+			ASMPlugin.log.info("Transforming class: " + transformedName);
 			
 			//"func_151260_c", "()Lnet/minecraft/network/Packet;"
 			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_151260_c", "()Lnet/minecraft/network/Packet;");
@@ -89,4 +91,7 @@ public class ModuleEntityTrackerEntryClass implements IClassTransformerModule
 		
 		//BlockPhysics.printMethod(method);
 	}
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry arg0) {}
 }

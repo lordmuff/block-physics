@@ -15,7 +15,6 @@ import static org.objectweb.asm.Opcodes.ISUB;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import static org.objectweb.asm.Opcodes.RETURN;
 
-import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -31,9 +30,9 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.ClassTransformer;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -66,10 +65,7 @@ public class ModuleEntityTrackerClass implements IClassTransformerModule
 		
 		if (transformedName.equals("net.minecraft.entity.EntityTracker"))
 		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
-			
-			createMovingBlocks(classNode);
-			verifyFieldAdded(classNode, "movingblocks", "I");
+			ASMPlugin.log.info("Transforming class: " + transformedName);
 			
 			
 			//"<init>", "(Lnet/minecraft/world/WorldServer;)V"
@@ -111,22 +107,6 @@ public class ModuleEntityTrackerClass implements IClassTransformerModule
             return ASMHelper.writeClassToBytesNoDeobfSkipFrames(classNode);
 		}
 		return bytes;
-	}
-	
-	public void verifyFieldAdded(ClassNode classNode, String name, String desc)
-	{
-		FieldNode fieldNode = ClassTransformer.findFieldNodeOfClass(classNode, name, desc);
-		if (fieldNode != null)
-		{
-			ModInfo.Log.info("Successfully added field: " + fieldNode.name + fieldNode.desc + " in " + classNode.name);
-		} else
-			throw new RuntimeException("Could not create field: " + name + desc + " in " + classNode.name);
-	}
-	
-	public void createMovingBlocks(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "movingblocks", "I", null, null);
-		fieldVisitor.visitEnd();
 	}
 	
 	public void transformInit(MethodNode method)
@@ -251,9 +231,9 @@ public class ModuleEntityTrackerClass implements IClassTransformerModule
 		
 		method.instructions.insertBefore(target, toInject);
 	}
-	
-	public void transformAddEntityToTracker2(MethodNode method)
-	{
-		//BlockPhysics.printMethod(method);
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry registry) {
+		registry.registerFieldAddition("net.minecraft.entity.EntityTracker", new FieldNode(ACC_PUBLIC, "movingblocks", "I", null, null));
 	}
 }

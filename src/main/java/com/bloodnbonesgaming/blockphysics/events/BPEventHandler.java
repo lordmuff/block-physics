@@ -2,6 +2,9 @@ package com.bloodnbonesgaming.blockphysics.events;
 
 import java.util.Iterator;
 
+import com.bloodnbonesgaming.blockphysics.ExplosionQueue;
+import com.bnbgaming.lib.core.ASMAdditionHelper;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.play.server.S27PacketExplosion;
@@ -18,7 +21,7 @@ public class BPEventHandler
 	{
 		event.setCanceled(true);
 		
-		event.world.explosionQueue.add(event.explosion);
+		((ExplosionQueue)ASMAdditionHelper.get(event.world, "explosionQueue")).add(event.explosion);
 		
 		if (event.world instanceof WorldServer)
 		{

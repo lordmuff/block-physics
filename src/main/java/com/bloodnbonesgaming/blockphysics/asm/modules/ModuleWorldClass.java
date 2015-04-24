@@ -11,7 +11,6 @@ import static org.objectweb.asm.Opcodes.NEW;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import static org.objectweb.asm.Opcodes.RETURN;
 
-import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
@@ -24,8 +23,9 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.ClassTransformer;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -58,16 +58,7 @@ public class ModuleWorldClass implements IClassTransformerModule
 		
 		if (transformedName.equals("net.minecraft.world.World"))
 		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
-			
-			transformActiveChunkSet(classNode);
-			createMoveTickList(classNode);
-			createPistonMoveBlocks(classNode);
-			createExplosionQueue(classNode);
-			
-			verifyFieldAdded(classNode, "moveTickList", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/BTickList;");
-			verifyFieldAdded(classNode, "pistonMoveBlocks", "Ljava/util/HashSet;");
-			verifyFieldAdded(classNode, "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;");
+			ASMPlugin.log.info("Transforming class: " + transformedName);
 			
 			//"<init>", "(Lnet/minecraft/world/storage/ISaveHandler;Ljava/lang/String;Lnet/minecraft/world/WorldProvider;Lnet/minecraft/world/WorldSettings;Lnet/minecraft/profiler/Profiler;)V"
 			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "(Lnet/minecraft/world/storage/ISaveHandler;Ljava/lang/String;Lnet/minecraft/world/WorldProvider;Lnet/minecraft/world/WorldSettings;Lnet/minecraft/profiler/Profiler;)V");
@@ -76,7 +67,7 @@ public class ModuleWorldClass implements IClassTransformerModule
             	transformInit1(methodNode);
             }
             else
-                ModInfo.Log.debug("Could not find <init>1 method in " + transformedName + ". This must be a dedicated server.");
+                ASMPlugin.log.debug("Could not find <init>1 method in " + transformedName + ". This must be a dedicated server.");
             
             //"<init>", "(Lnet/minecraft/world/storage/ISaveHandler;Ljava/lang/String;Lnet/minecraft/world/WorldSettings;Lnet/minecraft/world/WorldProvider;Lnet/minecraft/profiler/Profiler;)V"
             methodNode = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "(Lnet/minecraft/world/storage/ISaveHandler;Ljava/lang/String;Lnet/minecraft/world/WorldSettings;Lnet/minecraft/world/WorldProvider;Lnet/minecraft/profiler/Profiler;)V");
@@ -99,40 +90,6 @@ public class ModuleWorldClass implements IClassTransformerModule
             return ASMHelper.writeClassToBytes(classNode);
 		}
 		return bytes;
-	}
-	
-	public void verifyFieldAdded(ClassNode classNode, String name, String desc)
-	{
-		FieldNode fieldNode = ClassTransformer.findFieldNodeOfClass(classNode, name, desc);
-		if (fieldNode != null)
-		{
-			ModInfo.Log.info("Successfully added field: " + fieldNode.name + fieldNode.desc + " in " + classNode.name);
-		} else
-			throw new RuntimeException("Could not create field: " + name + desc + " in " + classNode.name);
-	}
-	
-	public void transformActiveChunkSet(ClassNode classNode)
-	{
-		FieldNode fieldNode = ClassTransformer.findFieldNodeOfClass(classNode, "field_72993_I", "Ljava/util/Set;");
-		fieldNode.access = ACC_PUBLIC;
-	}
-	
-	public void createMoveTickList(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "moveTickList", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/BTickList;", null, null);
-		fieldVisitor.visitEnd();
-	}
-	
-	public void createPistonMoveBlocks(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "pistonMoveBlocks", "Ljava/util/HashSet;", "Ljava/util/HashSet<Ljava/lang/String;>;", null);
-		fieldVisitor.visitEnd();
-	}
-	
-	public void createExplosionQueue(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;", null, null);
-		fieldVisitor.visitEnd();
 	}
 	
 	public void transformInit1(MethodNode method)
@@ -217,5 +174,12 @@ public class ModuleWorldClass implements IClassTransformerModule
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue", "add", "(Lnet/minecraft/world/Explosion;)V", false));
 		
 		method.instructions.insertBefore(target2, toInject);
+	}
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry registry) {
+		registry.registerFieldAddition("net.minecraft.world.World", new FieldNode(ACC_PUBLIC, "moveTickList", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/BTickList;", null, null));
+		registry.registerFieldAddition("net.minecraft.world.World", new FieldNode(ACC_PUBLIC, "pistonMoveBlocks", "Ljava/util/HashSet;", null, null));
+		registry.registerFieldAddition("net.minecraft.world.World", new FieldNode(ACC_PUBLIC, "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;", null, null));
 	}
 }

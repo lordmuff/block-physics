@@ -155,7 +155,7 @@ public class ModConfig
 						floatingradius = Integer.parseInt(properties[i].substring(colonIndex +1, value2));
 						//int value3 = properties[i].indexOf(":", value2);
 						floatingblock = properties[i].substring(value2 + 1);
-						ModInfo.Log.info("FLOATINGBLOCK = " + floatingblock);
+						BlockPhysics.instance.getLog().info("FLOATINGBLOCK = " + floatingblock);
 						/*if (value3 != -1)
 						{
 							floatingblock = properties[i].substring(value2 +1, value3);

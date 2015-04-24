@@ -9,7 +9,6 @@ import static org.objectweb.asm.Opcodes.RETURN;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -19,7 +18,9 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -52,7 +53,7 @@ public class ModuleRenderFallingBlockClass implements IClassTransformerModule
 		
 		if (transformedName.equals("net.minecraft.client.renderer.entity.RenderFallingBlock"))
 		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
+			ASMPlugin.log.info("Transforming class: " + transformedName);
 			
 			//"doRender", "(Lnet/minecraft/entity/item/EntityFallingBlock;DDDFF)V"
 			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_76986_a", "(Lnet/minecraft/entity/item/EntityFallingBlock;DDDFF)V");
@@ -107,4 +108,7 @@ public class ModuleRenderFallingBlockClass implements IClassTransformerModule
 		
 		method.instructions.set(toReplace, replaceWith);
 	}
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry arg0) {}
 }

@@ -3,8 +3,6 @@ package com.bloodnbonesgaming.blockphysics.asm;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-import com.bloodnbonesgaming.blockphysics.ModInfo;
-
 public class RemoveMethodAdapter extends ClassVisitor
 {
 	private String mName;
@@ -20,10 +18,10 @@ public class RemoveMethodAdapter extends ClassVisitor
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
-		ModInfo.Log.info("visitMethod Called for method: " + name + " " + desc);
+		ASMPlugin.log.info("visitMethod Called for method: " + name + " " + desc);
 		if (name.equals(mName) && desc.equals(mDesc))
 		{
-			ModInfo.Log.info("Returning null for method: " + name + " " + desc);
+			ASMPlugin.log.info("Returning null for method: " + name + " " + desc);
 			// do not delegate to next visitor -> this removes the method
 			return null;
 		}

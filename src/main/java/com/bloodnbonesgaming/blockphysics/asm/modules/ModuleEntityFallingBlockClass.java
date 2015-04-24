@@ -28,7 +28,6 @@ import static org.objectweb.asm.Opcodes.PUTFIELD;
 import static org.objectweb.asm.Opcodes.RETURN;
 import static org.objectweb.asm.Opcodes.T_DOUBLE;
 
-import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -45,8 +44,9 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.ClassTransformer;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -79,31 +79,7 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		
 		if (transformedName.equals("net.minecraft.entity.item.EntityFallingBlock"))
 		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
-			
-			createSlideDir(classNode);
-			createAccelerationX(classNode);
-			createAccelerationY(classNode);
-			createAccelerationZ(classNode);
-			createBpData(classNode);
-			createMedia(classNode);
-			createDead(classNode);
-			
-			verifyFieldAdded(classNode, "slideDir", "B");
-			verifyFieldAdded(classNode, "accelerationX", "D");
-			verifyFieldAdded(classNode, "accelerationY", "D");
-			verifyFieldAdded(classNode, "accelerationZ", "D");
-			verifyFieldAdded(classNode, "bpdata", "I");
-			verifyFieldAdded(classNode, "media", "Ljava/lang/String;");
-			verifyFieldAdded(classNode, "dead", "B");
-			
-			createGetBoundingBox(classNode);
-			createSetInWeb(classNode);
-			createMoveEntity(classNode);
-			
-			verifyMethodAdded(classNode, "func_70046_E", "()Lnet/minecraft/util/AxisAlignedBB;");
-			verifyMethodAdded(classNode, "func_70110_aj", "()V");
-			verifyMethodAdded(classNode, "func_70091_d", "(DDD)V");
+			ASMPlugin.log.info("Transforming class: " + transformedName);
 			
 			//"<init>", "(Lnet/minecraft/world/World;)V"
 			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "(Lnet/minecraft/world/World;)V");
@@ -175,73 +151,11 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
             	transformCanRenderOnFire(methodNode);
             }
             else
-                ModInfo.Log.debug("Could not find canRenderOnFire method in " + transformedName + ". This must be a dedicated server.");
+                ASMPlugin.log.debug("Could not find canRenderOnFire method in " + transformedName + ". This must be a dedicated server.");
             
             return ASMHelper.writeClassToBytesNoDeobfSkipFrames(classNode);
 		}
 		return bytes;
-	}
-
-	public void verifyMethodAdded(ClassNode classNode, String name, String desc)
-	{
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, name, desc);
-		if (methodNode != null)
-		{
-			ModInfo.Log.info("Successfully added method: " + methodNode.name + methodNode.desc + " in " + classNode.name);
-		} else
-			throw new RuntimeException("Could not create method: " + name + desc + " in " + classNode.name);
-	}
-	
-	public void verifyFieldAdded(ClassNode classNode, String name, String desc)
-	{
-		FieldNode fieldNode = ClassTransformer.findFieldNodeOfClass(classNode, name, desc);
-		if (fieldNode != null)
-		{
-			ModInfo.Log.info("Successfully added field: " + fieldNode.name + fieldNode.desc + " in " + classNode.name);
-		} else
-			throw new RuntimeException("Could not create field: " + name + desc + " in " + classNode.name);
-	}
-	
-	public void createSlideDir(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "slideDir", "B", null, null);
-        fieldVisitor.visitEnd();
-	}
-	
-	public void createAccelerationX(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "accelerationX", "D", null, null);
-        fieldVisitor.visitEnd();
-	}
-	
-	public void createAccelerationY(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "accelerationY", "D", null, null);
-        fieldVisitor.visitEnd();
-	}
-	
-	public void createAccelerationZ(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "accelerationZ", "D", null, null);
-        fieldVisitor.visitEnd();
-	}
-	
-	public void createBpData(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "bpdata", "I", null, null);
-        fieldVisitor.visitEnd();
-	}
-	
-	public void createMedia(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "media", "Ljava/lang/String;", null, null);
-        fieldVisitor.visitEnd();
-	}
-	
-	public void createDead(ClassNode classNode)
-	{
-		FieldVisitor fieldVisitor = classNode.visitField(ACC_PUBLIC, "dead", "B", null, null);
-        fieldVisitor.visitEnd();
 	}
 	
 	public void createGetBoundingBox(ClassNode classNode)
@@ -662,5 +576,26 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70090_H", "()Z", false));
 		
 		method.instructions.insertBefore(target, toInject);
+	}
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry registry) {
+		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "slideDir", "B", null, null));
+		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "accelerationX", "D", null, null));
+		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "accelerationY", "D", null, null));
+		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "accelerationZ", "D", null, null));
+		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "bpdata", "I", null, null));
+		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "media", "Ljava/lang/String;", null, null));
+		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "dead", "B", null, null));
+
+		ClassNode classNode = new ClassNode();
+		
+		createGetBoundingBox(classNode);
+		createSetInWeb(classNode);
+		createMoveEntity(classNode);
+		
+		registry.registerMethodAddition("net.minecraft.entity.item.EntityFallingBlock", ASMHelper.findMethodNodeOfClass(classNode, "func_70046_E", "()Lnet/minecraft/util/AxisAlignedBB;"));
+		registry.registerMethodAddition("net.minecraft.entity.item.EntityFallingBlock", ASMHelper.findMethodNodeOfClass(classNode, "func_70110_aj", "()V"));
+		registry.registerMethodAddition("net.minecraft.entity.item.EntityFallingBlock", ASMHelper.findMethodNodeOfClass(classNode, "func_70091_d", "(DDD)V"));
 	}
 }

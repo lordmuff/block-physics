@@ -10,14 +10,15 @@ import static org.objectweb.asm.Opcodes.RETURN;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bloodnbonesgaming.blockphysics.asm.IClassTransformerModule;
+import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
@@ -50,7 +51,7 @@ public class ModuleBlockWebClass implements IClassTransformerModule
 		
 		if (transformedName.equals("net.minecraft.block.BlockWeb"))
 		{
-			ModInfo.Log.info("Transforming class: " + transformedName);
+			ASMPlugin.log.info("Transforming class: " + transformedName);
 			
 			//"onEntityCollidedWithBlock", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V"
             MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149670_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V");
@@ -87,4 +88,7 @@ public class ModuleBlockWebClass implements IClassTransformerModule
 		
 		method.instructions.insertBefore(target, toInject);
 	}
+
+	@Override
+	public void registerAdditions(ASMAdditionRegistry arg0) {}
 }
