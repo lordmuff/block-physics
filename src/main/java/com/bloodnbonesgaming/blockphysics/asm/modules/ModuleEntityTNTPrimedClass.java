@@ -27,6 +27,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -132,7 +134,7 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 	{
 		//Fix super call
 		AbstractInsnNode toReplace = ASMHelper.find(method.instructions, new MethodInsnNode(INVOKESPECIAL, "net/minecraft/entity/Entity", "<init>", "(Lnet/minecraft/world/World;)V", false));
-		AbstractInsnNode replacement = new MethodInsnNode(INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", "<init>", "(Lnet/minecraft/world/World;)V", false);
+		AbstractInsnNode replacement = new RedirectedMethodInsnNode(INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", "<init>", "(Lnet/minecraft/world/World;)V", false, this);
 		
 		if (toReplace == null)
 			throw new RuntimeException("Unexpected instruction pattern in EntityTNTPrimed.init 1");
@@ -160,14 +162,14 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(DLOAD, 2));
 		toInject.add(new VarInsnNode(DLOAD, 4));
 		toInject.add(new VarInsnNode(DLOAD, 6));
-		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraft/init/Blocks", "field_150335_W", "Lnet/minecraft/block/Block;"));
+		toInject.add(new RedirectedFieldInsnNode(GETSTATIC, "net/minecraft/init/Blocks", "field_150335_W", "Lnet/minecraft/block/Block;", this));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new MethodInsnNode(INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", "<init>", "(Lnet/minecraft/world/World;DDDLnet/minecraft/block/Block;I)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", "<init>", "(Lnet/minecraft/world/World;DDDLnet/minecraft/block/Block;I)V", false, this));
 		
 		//this.fuse = 80;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new IntInsnNode(BIPUSH, 80));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityTNTPrimed", "field_70516_a", "I"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityTNTPrimed", "field_70516_a", "I", this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -208,9 +210,9 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70170_p", "Lnet/minecraft/world/World;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70170_p", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "fallingSandUpdate", "(Lnet/minecraft/world/World;Lnet/minecraft/entity/item/EntityFallingBlock;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "fallingSandUpdate", "(Lnet/minecraft/world/World;Lnet/minecraft/entity/item/EntityFallingBlock;)V", false, this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -239,7 +241,7 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70014_b", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70014_b", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false, this));
 		
 		method.instructions.insertBefore(target,  toInject);
 	}
@@ -252,7 +254,7 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70037_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70037_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false, this));
 		
 		method.instructions.insertBefore(target,  toInject);
 	}

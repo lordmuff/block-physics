@@ -32,6 +32,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -117,7 +118,7 @@ public class ModuleEntityTrackerClass implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/EntityTracker", "movingblocks", "I"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/EntityTracker", "movingblocks", "I", this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -196,10 +197,10 @@ public class ModuleEntityTrackerClass implements IClassTransformerModule
 				InsnList toInject = new InsnList();
     			toInject.add(new VarInsnNode(ALOAD, 0));
     			toInject.add(new InsnNode(DUP));
-    			toInject.add(new FieldInsnNode( GETFIELD, "net/minecraft/entity/EntityTracker", "movingblocks", "I"));
+    			toInject.add(new RedirectedFieldInsnNode( GETFIELD, "net/minecraft/entity/EntityTracker", "movingblocks", "I", this));
     			toInject.add(new InsnNode(ICONST_1));
     			toInject.add(new InsnNode(IADD));
-            	toInject.add(new FieldInsnNode( PUTFIELD, "net/minecraft/entity/EntityTracker", "movingblocks", "I"));
+            	toInject.add(new RedirectedFieldInsnNode( PUTFIELD, "net/minecraft/entity/EntityTracker", "movingblocks", "I", this));
             	
     			method.instructions.insertBefore(method.instructions.get(index),toInject);
     			break;
@@ -222,10 +223,10 @@ public class ModuleEntityTrackerClass implements IClassTransformerModule
 		toInject.add(new JumpInsnNode(IFEQ, label1));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DUP));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/EntityTracker", "movingblocks", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/entity/EntityTracker", "movingblocks", "I", this));
 		toInject.add(new InsnNode(ICONST_1));
 		toInject.add(new InsnNode(ISUB));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/EntityTracker", "movingblocks", "I"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/EntityTracker", "movingblocks", "I", this));
 		toInject.add(label1);
 		toInject.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
 		
@@ -234,6 +235,6 @@ public class ModuleEntityTrackerClass implements IClassTransformerModule
 
 	@Override
 	public void registerAdditions(ASMAdditionRegistry registry) {
-		registry.registerFieldAddition("net.minecraft.entity.EntityTracker", new FieldNode(ACC_PUBLIC, "movingblocks", "I", null, null));
+		registry.registerFieldAddition("net/minecraft/entity/EntityTracker", new FieldNode(ACC_PUBLIC, "movingblocks", "I", null, null));
 	}
 }

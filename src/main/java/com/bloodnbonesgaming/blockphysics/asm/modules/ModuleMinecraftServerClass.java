@@ -16,6 +16,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -80,7 +81,7 @@ public class ModuleMinecraftServerClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(LLOAD, 3));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "setSkipMove", "(J)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "setSkipMove", "(J)V", false, this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}

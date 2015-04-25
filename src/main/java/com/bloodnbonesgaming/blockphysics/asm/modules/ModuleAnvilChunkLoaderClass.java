@@ -23,6 +23,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -85,7 +86,7 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		//InsnList toFind = new InsnList();
 		//toFind.add(new VarInsnNode(ALOAD, 5));
 		//toFind.add(new VarInsnNode(ALOAD, 9));
-		AbstractInsnNode appendTag = ASMHelper.find(method.instructions, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagList", "func_74742_a", "(Lnet/minecraft/nbt/NBTBase;)V", false));
+		AbstractInsnNode appendTag = ASMHelper.find(method.instructions, new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagList", "func_74742_a", "(Lnet/minecraft/nbt/NBTBase;)V", false, this));
 		VarInsnNode nbtTagCompound = (VarInsnNode) ASMHelper.move(appendTag, -1);
 		AbstractInsnNode target = ASMHelper.move(appendTag, -2);
 		
@@ -99,8 +100,8 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, nbtTagCompound.var));
 		toInject.add(new LdcInsnNode("BPData"));
 		toInject.add(new VarInsnNode(ALOAD, extendedBlockStorage.var));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "getBPdataArray", "()[B", false));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74773_a", "(Ljava/lang/String;[B)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "getBPdataArray", "()[B", false, this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74773_a", "(Ljava/lang/String;[B)V", false, this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -110,7 +111,7 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		//extendedblockstorage.removeInvalidBlocks();
 		InsnList toFind = new InsnList();
 		toFind.add(new VarInsnNode(ALOAD, 13));
-		toFind.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "func_76672_e", "()V", false));
+		toFind.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "func_76672_e", "()V", false, this));
 		
 		AbstractInsnNode target = ASMHelper.find(method.instructions, toFind);
 		
@@ -128,21 +129,21 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 11));
 		toInject.add(new LdcInsnNode("BPData"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74764_b", "(Ljava/lang/String;)Z", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74764_b", "(Ljava/lang/String;)Z", false, this));
 		LabelNode label1 = new LabelNode();
 		toInject.add(new JumpInsnNode(IFEQ, label1));
 		toInject.add(new VarInsnNode(ALOAD, 13));
 		toInject.add(new VarInsnNode(ALOAD, 11));
 		toInject.add(new LdcInsnNode(("BPData")));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74770_j", "(Ljava/lang/String;)[B", false));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "setBPdataArray", "([B)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74770_j", "(Ljava/lang/String;)[B", false, this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "setBPdataArray", "([B)V", false, this));
 		LabelNode label2 = new LabelNode();
 		toInject.add(new JumpInsnNode(GOTO, label2));
 		toInject.add(label1);
 		toInject.add(new VarInsnNode(ALOAD, 13));
 		toInject.add(new IntInsnNode(SIPUSH, 4096));
 		toInject.add(new IntInsnNode(NEWARRAY, T_BYTE));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "setBPdataArray", "([B)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "setBPdataArray", "([B)V", false, this));
 		toInject.add(label2);
 		
 		method.instructions.insertBefore(target, toInject);

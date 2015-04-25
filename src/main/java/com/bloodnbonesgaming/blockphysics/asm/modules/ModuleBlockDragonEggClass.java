@@ -18,6 +18,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -113,10 +115,10 @@ public class ModuleBlockDragonEggClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 2));
 		toInject.add(new VarInsnNode(ILOAD, 3));
 		toInject.add(new VarInsnNode(ILOAD, 4));
-		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraft/block/Block", "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;"));
+		toInject.add(new RedirectedFieldInsnNode(GETSTATIC, "net/minecraft/block/Block", "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onNeighborBlockChange", "(Lnet/minecraft/world/World;IIILjava/lang/String;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onNeighborBlockChange", "(Lnet/minecraft/world/World;IIILjava/lang/String;)V", false, this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -158,7 +160,7 @@ public class ModuleBlockDragonEggClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 6));
 		toInject.add(new VarInsnNode(ILOAD, 8));
 		toInject.add(new VarInsnNode(ILOAD, 7));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "notifyMove", "(Lnet/minecraft/world/World;III)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "notifyMove", "(Lnet/minecraft/world/World;III)V", false, this));
 		
 		method.instructions.insert(target, toInject);
 	}

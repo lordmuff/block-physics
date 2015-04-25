@@ -22,6 +22,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -96,7 +98,7 @@ public class ModuleExplosionClass implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/world/Explosion", "impact", "Z"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/world/Explosion", "impact", "Z", this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -112,9 +114,9 @@ public class ModuleExplosionClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/world/Explosion", "field_77287_j", "Lnet/minecraft/world/World;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/world/Explosion", "field_77287_j", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "doExplosionA", "(Lnet/minecraft/world/World;Lnet/minecraft/world/Explosion;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "doExplosionA", "(Lnet/minecraft/world/World;Lnet/minecraft/world/Explosion;)V", false, this));
 		toInject.add(new InsnNode(RETURN));
 		
 		method.instructions.add(toInject);
@@ -132,10 +134,10 @@ public class ModuleExplosionClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/world/Explosion", "field_77287_j", "Lnet/minecraft/world/World;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/world/Explosion", "field_77287_j", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ILOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "doExplosionB", "(Lnet/minecraft/world/World;Lnet/minecraft/world/Explosion;Z)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "doExplosionB", "(Lnet/minecraft/world/World;Lnet/minecraft/world/Explosion;Z)V", false, this));
 		toInject.add(new InsnNode(RETURN));
 		
 		method.instructions.add(toInject);
@@ -143,6 +145,6 @@ public class ModuleExplosionClass implements IClassTransformerModule
 
 	@Override
 	public void registerAdditions(ASMAdditionRegistry registry) {
-		registry.registerFieldAddition("net.minecraft.world.Explosion", new FieldNode(ACC_PUBLIC, "impact", "Z", null, null));
+		registry.registerFieldAddition("net/minecraft/world/Explosion", new FieldNode(ACC_PUBLIC, "impact", "Z", null, null));
 	}
 }

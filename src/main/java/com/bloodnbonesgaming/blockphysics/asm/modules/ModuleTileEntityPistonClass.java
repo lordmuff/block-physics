@@ -31,6 +31,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -123,11 +125,11 @@ public class ModuleTileEntityPistonClass implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ACONST_NULL));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", this));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/tileentity/TileEntityPiston", "bpmeta", "I"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/tileentity/TileEntityPiston", "bpmeta", "I", this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -138,47 +140,47 @@ public class ModuleTileEntityPistonClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145851_c", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145851_c", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));;
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145848_d", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145848_d", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145849_e", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145849_e", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "bpmeta", "I"));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "setBlockBPdata", "(Lnet/minecraft/world/World;IIII)Z", false));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "bpmeta", "I", this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "setBlockBPdata", "(Lnet/minecraft/world/World;IIII)Z", false, this));
 		toInject.add(new InsnNode(POP));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", this));
 		LabelNode label1 = new LabelNode();
 		toInject.add(new JumpInsnNode(IFNULL, label1));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145869_a", "Lnet/minecraft/block/Block;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145869_a", "Lnet/minecraft/block/Block;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145876_i", "I"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/block/Block", "createTileEntity", "(Lnet/minecraft/world/World;I)Lnet/minecraft/tileentity/TileEntity;", false));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145876_i", "I", this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/block/Block", "createTileEntity", "(Lnet/minecraft/world/World;I)Lnet/minecraft/tileentity/TileEntity;", false, this));
 		toInject.add(new VarInsnNode(ASTORE, 1));
 		
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/tileentity/TileEntity", "func_145839_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/tileentity/TileEntity", "func_145839_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false, this));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145851_c", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145851_c", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));;
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145848_d", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145848_d", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145849_e", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145849_e", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/World", "func_147455_a", "(IIILnet/minecraft/tileentity/TileEntity;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/World", "func_147455_a", "(IIILnet/minecraft/tileentity/TileEntity;)V", false, this));
 		toInject.add(label1);
 		
 		method.instructions.insert(target, toInject);
@@ -190,47 +192,47 @@ public class ModuleTileEntityPistonClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145851_c", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145851_c", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));;
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145848_d", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145848_d", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145849_e", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145849_e", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "bpmeta", "I"));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "setBlockBPdata", "(Lnet/minecraft/world/World;IIII)Z", false));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "bpmeta", "I", this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "setBlockBPdata", "(Lnet/minecraft/world/World;IIII)Z", false, this));
 		toInject.add(new InsnNode(POP));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", this));
 		LabelNode label1 = new LabelNode();
 		toInject.add(new JumpInsnNode(IFNULL, label1));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145869_a", "Lnet/minecraft/block/Block;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145869_a", "Lnet/minecraft/block/Block;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145876_i", "I"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/block/Block", "createTileEntity", "(Lnet/minecraft/world/World;I)Lnet/minecraft/tileentity/TileEntity;", false));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145876_i", "I", this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/block/Block", "createTileEntity", "(Lnet/minecraft/world/World;I)Lnet/minecraft/tileentity/TileEntity;", false, this));
 		toInject.add(new VarInsnNode(ASTORE, 1));
 		
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/tileentity/TileEntity", "func_145839_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/tileentity/TileEntity", "func_145839_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false, this));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145850_b", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145851_c", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145851_c", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));;
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145848_d", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145848_d", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145849_e", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "field_145849_e", "I", this));
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/World", "func_147455_a", "(IIILnet/minecraft/tileentity/TileEntity;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/World", "func_147455_a", "(IIILnet/minecraft/tileentity/TileEntity;)V", false, this));
 		toInject.add(label1);
 		
 		method.instructions.insert(target, toInject);
@@ -243,28 +245,28 @@ public class ModuleTileEntityPistonClass implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new LdcInsnNode("BPData"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74764_b", "(Ljava/lang/String;)Z", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74764_b", "(Ljava/lang/String;)Z", false, this));
 		LabelNode label1 = new LabelNode();
 		toInject.add(new JumpInsnNode(IFEQ, label1));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new LdcInsnNode("BPData"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74771_c", "(Ljava/lang/String;)B", false));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/tileentity/TileEntityPiston", "bpmeta", "I"));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74771_c", "(Ljava/lang/String;)B", false, this));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/tileentity/TileEntityPiston", "bpmeta", "I", this));
 		toInject.add(label1);
 		
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new LdcInsnNode("TileEntityData"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74764_b", "(Ljava/lang/String;)Z", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74764_b", "(Ljava/lang/String;)Z", false, this));
 		LabelNode label2 = new LabelNode();
 		toInject.add(new JumpInsnNode(IFEQ, label2));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new LdcInsnNode("TileEntityData"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74775_l", "(Ljava/lang/String;)Lnet/minecraft/nbt/NBTTagCompound;", false));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;"));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74775_l", "(Ljava/lang/String;)Lnet/minecraft/nbt/NBTTagCompound;", false, this));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", this));
 		toInject.add(label2);
 		
 		method.instructions.insertBefore(target, toInject);
@@ -278,20 +280,20 @@ public class ModuleTileEntityPistonClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new LdcInsnNode("BPData"));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "bpmeta", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "bpmeta", "I", this));
 		toInject.add(new InsnNode(I2B));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74774_a", "(Ljava/lang/String;B)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74774_a", "(Ljava/lang/String;B)V", false, this));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", this));
 		LabelNode label1 = new LabelNode();
 		toInject.add(new JumpInsnNode(IFNULL, label1));
 		
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new LdcInsnNode("TileEntityData"));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74782_a", "(Ljava/lang/String;Lnet/minecraft/nbt/NBTBase;)V", false));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/tileentity/TileEntityPiston", "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74782_a", "(Ljava/lang/String;Lnet/minecraft/nbt/NBTBase;)V", false, this));
 		toInject.add(label1);
 		
 		method.instructions.insertBefore(target, toInject);
@@ -299,7 +301,7 @@ public class ModuleTileEntityPistonClass implements IClassTransformerModule
 
 	@Override
 	public void registerAdditions(ASMAdditionRegistry registry) {
-		registry.registerFieldAddition("net.minecraft.tileentity.TileEntityPiston", new FieldNode(ACC_PUBLIC, "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", null, null));
-		registry.registerFieldAddition("net.minecraft.tileentity.TileEntityPiston", new FieldNode(ACC_PUBLIC, "bpmeta", "I", null, null));
+		registry.registerFieldAddition("net/minecraft/tileentity/TileEntityPiston", new FieldNode(ACC_PUBLIC, "movingBlockTileEntityData", "Lnet/minecraft/nbt/NBTTagCompound;", null, null));
+		registry.registerFieldAddition("net/minecraft/tileentity/TileEntityPiston", new FieldNode(ACC_PUBLIC, "bpmeta", "I", null, null));
 	}
 }

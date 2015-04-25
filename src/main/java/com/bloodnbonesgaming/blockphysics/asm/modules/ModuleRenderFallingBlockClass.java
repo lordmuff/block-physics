@@ -20,6 +20,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -82,7 +83,7 @@ public class ModuleRenderFallingBlockClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BClient", "cancelRender", "(Lnet/minecraft/entity/item/EntityFallingBlock;)Z", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BClient", "cancelRender", "(Lnet/minecraft/entity/item/EntityFallingBlock;)Z", false, this));
 		LabelNode label1 = new LabelNode();
 		toInject.add(new JumpInsnNode(IFEQ, label1));
 		toInject.add(new InsnNode(RETURN));
@@ -104,7 +105,7 @@ public class ModuleRenderFallingBlockClass implements IClassTransformerModule
 		//this.field_147920_a.renderBlockSandFalling(block, world, i, j, k, p_76986_1_.field_145814_a);
 		AbstractInsnNode toReplace = ASMHelper.find(method.instructions, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/client/renderer/RenderBlocks", "func_147749_a", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false));
 		//BClient.renderBlockSandFalling(this.field_147920_a, block, world, i, j, k, p_76986_1_.field_145814_a);
-		AbstractInsnNode replaceWith = new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BClient", "renderBlockSandFalling", "(Lnet/minecraft/client/renderer/RenderBlocks;Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false);
+		AbstractInsnNode replaceWith = new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BClient", "renderBlockSandFalling", "(Lnet/minecraft/client/renderer/RenderBlocks;Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false, this);
 		
 		method.instructions.set(toReplace, replaceWith);
 	}

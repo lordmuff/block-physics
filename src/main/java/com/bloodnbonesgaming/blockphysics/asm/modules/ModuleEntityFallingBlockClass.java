@@ -46,6 +46,9 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
+import com.bnbgaming.lib.core.insn.RedirectedMethodVisitor;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -161,9 +164,10 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 	public void createGetBoundingBox(ClassNode classNode)
 	{
 		MethodVisitor methodVisitor = classNode.visitMethod(ACC_PUBLIC, "func_70046_E", "()Lnet/minecraft/util/AxisAlignedBB;", null, null);
+		RedirectedMethodVisitor rMethodVisitor = new RedirectedMethodVisitor(methodVisitor);
 		methodVisitor.visitCode();
 		methodVisitor.visitVarInsn(ALOAD, 0);
-		methodVisitor.visitFieldInsn(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70121_D", "Lnet/minecraft/util/AxisAlignedBB;");
+		rMethodVisitor.visitRedirectedFieldInsn(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70121_D", "Lnet/minecraft/util/AxisAlignedBB;", this);
 		methodVisitor.visitInsn(ARETURN);
 		methodVisitor.visitMaxs(1, 1);
 		methodVisitor.visitEnd();
@@ -181,14 +185,15 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 	public void createMoveEntity(ClassNode classNode)
 	{
 		MethodVisitor methodVisitor = classNode.visitMethod(ACC_PUBLIC, "func_70091_d", "(DDD)V", null, null);
+		RedirectedMethodVisitor rMethodVisitor = new RedirectedMethodVisitor(methodVisitor);
 		methodVisitor.visitCode();
 		methodVisitor.visitVarInsn(ALOAD, 0);
-		methodVisitor.visitFieldInsn(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70170_p", "Lnet/minecraft/world/World;");
+		rMethodVisitor.visitRedirectedFieldInsn(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70170_p", "Lnet/minecraft/world/World;", this);
 		methodVisitor.visitVarInsn(ALOAD, 0);
 		methodVisitor.visitVarInsn(DLOAD, 1);
 		methodVisitor.visitVarInsn(DLOAD, 3);
 		methodVisitor.visitVarInsn(DLOAD, 5);
-		methodVisitor.visitMethodInsn(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "moveEntity", "(Lnet/minecraft/world/World;Lnet/minecraft/entity/item/EntityFallingBlock;DDD)V", false);
+		rMethodVisitor.visitRedirectedMethodInsn(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "moveEntity", "(Lnet/minecraft/world/World;Lnet/minecraft/entity/item/EntityFallingBlock;DDD)V", false, this);
 		methodVisitor.visitInsn(RETURN);
 		methodVisitor.visitMaxs(8, 7);
 		methodVisitor.visitEnd();
@@ -202,76 +207,76 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		//this.preventEntitySpawning = true;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_1));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70156_m", "Z"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70156_m", "Z", this));
 		
 		//this.setSize(0.996f, 0.996f);
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new LdcInsnNode(new Float("0.996")));
 		toInject.add(new LdcInsnNode(new Float("0.996")));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70105_a", "(FF)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70105_a", "(FF)V", false, this));
 		
 		//this.yOffset = this.height/2.0f;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70131_O", "F"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70131_O", "F", this));
 		toInject.add(new InsnNode(FCONST_2));
 		toInject.add(new InsnNode(FDIV));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70129_M", "F"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70129_M", "F", this));
 		
 		//this.motionX = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DCONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70159_w", "D"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70159_w", "D", this));
 		
 		//this.motionY = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DCONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70181_x", "D"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70181_x", "D", this));
 		
 		//this.motionZ = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DCONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70179_y", "D"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70179_y", "D", this));
 		
 		//this.accelerationX = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DCONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationX", "D"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationX", "D", this));
 		
 		//this.accelerationY = -0.024525;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new LdcInsnNode(new Double("-0.024525")));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationY", "D"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationY", "D", this));
 		
 		//this.accelerationZ = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DCONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationZ", "D"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationZ", "D", this));
 		
 		//this.slideDir = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "slideDir", "B"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "slideDir", "B", this));
 		
 		//this.noClip = true;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_1));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70145_X", "Z"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70145_X", "Z", this));
 		
 		//this.entityCollisionReduction = 0.8F;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new LdcInsnNode(new Float("0.8")));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70144_Y", "F"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70144_Y", "F", this));
 		
 		//this.dead = 4;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_4));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "dead", "B"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "dead", "B", this));
 		
 		//this.bpdata = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "bpdata", "I"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "bpdata", "I", this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -295,42 +300,42 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		//this.accelerationX = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DCONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationX", "D"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationX", "D", this));
 
 		//this.accelerationY = -0.024525;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new LdcInsnNode(new Double("-0.024525")));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationY", "D"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationY", "D", this));
 
 		//this.accelerationZ = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DCONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationZ", "D"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationZ", "D", this));
 
 		//this.slideDir = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "slideDir", "B"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "slideDir", "B", this));
 
 		//this.noClip = true;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_1));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70145_X", "Z"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70145_X", "Z", this));
 
 		//this.entityCollisionReduction = 0.8F;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new LdcInsnNode(new Float("0.8")));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70144_Y", "F"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70144_Y", "F", this));
 
 		//this.dead = 4;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_4));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "dead", "B"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "dead", "B", this));
 
 		//this.bpdata = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "bpdata", "I"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "bpdata", "I", this));
 
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -371,9 +376,9 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70170_p", "Lnet/minecraft/world/World;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70170_p", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "fallingSandUpdate", "(Lnet/minecraft/world/World;Lnet/minecraft/entity/item/EntityFallingBlock;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "fallingSandUpdate", "(Lnet/minecraft/world/World;Lnet/minecraft/entity/item/EntityFallingBlock;)V", false, this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -404,28 +409,28 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		toInject.add(new InsnNode(DUP));
 		toInject.add(new InsnNode(ICONST_0));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationX", "D"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationX", "D", this));
 		toInject.add(new InsnNode(DASTORE));
 		toInject.add(new InsnNode(DUP));
 		toInject.add(new InsnNode(ICONST_1));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationY", "D"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationY", "D", this));
 		toInject.add(new InsnNode(DASTORE));
 		toInject.add(new InsnNode(DUP));
 		toInject.add(new InsnNode(ICONST_2));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationZ", "D"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationZ", "D", this));
 		toInject.add(new InsnNode(DASTORE));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70087_a", "([D)Lnet/minecraft/nbt/NBTTagList;", false));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74782_a", "(Ljava/lang/String;Lnet/minecraft/nbt/NBTBase;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70087_a", "([D)Lnet/minecraft/nbt/NBTTagList;", false, this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74782_a", "(Ljava/lang/String;Lnet/minecraft/nbt/NBTBase;)V", false, this));
 		
 		//p_70014_1_.setByte("BPData", (byte)this.bpdata);
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new LdcInsnNode("BPData"));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "bpdata", "I"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "bpdata", "I", this));
 		toInject.add(new InsnNode(I2B));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74774_a", "(Ljava/lang/String;B)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74774_a", "(Ljava/lang/String;B)V", false, this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -450,8 +455,8 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "readFallingSandID", "(Lnet/minecraft/nbt/NBTTagCompound;)Lnet/minecraft/block/Block;", false));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_145811_e", "Lnet/minecraft/block/Block;"));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "readFallingSandID", "(Lnet/minecraft/nbt/NBTTagCompound;)Lnet/minecraft/block/Block;", false, this));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_145811_e", "Lnet/minecraft/block/Block;", this));
 		
 		method.instructions.insertBefore(target, toInject);
 		
@@ -485,33 +490,33 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		InsnList toInject2 = new InsnList();
 		toInject2.add(new VarInsnNode(ALOAD, 1));
 		toInject2.add(new LdcInsnNode("Acceleration"));
-		toInject2.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74764_b", "(Ljava/lang/String;)Z", false));
+		toInject2.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74764_b", "(Ljava/lang/String;)Z", false, this));
 		LabelNode label1 = new LabelNode();
 		toInject2.add(new JumpInsnNode(IFEQ, label1));
 		
 		toInject2.add(new VarInsnNode(ALOAD, 1));
 		toInject2.add(new LdcInsnNode("Acceleration"));
 		toInject2.add(new IntInsnNode(BIPUSH, 9));
-		toInject2.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_150295_c", "(Ljava/lang/String;I)Lnet/minecraft/nbt/NBTTagList;", false));
+		toInject2.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_150295_c", "(Ljava/lang/String;I)Lnet/minecraft/nbt/NBTTagList;", false, this));
 		toInject2.add(new VarInsnNode(ASTORE, 2));
 		
 		toInject2.add(new VarInsnNode(ALOAD, 0));
 		toInject2.add(new VarInsnNode(ALOAD, 2));
 		toInject2.add(new InsnNode(ICONST_0));
-		toInject2.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagList", "func_150309_d", "(I)D", false));
-		toInject2.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationX", "D"));
+		toInject2.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagList", "func_150309_d", "(I)D", false, this));
+		toInject2.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationX", "D", this));
 		
 		toInject2.add(new VarInsnNode(ALOAD, 0));
 		toInject2.add(new VarInsnNode(ALOAD, 2));
 		toInject2.add(new InsnNode(ICONST_1));
-		toInject2.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagList", "func_150309_d", "(I)D", false));
-		toInject2.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationY", "D"));
+		toInject2.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagList", "func_150309_d", "(I)D", false, this));
+		toInject2.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationY", "D", this));
 		
 		toInject2.add(new VarInsnNode(ALOAD, 0));
 		toInject2.add(new VarInsnNode(ALOAD, 2));
 		toInject2.add(new InsnNode(ICONST_2));
-		toInject2.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagList", "func_150309_d", "(I)D", false));
-		toInject2.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationZ", "D"));
+		toInject2.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagList", "func_150309_d", "(I)D", false, this));
+		toInject2.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationZ", "D", this));
 		
 		LabelNode label2 = new LabelNode();
 		toInject2.add(new JumpInsnNode(GOTO, label2));
@@ -519,29 +524,29 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		
 		toInject2.add(new VarInsnNode(ALOAD, 0));
 		toInject2.add(new InsnNode(DCONST_0));
-		toInject2.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationX", "D"));
+		toInject2.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationX", "D", this));
 		
 		
 		toInject2.add(new VarInsnNode(ALOAD, 0));
 		toInject2.add(new InsnNode(DCONST_0));
-		toInject2.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationY", "D"));
+		toInject2.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationY", "D", this));
 		
 		toInject2.add(new VarInsnNode(ALOAD, 0));
 		toInject2.add(new InsnNode(DCONST_0));
-		toInject2.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationZ", "D"));
+		toInject2.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "accelerationZ", "D", this));
 		toInject2.add(label2);
 		
 		toInject2.add(new VarInsnNode(ALOAD, 1));
 		toInject2.add(new LdcInsnNode("BPData"));
-		toInject2.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74764_b", "(Ljava/lang/String;)Z", false));
+		toInject2.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74764_b", "(Ljava/lang/String;)Z", false, this));
 		LabelNode label3 = new LabelNode();
 		toInject2.add(new JumpInsnNode(IFEQ, label3));
 		
 		toInject2.add(new VarInsnNode(ALOAD, 0));
 		toInject2.add(new VarInsnNode(ALOAD, 1));
 		toInject2.add(new LdcInsnNode("BPData"));
-		toInject2.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74771_c", "(Ljava/lang/String;)B", false));
-		toInject2.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "bpdata", "I"));
+		toInject2.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74771_c", "(Ljava/lang/String;)B", false, this));
+		toInject2.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "bpdata", "I", this));
 		
 		LabelNode label4 = new LabelNode();
 		toInject2.add(new JumpInsnNode(GOTO, label4));
@@ -549,7 +554,7 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		
 		toInject2.add(new VarInsnNode(ALOAD, 0));
 		toInject2.add(new InsnNode(ICONST_0));
-		toInject2.add(new FieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "bpdata", "I"));
+		toInject2.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/entity/item/EntityFallingBlock", "bpdata", "I", this));
 		toInject2.add(label4);
 		
 		method.instructions.insertBefore(target2, toInject2);
@@ -573,20 +578,20 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70090_H", "()Z", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70090_H", "()Z", false, this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
 
 	@Override
 	public void registerAdditions(ASMAdditionRegistry registry) {
-		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "slideDir", "B", null, null));
-		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "accelerationX", "D", null, null));
-		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "accelerationY", "D", null, null));
-		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "accelerationZ", "D", null, null));
-		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "bpdata", "I", null, null));
-		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "media", "Ljava/lang/String;", null, null));
-		registry.registerFieldAddition("net.minecraft.entity.item.EntityFallingBlock", new FieldNode(ACC_PUBLIC, "dead", "B", null, null));
+		registry.registerFieldAddition("net/minecraft/entity/item/EntityFallingBlock", new FieldNode(ACC_PUBLIC, "slideDir", "B", null, null));
+		registry.registerFieldAddition("net/minecraft/entity/item/EntityFallingBlock", new FieldNode(ACC_PUBLIC, "accelerationX", "D", null, null));
+		registry.registerFieldAddition("net/minecraft/entity/item/EntityFallingBlock", new FieldNode(ACC_PUBLIC, "accelerationY", "D", null, null));
+		registry.registerFieldAddition("net/minecraft/entity/item/EntityFallingBlock", new FieldNode(ACC_PUBLIC, "accelerationZ", "D", null, null));
+		registry.registerFieldAddition("net/minecraft/entity/item/EntityFallingBlock", new FieldNode(ACC_PUBLIC, "bpdata", "I", null, null));
+		registry.registerFieldAddition("net/minecraft/entity/item/EntityFallingBlock", new FieldNode(ACC_PUBLIC, "media", "Ljava/lang/String;", null, null));
+		registry.registerFieldAddition("net/minecraft/entity/item/EntityFallingBlock", new FieldNode(ACC_PUBLIC, "dead", "B", null, null));
 
 		ClassNode classNode = new ClassNode();
 		
@@ -594,8 +599,8 @@ public class ModuleEntityFallingBlockClass implements IClassTransformerModule
 		createSetInWeb(classNode);
 		createMoveEntity(classNode);
 		
-		registry.registerMethodAddition("net.minecraft.entity.item.EntityFallingBlock", ASMHelper.findMethodNodeOfClass(classNode, "func_70046_E", "()Lnet/minecraft/util/AxisAlignedBB;"));
-		registry.registerMethodAddition("net.minecraft.entity.item.EntityFallingBlock", ASMHelper.findMethodNodeOfClass(classNode, "func_70110_aj", "()V"));
-		registry.registerMethodAddition("net.minecraft.entity.item.EntityFallingBlock", ASMHelper.findMethodNodeOfClass(classNode, "func_70091_d", "(DDD)V"));
+		registry.registerMethodAddition("net/minecraft/entity/item/EntityFallingBlock", ASMHelper.findMethodNodeOfClass(classNode, "func_70046_E", "()Lnet/minecraft/util/AxisAlignedBB;"));
+		registry.registerMethodAddition("net/minecraft/entity/item/EntityFallingBlock", ASMHelper.findMethodNodeOfClass(classNode, "func_70110_aj", "()V"));
+		registry.registerMethodAddition("net/minecraft/entity/item/EntityFallingBlock", ASMHelper.findMethodNodeOfClass(classNode, "func_70091_d", "(DDD)V"));
 	}
 }

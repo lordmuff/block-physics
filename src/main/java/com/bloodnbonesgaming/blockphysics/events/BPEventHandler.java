@@ -2,6 +2,7 @@ package com.bloodnbonesgaming.blockphysics.events;
 
 import java.util.Iterator;
 
+import com.bloodnbonesgaming.blockphysics.BlockPhysics;
 import com.bloodnbonesgaming.blockphysics.ExplosionQueue;
 import com.bnbgaming.lib.core.ASMAdditionHelper;
 
@@ -21,7 +22,7 @@ public class BPEventHandler
 	{
 		event.setCanceled(true);
 		
-		((ExplosionQueue)ASMAdditionHelper.get(event.world, "explosionQueue")).add(event.explosion);
+		((ExplosionQueue)BlockPhysics.asmHelper.get(event.world, "explosionQueue")).add(event.explosion);
 		
 		if (event.world instanceof WorldServer)
 		{

@@ -20,6 +20,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -82,9 +84,9 @@ public class ModuleEntityTrackerEntryClass implements IClassTransformerModule
 		//return BlockPhysics.spawnFallingSandPacket((EntityFallingBlock)this.myEntity);
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/EntityTrackerEntry", "field_73132_a", "Lnet/minecraft/entity/Entity;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/entity/EntityTrackerEntry", "field_73132_a", "Lnet/minecraft/entity/Entity;", this));
 		toInject.add(new TypeInsnNode(CHECKCAST, "net/minecraft/entity/item/EntityFallingBlock"));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "spawnFallingSandPacket", "(Lnet/minecraft/entity/item/EntityFallingBlock;)Lnet/minecraft/network/play/server/S0EPacketSpawnObject;", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "spawnFallingSandPacket", "(Lnet/minecraft/entity/item/EntityFallingBlock;)Lnet/minecraft/network/play/server/S0EPacketSpawnObject;", false, this));
 		toInject.add(new InsnNode(ARETURN));
 		
 		method.instructions.insert(target2, toInject);

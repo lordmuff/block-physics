@@ -25,7 +25,9 @@ import static org.objectweb.asm.Opcodes.PUTFIELD;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.ClassNode;
+
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedMethodVisitor;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -80,10 +82,11 @@ public class ModuleChunkClass implements IClassTransformerModule
 		//}
 		
 		MethodVisitor methodVisitor = classNode.visitMethod(ACC_PUBLIC, "setBlockBPdata", "(IIII)Z", null, null);
+		RedirectedMethodVisitor rMethodVisitor = new RedirectedMethodVisitor(methodVisitor);
 		
 		methodVisitor.visitCode();
 		methodVisitor.visitVarInsn(ALOAD, 0);
-		methodVisitor.visitFieldInsn(GETFIELD, "net/minecraft/world/chunk/Chunk", "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;");
+		rMethodVisitor.visitRedirectedFieldInsn(GETFIELD, "net/minecraft/world/chunk/Chunk", "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;", this);
 		methodVisitor.visitVarInsn(ILOAD, 2);
 		methodVisitor.visitInsn(ICONST_4);
 		methodVisitor.visitInsn(ISHR);
@@ -101,7 +104,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 		methodVisitor.visitIntInsn(BIPUSH, 15);
 		methodVisitor.visitInsn(IAND);
 		methodVisitor.visitVarInsn(ILOAD, 3);
-		methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "getBlockBPdata", "(III)I", false);
+		rMethodVisitor.visitRedirectedMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "getBlockBPdata", "(III)I", false, this);
 		methodVisitor.visitVarInsn(ISTORE, 6);
 		methodVisitor.visitVarInsn(ILOAD, 6);
 		methodVisitor.visitVarInsn(ILOAD, 4);
@@ -112,7 +115,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 		methodVisitor.visitLabel(label2);
 		methodVisitor.visitVarInsn(ALOAD, 0);
 		methodVisitor.visitInsn(ICONST_1);
-		methodVisitor.visitFieldInsn(PUTFIELD, "net/minecraft/world/chunk/Chunk", "field_76643_l", "Z");
+		rMethodVisitor.visitRedirectedFieldInsn(PUTFIELD, "net/minecraft/world/chunk/Chunk", "field_76643_l", "Z", this);
 		methodVisitor.visitVarInsn(ALOAD, 5);
 		methodVisitor.visitVarInsn(ILOAD, 1);
 		methodVisitor.visitVarInsn(ILOAD, 2);
@@ -120,7 +123,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 		methodVisitor.visitInsn(IAND);
 		methodVisitor.visitVarInsn(ILOAD, 3);
 		methodVisitor.visitVarInsn(ILOAD, 4);
-		methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "setBlockBPdata", "(IIII)V", false);
+		rMethodVisitor.visitRedirectedMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "setBlockBPdata", "(IIII)V", false, this);
 		methodVisitor.visitInsn(ICONST_1);
 		methodVisitor.visitInsn(IRETURN);
 		methodVisitor.visitMaxs(5, 7);
@@ -149,13 +152,14 @@ public class ModuleChunkClass implements IClassTransformerModule
 		//}
 		
 		MethodVisitor methodVisitor = classNode.visitMethod(ACC_PUBLIC, "getBlockBPdata", "(III)I", null, null);
+		RedirectedMethodVisitor rMethodVisitor = new RedirectedMethodVisitor(methodVisitor);
 		
 		methodVisitor.visitCode();
 		methodVisitor.visitVarInsn(ILOAD, 2);
 		methodVisitor.visitInsn(ICONST_4);
 		methodVisitor.visitInsn(ISHR);
 		methodVisitor.visitVarInsn(ALOAD, 0);
-		methodVisitor.visitFieldInsn(GETFIELD, "net/minecraft/world/chunk/Chunk", "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;");
+		rMethodVisitor.visitRedirectedFieldInsn(GETFIELD, "net/minecraft/world/chunk/Chunk", "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;", this);
 		methodVisitor.visitInsn(ARRAYLENGTH);
 		Label l1 = new Label();
 		methodVisitor.visitJumpInsn(IF_ICMPLT, l1);
@@ -163,7 +167,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 		methodVisitor.visitInsn(IRETURN);
 		methodVisitor.visitLabel(l1);
 		methodVisitor.visitVarInsn(ALOAD, 0);
-		methodVisitor.visitFieldInsn(GETFIELD, "net/minecraft/world/chunk/Chunk", "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;");
+		rMethodVisitor.visitRedirectedFieldInsn(GETFIELD, "net/minecraft/world/chunk/Chunk", "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;", this);
 		methodVisitor.visitVarInsn(ILOAD, 2);
 		methodVisitor.visitInsn(ICONST_4);
 		methodVisitor.visitInsn(ISHR);
@@ -178,7 +182,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 		methodVisitor.visitIntInsn(BIPUSH, 15);
 		methodVisitor.visitInsn(IAND);
 		methodVisitor.visitVarInsn(ILOAD, 3);
-		methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "getBlockBPdata", "(III)I", false);
+		rMethodVisitor.visitRedirectedMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockphysctgetBlockBPdata", "(III)I", false, this);
 		methodVisitor.visitInsn(IRETURN);
 		methodVisitor.visitLabel(l4);
 		methodVisitor.visitInsn(ICONST_0);
@@ -194,7 +198,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 		createGetBlockBPdata(classNode);
 		createSetBlockBPdata(classNode);
 		
-		registry.registerMethodAddition("net.minecraft.world.chunk.Chunk", ASMHelper.findMethodNodeOfClass(classNode, "getBlockBPdata", "(III)I"));
-		registry.registerMethodAddition("net.minecraft.world.chunk.Chunk", ASMHelper.findMethodNodeOfClass(classNode, "setBlockBPdata", "(IIII)Z"));
+		registry.registerMethodAddition("net/minecraft/world/chunk/Chunk", ASMHelper.findMethodNodeOfClass(classNode, "getBlockBPdata", "(III)I"));
+		registry.registerMethodAddition("net/minecraft/world/chunk/Chunk", ASMHelper.findMethodNodeOfClass(classNode, "setBlockBPdata", "(IIII)Z"));
 	}
 }

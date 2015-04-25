@@ -22,6 +22,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -79,16 +81,16 @@ public class ModuleNetHandlerPlayClientClass implements IClassTransformerModule
 		//p_147235_1_.func_149002_g(1);
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/client/network/NetHandlerPlayClient", "field_147300_g", "Lnet/minecraft/client/multiplayer/WorldClient;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/client/network/NetHandlerPlayClient", "field_147300_g", "Lnet/minecraft/client/multiplayer/WorldClient;", this));
 		toInject.add(new VarInsnNode(DLOAD, 2));
 		toInject.add(new VarInsnNode(DLOAD, 4));
 		toInject.add(new VarInsnNode(DLOAD, 6));
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "createFallingsand", "(Lnet/minecraft/world/World;DDDLnet/minecraft/network/play/server/S0EPacketSpawnObject;)Lnet/minecraft/entity/item/EntityFallingBlock;", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "createFallingsand", "(Lnet/minecraft/world/World;DDDLnet/minecraft/network/play/server/S0EPacketSpawnObject;)Lnet/minecraft/entity/item/EntityFallingBlock;", false, this));
 		toInject.add(new VarInsnNode(ASTORE, 8));
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new InsnNode(ICONST_1));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/network/play/server/S0EPacketSpawnObject", "func_149002_g", "(I)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/network/play/server/S0EPacketSpawnObject", "func_149002_g", "(I)V", false, this));
 		
 		method.instructions.insertBefore(target, toInject);
 		

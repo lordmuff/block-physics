@@ -25,6 +25,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -103,20 +105,20 @@ public class ModuleWorldClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new TypeInsnNode(NEW, ModInfo.MAIN_PACKACE + "/blockphysics/BTickList"));
 		toInject.add(new InsnNode(DUP));
-		toInject.add(new MethodInsnNode(INVOKESPECIAL, ModInfo.MAIN_PACKACE + "/blockphysics/BTickList", "<init>", "()V", false));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/world/World", "moveTickList", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/BTickList;"));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESPECIAL, ModInfo.MAIN_PACKACE + "/blockphysics/BTickList", "<init>", "()V", false, this));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/world/World", "moveTickList", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/BTickList;", this));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new TypeInsnNode(NEW, "java/util/HashSet"));
 		toInject.add(new InsnNode(DUP));
-		toInject.add(new MethodInsnNode(INVOKESPECIAL, "java/util/HashSet", "<init>", "()V", false));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/world/World", "pistonMoveBlocks", "Ljava/util/HashSet;"));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESPECIAL, "java/util/HashSet", "<init>", "()V", false, this));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/world/World", "pistonMoveBlocks", "Ljava/util/HashSet;", this));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new TypeInsnNode(NEW, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue"));
 		toInject.add(new InsnNode(DUP));
-		toInject.add(new MethodInsnNode(INVOKESPECIAL, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue", "<init>", "()V", false));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/world/World", "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;"));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESPECIAL, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue", "<init>", "()V", false, this));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/world/World", "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;", this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -132,20 +134,20 @@ public class ModuleWorldClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new TypeInsnNode(NEW, ModInfo.MAIN_PACKACE + "/blockphysics/BTickList"));
 		toInject.add(new InsnNode(DUP));
-		toInject.add(new MethodInsnNode(INVOKESPECIAL, ModInfo.MAIN_PACKACE + "/blockphysics/BTickList", "<init>", "()V", false));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/world/World", "moveTickList", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/BTickList;"));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESPECIAL, ModInfo.MAIN_PACKACE + "/blockphysics/BTickList", "<init>", "()V", false, this));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/world/World", "moveTickList", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/BTickList;", this));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new TypeInsnNode(NEW, "java/util/HashSet"));
 		toInject.add(new InsnNode(DUP));
-		toInject.add(new MethodInsnNode(INVOKESPECIAL, "java/util/HashSet", "<init>", "()V", false));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/world/World", "pistonMoveBlocks", "Ljava/util/HashSet;"));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESPECIAL, "java/util/HashSet", "<init>", "()V", false, this));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/world/World", "pistonMoveBlocks", "Ljava/util/HashSet;", this));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new TypeInsnNode(NEW, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue"));
 		toInject.add(new InsnNode(DUP));
-		toInject.add(new MethodInsnNode(INVOKESPECIAL, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue", "<init>", "()V", false));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/world/World", "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;"));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESPECIAL, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue", "<init>", "()V", false, this));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/world/World", "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;", this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -169,17 +171,17 @@ public class ModuleWorldClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/world/World", "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/world/World", "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;", this));
 		toInject.add(new VarInsnNode(ALOAD, 11));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue", "add", "(Lnet/minecraft/world/Explosion;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue", "add", "(Lnet/minecraft/world/Explosion;)V", false, this));
 		
 		method.instructions.insertBefore(target2, toInject);
 	}
 
 	@Override
 	public void registerAdditions(ASMAdditionRegistry registry) {
-		registry.registerFieldAddition("net.minecraft.world.World", new FieldNode(ACC_PUBLIC, "moveTickList", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/BTickList;", null, null));
-		registry.registerFieldAddition("net.minecraft.world.World", new FieldNode(ACC_PUBLIC, "pistonMoveBlocks", "Ljava/util/HashSet;", null, null));
-		registry.registerFieldAddition("net.minecraft.world.World", new FieldNode(ACC_PUBLIC, "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;", null, null));
+		registry.registerFieldAddition("net/minecraft/world/World", new FieldNode(ACC_PUBLIC, "moveTickList", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/BTickList;", null, null));
+		registry.registerFieldAddition("net/minecraft/world/World", new FieldNode(ACC_PUBLIC, "pistonMoveBlocks", "Ljava/util/HashSet;", null, null));
+		registry.registerFieldAddition("net/minecraft/world/World", new FieldNode(ACC_PUBLIC, "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;", null, null));
 	}
 }

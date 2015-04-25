@@ -31,6 +31,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
+import com.bnbgaming.lib.core.insn.RedirectedMethodVisitor;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -89,10 +91,11 @@ public class ModuleExtendedBlockStorageClass implements IClassTransformerModule
 		//}
 		
 		MethodVisitor methodVisitor = classNode.visitMethod(ACC_PUBLIC, "setBlockBPdata", "(IIII)V", null, null);
+		RedirectedMethodVisitor rMethodVisitor = new RedirectedMethodVisitor(methodVisitor);
 
 		methodVisitor.visitCode();
 		methodVisitor.visitVarInsn(ALOAD, 0);
-		methodVisitor.visitFieldInsn(GETFIELD, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockBPdataArray", "[B");
+		rMethodVisitor.visitRedirectedFieldInsn(GETFIELD, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockBPdataArray", "[B", this);
 		methodVisitor.visitVarInsn(ILOAD, 2);
 		methodVisitor.visitIntInsn(SIPUSH, 256);
 		methodVisitor.visitInsn(IMUL);
@@ -118,10 +121,11 @@ public class ModuleExtendedBlockStorageClass implements IClassTransformerModule
 		//}
 		
 		MethodVisitor methodVisitor = classNode.visitMethod(ACC_PUBLIC, "getBlockBPdata", "(III)I", null, null);
+		RedirectedMethodVisitor rMethodVisitor = new RedirectedMethodVisitor(methodVisitor);
 
 		methodVisitor.visitCode();
 		methodVisitor.visitVarInsn(ALOAD, 0);
-		methodVisitor.visitFieldInsn(GETFIELD, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockBPdataArray", "[B");
+		rMethodVisitor.visitRedirectedFieldInsn(GETFIELD, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockBPdataArray", "[B", this);
 		methodVisitor.visitVarInsn(ILOAD, 2);
 		methodVisitor.visitIntInsn(SIPUSH, 256);
 		methodVisitor.visitInsn(IMUL);
@@ -145,11 +149,12 @@ public class ModuleExtendedBlockStorageClass implements IClassTransformerModule
 		//}
 		
 		MethodVisitor methodVisitor = classNode.visitMethod(ACC_PUBLIC, "setBPdataArray", "([B)V", null, null);
+		RedirectedMethodVisitor rMethodVisitor = new RedirectedMethodVisitor(methodVisitor);
 
 		methodVisitor.visitCode();
 		methodVisitor.visitVarInsn(ALOAD, 0);
 		methodVisitor.visitVarInsn(ALOAD, 1);
-		methodVisitor.visitFieldInsn(PUTFIELD, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockBPdataArray", "[B");
+		rMethodVisitor.visitRedirectedFieldInsn(PUTFIELD, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockBPdataArray", "[B", this);
 		methodVisitor.visitInsn(RETURN);
 		methodVisitor.visitMaxs(2, 2);
 		methodVisitor.visitEnd();
@@ -163,10 +168,11 @@ public class ModuleExtendedBlockStorageClass implements IClassTransformerModule
 		//}
 		
 		MethodVisitor methodVisitor = classNode.visitMethod(ACC_PUBLIC, "getBPdataArray", "()[B", null, null);
+		RedirectedMethodVisitor rMethodVisitor = new RedirectedMethodVisitor(methodVisitor);
 
 		methodVisitor.visitCode();
 		methodVisitor.visitVarInsn(ALOAD, 0);
-		methodVisitor.visitFieldInsn(GETFIELD, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockBPdataArray", "[B");
+		rMethodVisitor.visitRedirectedFieldInsn(GETFIELD, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockBPdataArray", "[B", this);
 		methodVisitor.visitInsn(ARETURN);
 		methodVisitor.visitMaxs(1, 1);
 		methodVisitor.visitEnd();
@@ -185,14 +191,14 @@ public class ModuleExtendedBlockStorageClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new IntInsnNode(SIPUSH, 4096));
 		toInject.add(new IntInsnNode(NEWARRAY, T_BYTE));
-		toInject.add(new FieldInsnNode(PUTFIELD, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockBPdataArray", "[B"));
+		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockBPdataArray", "[B", this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
 
 	@Override
 	public void registerAdditions(ASMAdditionRegistry registry) {
-		registry.registerFieldAddition("net.minecraft.world.chunk.storage.ExtendedBlockStorage", new FieldNode(ACC_PRIVATE, "blockBPdataArray", "[B", null, null));
+		registry.registerFieldAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", new FieldNode(ACC_PRIVATE, "blockBPdataArray", "[B", null, null));
 		
 		ClassNode classNode = new ClassNode();
 		createSetBlockBPdata(classNode);
@@ -200,9 +206,9 @@ public class ModuleExtendedBlockStorageClass implements IClassTransformerModule
         createSetBPdataArray(classNode);
 		createGetBPdataArray(classNode);
 		
-		registry.registerMethodAddition("net.minecraft.world.chunk.storage.ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "getBlockBPdata", "(III)I"));
-		registry.registerMethodAddition("net.minecraft.world.chunk.storage.ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "setBlockBPdata", "(IIII)V"));
-		registry.registerMethodAddition("net.minecraft.world.chunk.storage.ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "getBPdataArray", "()[B"));
-		registry.registerMethodAddition("net.minecraft.world.chunk.storage.ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "setBPdataArray", "([B)V"));
+		registry.registerMethodAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "getBlockBPdata", "(III)I"));
+		registry.registerMethodAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "setBlockBPdata", "(IIII)V"));
+		registry.registerMethodAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "getBPdataArray", "()[B"));
+		registry.registerMethodAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "setBPdataArray", "([B)V"));
 	}
 }

@@ -21,6 +21,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -88,20 +90,20 @@ public class ModuleWorldServerClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "tickBlocksRandomMove", "(Lnet/minecraft/world/WorldServer;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "tickBlocksRandomMove", "(Lnet/minecraft/world/WorldServer;)V", false, this));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/world/WorldServer", "moveTickList", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/BTickList;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/world/World", "moveTickList", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/BTickList;", this));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ModInfo.MAIN_PACKACE + "/blockphysics/BTickList", "tickMoveUpdates", "(Lnet/minecraft/world/World;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, ModInfo.MAIN_PACKACE + "/blockphysics/BTickList", "tickMoveUpdates", "(Lnet/minecraft/world/World;)V", false, this));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/world/WorldServer", "pistonMoveBlocks", "Ljava/util/HashSet;"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, "java/util/HashSet", "clear", "()V", false));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/world/World", "pistonMoveBlocks", "Ljava/util/HashSet;", this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "java/util/HashSet", "clear", "()V", false, this));
 		
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/world/WorldServer", "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue", "doNextExplosion", "()V", false));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/world/World", "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;", this));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue", "doNextExplosion", "()V", false, this));
 		
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -110,7 +112,7 @@ public class ModuleWorldServerClass implements IClassTransformerModule
 	{
 		InsnList toRemove1 = new InsnList();
 		toRemove1.add(new VarInsnNode(ALOAD, 11));
-		toRemove1.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/Explosion", "func_77278_a", "()V", false));
+		toRemove1.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/Explosion", "func_77278_a", "()V", false, this));
 		
 		AbstractInsnNode start1 = ASMHelper.find(method.instructions, toRemove1);
 		AbstractInsnNode end1 = ASMHelper.move(start1, 2);
@@ -123,7 +125,7 @@ public class ModuleWorldServerClass implements IClassTransformerModule
 		InsnList toRemove2 = new InsnList();
 		toRemove2.add(new VarInsnNode(ALOAD, 11));
 		toRemove2.add(new InsnNode(ICONST_0));
-		toRemove2.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/Explosion", "func_77279_a", "(Z)V", false));
+		toRemove2.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/Explosion", "func_77279_a", "(Z)V", false, this));
 		
 		AbstractInsnNode start2 = ASMHelper.find(method.instructions, toRemove2);
 		AbstractInsnNode end2 = ASMHelper.move(start2, 3);
@@ -140,9 +142,9 @@ public class ModuleWorldServerClass implements IClassTransformerModule
 		
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, "net/minecraft/world/World", "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;"));
+		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/world/World", "explosionQueue", "L" + ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue;", this));
 		toInject.add(new VarInsnNode(ALOAD, 11));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue", "add", "(Lnet/minecraft/world/Explosion;)V", false));
+		toInject.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, ModInfo.MAIN_PACKACE + "/blockphysics/ExplosionQueue", "add", "(Lnet/minecraft/world/Explosion;)V", false, this));
 		
 		method.instructions.insert(target, toInject);
 	}

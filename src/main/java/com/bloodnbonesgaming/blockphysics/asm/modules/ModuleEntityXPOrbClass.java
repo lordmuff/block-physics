@@ -53,6 +53,6 @@ public class ModuleEntityXPOrbClass implements IClassTransformerModule
 		
 		createSetInWeb(classNode);
 		
-		registry.registerMethodAddition("net.minecraft.entity.item.EntityXPOrb", ASMHelper.findMethodNodeOfClass(classNode, "func_70110_aj", "()V"));
+		registry.registerMethodAddition("net/minecraft/entity/item/EntityXPOrb", ASMHelper.findMethodNodeOfClass(classNode, "func_70110_aj", "()V"));
 	}
 }

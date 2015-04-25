@@ -13,6 +13,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
@@ -71,7 +72,7 @@ public class ModuleBlockChestClass implements IClassTransformerModule
 		toFind.add(new VarInsnNode(ILOAD, 2));
 		toFind.add(new VarInsnNode(ILOAD, 3));
 		toFind.add(new VarInsnNode(ILOAD, 4));
-		toFind.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/block/BlockChest", "func_149954_e", "(Lnet/minecraft/world/World;III)V", false));
+		toFind.add(new RedirectedMethodInsnNode(INVOKEVIRTUAL, "net/minecraft/block/BlockChest", "func_149954_e", "(Lnet/minecraft/world/World;III)V", false, this));
 		
 		AbstractInsnNode start = ASMHelper.find(method.instructions, toFind);
 		AbstractInsnNode end = ASMHelper.move(start, 6);

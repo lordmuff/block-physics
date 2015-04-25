@@ -5,6 +5,7 @@ import java.util.List;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 
+import com.bloodnbonesgaming.blockphysics.BlockPhysics;
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleAnvilChunkLoaderClass;
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleBlockAnvilClass;
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleBlockChestClass;
@@ -36,6 +37,7 @@ import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleRenderFallingBlockCl
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleTileEntityPistonClass;
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleWorldClass;
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleWorldServerClass;
+import com.bnbgaming.lib.core.ASMAdditionHelper;
 import com.bnbgaming.lib.core.BNBGamingClassTransformer;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 import com.google.common.collect.Lists;
@@ -93,5 +95,16 @@ public class ClassTransformer extends BNBGamingClassTransformer
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		return basicClass;
+	}
+
+	@Override
+	public String getName() {
+		return "blockphysct";
+	}
+
+	@Override
+	public void setAdditionHelper(ASMAdditionHelper helper) {
+		ASMPlugin.log.info("Received helper");
+		BlockPhysics.asmHelper = helper;
 	}
 }
