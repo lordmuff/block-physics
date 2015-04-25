@@ -1,23 +1,15 @@
 package com.bloodnbonesgaming.blockphysics.asm.modules;
 
-import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.GETFIELD;
-import static org.objectweb.asm.Opcodes.ICONST_0;
-import static org.objectweb.asm.Opcodes.ILOAD;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static org.objectweb.asm.Opcodes.PUTFIELD;
-import static org.objectweb.asm.Opcodes.RETURN;
-
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
+
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
@@ -26,15 +18,13 @@ import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
 import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
-import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
-
 public class ModuleExplosionClass implements IClassTransformerModule
 {
 	@Override
 	public String[] getClassesToTransform()
 	{
 		return new String[]{
-		"net.minecraft.world.Explosion"
+				"net.minecraft.world.Explosion"
 		};
 	}
 
@@ -51,100 +41,100 @@ public class ModuleExplosionClass implements IClassTransformerModule
 	}
 
 	@Override
-	public byte[] transform(String name, String transformedName, byte[] bytes)
+	public byte[] transform(final String name, final String transformedName, final byte[] bytes)
 	{
-		ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
-		
+		final ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
+
 		if (transformedName.equals("net.minecraft.world.Explosion"))
 		{
 			ASMPlugin.log.info("Transforming class: " + transformedName);
-			
+
 			//"<init>", "(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;DDDF)V"
 			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;DDDF)V");
-            if (methodNode != null)
-            {
-            	transformInit(methodNode);
-            }
-            else
-                throw new RuntimeException("Could not find <init> method in " + transformedName);
-            
-            //"doExplosionA", "()V"
-            methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_77278_a", "()V");
-            if (methodNode != null)
-            {
-            	transformDoExplosionA(methodNode);
-            }
-            else
-                throw new RuntimeException("Could not find doExplosionA method in " + transformedName);
-            
-            //"doExplosionB", "(Z)V"
-            methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_77279_a", "(Z)V");
-            if (methodNode != null)
-            {
-            	transformDoExplosionB(methodNode);
-            }
-            else
-                throw new RuntimeException("Could not find doExplosionB method in " + transformedName);
-            
-            return ASMHelper.writeClassToBytes(classNode);
+			if (methodNode != null)
+			{
+				this.transformInit(methodNode);
+			} else {
+				throw new RuntimeException("Could not find <init> method in " + transformedName);
+			}
+
+			//"doExplosionA", "()V"
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_77278_a", "()V");
+			if (methodNode != null)
+			{
+				this.transformDoExplosionA(methodNode);
+			} else {
+				throw new RuntimeException("Could not find doExplosionA method in " + transformedName);
+			}
+
+			//"doExplosionB", "(Z)V"
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_77279_a", "(Z)V");
+			if (methodNode != null)
+			{
+				this.transformDoExplosionB(methodNode);
+			} else {
+				throw new RuntimeException("Could not find doExplosionB method in " + transformedName);
+			}
+
+			return ASMHelper.writeClassToBytes(classNode);
 		}
 		return bytes;
 	}
-	
-	public void transformInit(MethodNode method)
+
+	public void transformInit(final MethodNode method)
 	{
-		AbstractInsnNode target = ASMHelper.findLastInstructionWithOpcode(method, RETURN);
-		
-		InsnList toInject = new InsnList();
-		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new RedirectedFieldInsnNode(PUTFIELD, "net/minecraft/world/Explosion", "impact", "Z", this));
-		
+		final AbstractInsnNode target = ASMHelper.findLastInstructionWithOpcode(method, Opcodes.RETURN);
+
+		final InsnList toInject = new InsnList();
+		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		toInject.add(new InsnNode(Opcodes.ICONST_0));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.PUTFIELD, "net/minecraft/world/Explosion", "impact", "Z", this));
+
 		method.instructions.insertBefore(target, toInject);
 	}
-	
-	public void transformDoExplosionA(MethodNode method)
+
+	public void transformDoExplosionA(final MethodNode method)
 	{
 		method.instructions.clear();
 		method.localVariables.clear();
-		
-		
+
+
 		//BlockPhysics.doExplosionA(this.worldObj, this);
 		//AbstractInsnNode target = ASMHelper.findLastInstructionWithOpcode(method, RETURN);
-		
-		InsnList toInject = new InsnList();
-		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/world/Explosion", "field_77287_j", "Lnet/minecraft/world/World;", this));
-		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "doExplosionA", "(Lnet/minecraft/world/World;Lnet/minecraft/world/Explosion;)V", false, this));
-		toInject.add(new InsnNode(RETURN));
-		
+
+		final InsnList toInject = new InsnList();
+		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/world/Explosion", "field_77287_j", "Lnet/minecraft/world/World;", this));
+		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "doExplosionA", "(Lnet/minecraft/world/World;Lnet/minecraft/world/Explosion;)V", false, this));
+		toInject.add(new InsnNode(Opcodes.RETURN));
+
 		method.instructions.add(toInject);
-		
-		
+
+
 	}
-	
-	public void transformDoExplosionB(MethodNode method)
+
+	public void transformDoExplosionB(final MethodNode method)
 	{
 		method.instructions.clear();
 		method.localVariables.clear();
-		
+
 		//BlockPhysics.doExplosionB(this.worldObj, this, p_77279_1_);
 		//AbstractInsnNode target = ASMHelper.findLastInstructionWithOpcode(method, RETURN);
-		
-		InsnList toInject = new InsnList();
-		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new RedirectedFieldInsnNode(GETFIELD, "net/minecraft/world/Explosion", "field_77287_j", "Lnet/minecraft/world/World;", this));
-		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new VarInsnNode(ILOAD, 1));
-		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "doExplosionB", "(Lnet/minecraft/world/World;Lnet/minecraft/world/Explosion;Z)V", false, this));
-		toInject.add(new InsnNode(RETURN));
-		
+
+		final InsnList toInject = new InsnList();
+		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/world/Explosion", "field_77287_j", "Lnet/minecraft/world/World;", this));
+		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		toInject.add(new VarInsnNode(Opcodes.ILOAD, 1));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "doExplosionB", "(Lnet/minecraft/world/World;Lnet/minecraft/world/Explosion;Z)V", false, this));
+		toInject.add(new InsnNode(Opcodes.RETURN));
+
 		method.instructions.add(toInject);
 	}
 
 	@Override
-	public void registerAdditions(ASMAdditionRegistry registry) {
-		registry.registerFieldAddition("net/minecraft/world/Explosion", new FieldNode(ACC_PUBLIC, "impact", "Z", null, null));
+	public void registerAdditions(final ASMAdditionRegistry registry) {
+		registry.registerFieldAddition("net/minecraft/world/Explosion", new FieldNode(Opcodes.ACC_PUBLIC, "impact", "Z", null, null));
 	}
 }

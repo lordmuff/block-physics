@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 
 public class RenderFallingBlocks
 {
-	public static void renderBlockSandFalling(RenderBlocks renderBlocks, Block block, World world, int x, int y, int z, int meta)
+	public static void renderBlockSandFalling(final RenderBlocks renderBlocks, final Block block, final World world, final int x, final int y, final int z, final int meta)
 	{
 		if (!block.renderAsNormalBlock())
 		{
@@ -27,37 +27,37 @@ public class RenderFallingBlocks
 			int colormult;
 			if (block instanceof BlockLeaves)
 			{
-				colormult = colorLeaves(world, x, z, meta);
+				colormult = RenderFallingBlocks.colorLeaves(world, x, z, meta);
 			}
 			else
 			{
 				colormult = block.colorMultiplier(world, x, y, z);
 			}
 
-			float cm1 = (float) (colormult >> 16 & 255) / 255.0F;
-			float cm2 = (float) (colormult >> 8 & 255) / 255.0F;
-			float cm3 = (float) (colormult & 255) / 255.0F;
+			final float cm1 = (colormult >> 16 & 255) / 255.0F;
+			final float cm2 = (colormult >> 8 & 255) / 255.0F;
+			final float cm3 = (colormult & 255) / 255.0F;
 
 			renderBlocks.enableAO = false;
-			boolean var9 = false;
-			float var10 = 0.5F;
-			float var11 = 1.0F;
-			float var12 = 0.8F;
-			float var13 = 0.6F;
-			float var14 = var11 * cm1;
-			float var15 = var11 * cm2;
-			float var16 = var11 * cm3;
-			float var17 = var10 * cm1;
-			float var18 = var12 * cm1;
-			float var19 = var13 * cm1;
-			float var20 = var10 * cm2;
-			float var21 = var12 * cm2;
-			float var22 = var13 * cm2;
-			float var23 = var10 * cm3;
-			float var24 = var12 * cm3;
-			float var25 = var13 * cm3;
+			final boolean var9 = false;
+			final float var10 = 0.5F;
+			final float var11 = 1.0F;
+			final float var12 = 0.8F;
+			final float var13 = 0.6F;
+			final float var14 = var11 * cm1;
+			final float var15 = var11 * cm2;
+			final float var16 = var11 * cm3;
+			final float var17 = var10 * cm1;
+			final float var18 = var12 * cm1;
+			final float var19 = var13 * cm1;
+			final float var20 = var10 * cm2;
+			final float var21 = var12 * cm2;
+			final float var22 = var13 * cm2;
+			final float var23 = var10 * cm3;
+			final float var24 = var12 * cm3;
+			final float var25 = var13 * cm3;
 
-			Tessellator tesselator = Tessellator.instance;
+			final Tessellator tesselator = Tessellator.instance;
 
 			tesselator.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z));
 			tesselator.startDrawingQuads();
@@ -84,7 +84,7 @@ public class RenderFallingBlocks
 		}
 	}
 
-	public static int colorLeaves(World par1World, int par2, int par4, int var5)
+	public static int colorLeaves(final World par1World, final int par2, final int par4, final int var5)
 	{
 
 		if ((var5 & 3) == 1)
@@ -105,10 +105,10 @@ public class RenderFallingBlocks
 			{
 				for (int var10 = -1; var10 <= 1; ++var10)
 				{//64 Is a guess :P
-					int var11 = par1World.getBiomeGenForCoords(par2 + var10, par4 + var9).getBiomeFoliageColor(par2 + var10, 64, par4 + var9);
+					final int var11 = par1World.getBiomeGenForCoords(par2 + var10, par4 + var9).getBiomeFoliageColor(par2 + var10, 64, par4 + var9);
 					var6 += (var11 & 16711680) >> 16;
-					var7 += (var11 & 65280) >> 8;
-					var8 += var11 & 255;
+				var7 += (var11 & 65280) >> 8;
+				var8 += var11 & 255;
 				}
 			}
 

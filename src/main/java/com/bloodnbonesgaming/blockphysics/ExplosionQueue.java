@@ -1,49 +1,58 @@
 package com.bloodnbonesgaming.blockphysics;
 
 import java.util.ArrayList;
+
 import net.minecraft.world.Explosion;
 
 public class ExplosionQueue
 {
-	private ArrayList explosionQueue;
+	private final ArrayList explosionQueue;
 	private int xinterv;
-	
+
 	public ExplosionQueue()
-    {
-        explosionQueue = new ArrayList();
-    }
-    
-	public void add( Explosion expl)
-    {
-		if (explosionQueue.size() >= ModConfig.explosionQueue) 
-    	{
-    		//BlockPhysics.writetoLog("Skipping explosion...");
-    		return;
-    	}
-    	explosionQueue.add(expl);
-    }
-	
+	{
+		this.explosionQueue = new ArrayList();
+	}
+
+	public void add( final Explosion expl)
+	{
+		if (this.explosionQueue.size() >= ModConfig.explosionQueue)
+		{
+			//BlockPhysics.writetoLog("Skipping explosion...");
+			return;
+		}
+		this.explosionQueue.add(expl);
+	}
+
 	public void doNextExplosion()
-    {
-		xinterv++;
-		if (xinterv < 0) xinterv = 1000;
-		if ( explosionQueue.isEmpty() ) return;
-		if ( xinterv < ModConfig.explosionInterval) return;
-		xinterv = 0;
-		Explosion explosion = (Explosion)explosionQueue.remove(0);
+	{
+		this.xinterv++;
+		if (this.xinterv < 0) {
+			this.xinterv = 1000;
+		}
+		if ( this.explosionQueue.isEmpty() ) {
+			return;
+		}
+		if ( this.xinterv < ModConfig.explosionInterval) {
+			return;
+		}
+		this.xinterv = 0;
+		final Explosion explosion = (Explosion)this.explosionQueue.remove(0);
 		explosion.doExplosionA();
 		explosion.doExplosionB(true);
-    }
-	  
+	}
+
 
 	public int getSize()
 	{
-		if (explosionQueue == null) return 0;
-		return explosionQueue.size();
+		if (this.explosionQueue == null) {
+			return 0;
+		}
+		return this.explosionQueue.size();
 	}
-	
-	public void reset() 
+
+	public void reset()
 	{
-		explosionQueue.clear();		
+		this.explosionQueue.clear();
 	}
 }

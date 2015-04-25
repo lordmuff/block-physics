@@ -1,12 +1,6 @@
 package com.bloodnbonesgaming.blockphysics.asm.modules;
 
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.IFEQ;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static org.objectweb.asm.Opcodes.ISTORE;
-import static org.objectweb.asm.Opcodes.RETURN;
-
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
@@ -17,13 +11,13 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
 import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
-
-import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
 public class ModuleRenderFallingBlockClass implements IClassTransformerModule
 {
@@ -31,7 +25,7 @@ public class ModuleRenderFallingBlockClass implements IClassTransformerModule
 	public String[] getClassesToTransform()
 	{
 		return new String[]{
-		"net.minecraft.client.renderer.entity.RenderFallingBlock"
+				"net.minecraft.client.renderer.entity.RenderFallingBlock"
 		};
 	}
 
@@ -48,68 +42,71 @@ public class ModuleRenderFallingBlockClass implements IClassTransformerModule
 	}
 
 	@Override
-	public byte[] transform(String name, String transformedName, byte[] bytes)
+	public byte[] transform(final String name, final String transformedName, final byte[] bytes)
 	{
-		ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
-		
+		final ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
+
 		if (transformedName.equals("net.minecraft.client.renderer.entity.RenderFallingBlock"))
 		{
 			ASMPlugin.log.info("Transforming class: " + transformedName);
-			
+
 			//"doRender", "(Lnet/minecraft/entity/item/EntityFallingBlock;DDDFF)V"
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_76986_a", "(Lnet/minecraft/entity/item/EntityFallingBlock;DDDFF)V");
-            if (methodNode != null)
-            {
-            	transformDoRender(methodNode);
-            }
-            else
-                throw new RuntimeException("Could not find doRender method in " + transformedName);
-            
-            return ASMHelper.writeClassToBytes(classNode);
+			final MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_76986_a", "(Lnet/minecraft/entity/item/EntityFallingBlock;DDDFF)V");
+			if (methodNode != null)
+			{
+				this.transformDoRender(methodNode);
+			} else {
+				throw new RuntimeException("Could not find doRender method in " + transformedName);
+			}
+
+			return ASMHelper.writeClassToBytes(classNode);
 		}
 		return bytes;
 	}
-	
-	public void transformDoRender(MethodNode method)
+
+	public void transformDoRender(final MethodNode method)
 	{
 		//if (BClient.cancelRender(p_76986_1_))
 		//{
 		//	return;
 		//}
-		AbstractInsnNode target = ASMHelper.findFirstInstruction(method);
-		
-		if (target == null)
+		final AbstractInsnNode target = ASMHelper.findFirstInstruction(method);
+
+		if (target == null) {
 			throw new RuntimeException("Unexpected instruction pattern in RenderFallingBlock.doRender1");
-		
-		InsnList toInject = new InsnList();
-		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BClient", "cancelRender", "(Lnet/minecraft/entity/item/EntityFallingBlock;)Z", false, this));
-		LabelNode label1 = new LabelNode();
-		toInject.add(new JumpInsnNode(IFEQ, label1));
-		toInject.add(new InsnNode(RETURN));
+		}
+
+		final InsnList toInject = new InsnList();
+		toInject.add(new VarInsnNode(Opcodes.ALOAD, 1));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BClient", "cancelRender", "(Lnet/minecraft/entity/item/EntityFallingBlock;)Z", false, this));
+		final LabelNode label1 = new LabelNode();
+		toInject.add(new JumpInsnNode(Opcodes.IFEQ, label1));
+		toInject.add(new InsnNode(Opcodes.RETURN));
 		toInject.add(label1);
-		
+
 		method.instructions.insertBefore(target, toInject);
-		
+
 		//Remove:
 		//if (block != null && block != world.getBlock(i, j, k))
-		AbstractInsnNode target2 = ASMHelper.find(method.instructions, new VarInsnNode(ISTORE, 14));
-		AbstractInsnNode start = ASMHelper.move(target2, 1);
-		AbstractInsnNode end = ASMHelper.move(start, 9);
-		
+		final AbstractInsnNode target2 = ASMHelper.find(method.instructions, new VarInsnNode(Opcodes.ISTORE, 14));
+		final AbstractInsnNode start = ASMHelper.move(target2, 1);
+		final AbstractInsnNode end = ASMHelper.move(start, 9);
+
 		if (target2 == null || start == null || end == null)
+		{
 			throw new RuntimeException("Unexpected instruction pattern in RenderFallingBlock.doRender2");
-		//TODO Fix this
-		//ASMHelper.removeFromInsnListUntil(method.instructions, start, end);
-		
+			//TODO Fix this
+			//ASMHelper.removeFromInsnListUntil(method.instructions, start, end);
+		}
+
 		//this.field_147920_a.renderBlockSandFalling(block, world, i, j, k, p_76986_1_.field_145814_a);
-		AbstractInsnNode toReplace = ASMHelper.find(method.instructions, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/client/renderer/RenderBlocks", "func_147749_a", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false));
+		final AbstractInsnNode toReplace = ASMHelper.find(method.instructions, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/client/renderer/RenderBlocks", "func_147749_a", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false));
 		//BClient.renderBlockSandFalling(this.field_147920_a, block, world, i, j, k, p_76986_1_.field_145814_a);
-		AbstractInsnNode replaceWith = new RedirectedMethodInsnNode(INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BClient", "renderBlockSandFalling", "(Lnet/minecraft/client/renderer/RenderBlocks;Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false, this);
-		
+		final AbstractInsnNode replaceWith = new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BClient", "renderBlockSandFalling", "(Lnet/minecraft/client/renderer/RenderBlocks;Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false, this);
+
 		method.instructions.set(toReplace, replaceWith);
 	}
 
 	@Override
-	public void registerAdditions(ASMAdditionRegistry arg0) {}
+	public void registerAdditions(final ASMAdditionRegistry arg0) {}
 }

@@ -6,10 +6,11 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
+
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bnbgaming.lib.util.LogHelper;
 
-import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 import cpw.mods.fml.common.asm.transformers.AccessTransformer;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.DependsOn;
@@ -23,9 +24,9 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 @TransformerExclusions({"com.bloodnbonesgaming.blockphysics.asm", "com.bloodnbonesgaming.blockphysics.BlockPhysics"})
 public class ASMPlugin extends AccessTransformer implements IFMLLoadingPlugin
 {
-	
+
 	public static final Logger log = LogManager.getLogger("BlockPhysicsCore");
-	
+
 	public ASMPlugin() throws IOException{
 		super(ModInfo.MODID.toLowerCase()+"_at.cfg");
 	}
@@ -49,7 +50,7 @@ public class ASMPlugin extends AccessTransformer implements IFMLLoadingPlugin
 	}
 
 	@Override
-	public void injectData(Map<String, Object> data)
+	public void injectData(final Map<String, Object> data)
 	{
 		ObfHelper.setObfuscated((Boolean) data.get("runtimeDeobfuscationEnabled"));
 		LogHelper.class.getName();

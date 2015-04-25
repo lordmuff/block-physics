@@ -7,81 +7,81 @@ public class DefinitionMaps
 	private static HashMap<String, MoveDef> moveDefMap = new HashMap<String, MoveDef>();
 	private static HashMap<String, BlockDef> blockDefMap = new HashMap<String, BlockDef>();
 	private static HashMap<String, String[]> blockToBlockDefMap = new HashMap<String, String[]>();
-	
-	
-	public static void putBlockToBlockDef(String blockName, String[] metas)
+
+
+	public static void putBlockToBlockDef(final String blockName, final String[] metas)
 	{
-		if (blockToBlockDefMap.containsKey(blockName) && blockToBlockDefMap.get(blockName) != null)
+		if (DefinitionMaps.blockToBlockDefMap.containsKey(blockName) && DefinitionMaps.blockToBlockDefMap.get(blockName) != null)
 		{
 			throw new RuntimeException("You attempted to override pre-existing entries in the BlockToBlockDef Map: " + blockName);
 		}
 		else
 		{
-			blockToBlockDefMap.put(blockName, metas);
+			DefinitionMaps.blockToBlockDefMap.put(blockName, metas);
 		}
 	}
-	
-	public static String getBlockToBlockDef(String blockName, int meta)
+
+	public static String getBlockToBlockDef(final String blockName, final int meta)
 	{
-		if (blockToBlockDefMap.containsKey(blockName) && blockToBlockDefMap.get(blockName)[meta] != null)
+		if (DefinitionMaps.blockToBlockDefMap.containsKey(blockName) && DefinitionMaps.blockToBlockDefMap.get(blockName)[meta] != null)
 		{
-			return blockToBlockDefMap.get(blockName)[meta];
+			return DefinitionMaps.blockToBlockDefMap.get(blockName)[meta];
 		}
 		return "default";
 	}
-	
-	public static BlockDef getBlockDef(String blockName, int meta)
+
+	public static BlockDef getBlockDef(final String blockName, final int meta)
 	{
-		return getBlockDef(getBlockToBlockDef(blockName, meta));
+		return DefinitionMaps.getBlockDef(DefinitionMaps.getBlockToBlockDef(blockName, meta));
 	}
-	
-	private static BlockDef getBlockDef(String name)
+
+	private static BlockDef getBlockDef(final String name)
 	{
-		if (blockDefMap.containsKey(name) && blockDefMap.get(name) != null)
+		if (DefinitionMaps.blockDefMap.containsKey(name) && DefinitionMaps.blockDefMap.get(name) != null)
 		{
-			return blockDefMap.get(name);
+			return DefinitionMaps.blockDefMap.get(name);
 		}
-		else if (!blockDefMap.containsKey("default") || blockDefMap.get("default") == null)
+		else if (!DefinitionMaps.blockDefMap.containsKey("default") || DefinitionMaps.blockDefMap.get("default") == null)
 		{
-			putBlockDef("default", new BlockDef("default"));
+			DefinitionMaps.putBlockDef("default", new BlockDef("default"));
 		}
-		return blockDefMap.get("default");
+		return DefinitionMaps.blockDefMap.get("default");
 	}
-	
-	public static void putBlockDef(String name, BlockDef blockDef)
+
+	public static void putBlockDef(final String name, final BlockDef blockDef)
 	{
-		if (blockDefMap.containsKey(name) && moveDefMap.get(name) != null)
+		if (DefinitionMaps.blockDefMap.containsKey(name) && DefinitionMaps.moveDefMap.get(name) != null)
 		{
 			throw new RuntimeException("You attempted to override pre-existing entries in the BlockDef Map: " + name);
 		}
 		else
 		{
-			blockDefMap.put(name, blockDef);
+			DefinitionMaps.blockDefMap.put(name, blockDef);
 		}
 	}
-	
-	public static MoveDef getMovedef(String name)
+
+	public static MoveDef getMovedef(final String name)
 	{
-		if (moveDefMap.containsKey(name) && moveDefMap.get(name) != null)
+		if (DefinitionMaps.moveDefMap.containsKey(name) && DefinitionMaps.moveDefMap.get(name) != null)
 		{
-			return moveDefMap.get(name);
+			return DefinitionMaps.moveDefMap.get(name);
 		}
-		else if (!moveDefMap.containsKey("default") || moveDefMap.get("default") == null)
+		else if (!DefinitionMaps.moveDefMap.containsKey("default") || DefinitionMaps.moveDefMap.get("default") == null)
 		{
-			putMoveDef("default", new MoveDef("default"));
+			DefinitionMaps.putMoveDef("default", new MoveDef("default"));
 		}
-		return moveDefMap.get("default");
+		return DefinitionMaps.moveDefMap.get("default");
 	}
-	
-	public static void putMoveDef(String name, MoveDef moveDef)
+
+	public static void putMoveDef(final String name, final MoveDef moveDef)
 	{
-		if (moveDefMap.containsKey(name) && moveDefMap.get(name) != null)
+		if (DefinitionMaps.moveDefMap.containsKey(name) && DefinitionMaps.moveDefMap.get(name) != null)
 		{
 			throw new RuntimeException("You attempted to override pre-existing entries in the MoveDef Map: " + name);
 		}
 		else
 		{
-			moveDefMap.put(name, moveDef);
+			DefinitionMaps.moveDefMap.put(name, moveDef);
 		}
 	}
 }

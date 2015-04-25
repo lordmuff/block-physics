@@ -1,14 +1,13 @@
 package com.bloodnbonesgaming.blockphysics.asm.modules;
 
-import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
-import static org.objectweb.asm.Opcodes.RETURN;
-
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
-import com.bnbgaming.lib.core.ASMAdditionRegistry;
-import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+
+import com.bnbgaming.lib.core.ASMAdditionRegistry;
+import com.bnbgaming.lib.core.module.IClassTransformerModule;
 
 public class ModuleEntityMinecartClass implements IClassTransformerModule
 {
@@ -16,7 +15,7 @@ public class ModuleEntityMinecartClass implements IClassTransformerModule
 	public String[] getClassesToTransform()
 	{
 		return new String[]{
-		"net.minecraft.entity.item.EntityMinecart"
+				"net.minecraft.entity.item.EntityMinecart"
 		};
 	}
 
@@ -33,26 +32,26 @@ public class ModuleEntityMinecartClass implements IClassTransformerModule
 	}
 
 	@Override
-	public byte[] transform(String name, String transformedName, byte[] bytes)
+	public byte[] transform(final String name, final String transformedName, final byte[] bytes)
 	{
 		return bytes;
 	}
-	
-	public void createSetInWeb(ClassNode classNode)
+
+	public void createSetInWeb(final ClassNode classNode)
 	{
-		MethodVisitor methodVisitor = classNode.visitMethod(ACC_PUBLIC, "func_70110_aj", "()V", null, null);
+		final MethodVisitor methodVisitor = classNode.visitMethod(Opcodes.ACC_PUBLIC, "func_70110_aj", "()V", null, null);
 		methodVisitor.visitCode();
-		methodVisitor.visitInsn(RETURN);
+		methodVisitor.visitInsn(Opcodes.RETURN);
 		methodVisitor.visitMaxs(0, 1);
 		methodVisitor.visitEnd();
 	}
-	
+
 	@Override
-	public void registerAdditions(ASMAdditionRegistry registry) {
-		ClassNode classNode = new ClassNode();
-		
-		createSetInWeb(classNode);
-		
+	public void registerAdditions(final ASMAdditionRegistry registry) {
+		final ClassNode classNode = new ClassNode();
+
+		this.createSetInWeb(classNode);
+
 		registry.registerMethodAddition("net/minecraft/entity/item/EntityMinecart", ASMHelper.findMethodNodeOfClass(classNode, "func_70110_aj", "()V"));
 	}
 }

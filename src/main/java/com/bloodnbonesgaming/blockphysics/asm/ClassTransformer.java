@@ -44,10 +44,10 @@ import com.google.common.collect.Lists;
 
 public class ClassTransformer extends BNBGamingClassTransformer
 {
-	
-	public static FieldNode findFieldNodeOfClass(ClassNode classNode, String fieldName, String fieldDesc)
+
+	public static FieldNode findFieldNodeOfClass(final ClassNode classNode, final String fieldName, final String fieldDesc)
 	{
-		for (FieldNode field : classNode.fields)
+		for (final FieldNode field : classNode.fields)
 		{
 			if (field.name.equals(fieldName) && (fieldDesc == null || field.desc.equals(fieldDesc)))
 			{
@@ -93,7 +93,7 @@ public class ClassTransformer extends BNBGamingClassTransformer
 	}
 
 	@Override
-	public byte[] transform(String name, String transformedName, byte[] basicClass) {
+	public byte[] transform(final String name, final String transformedName, final byte[] basicClass) {
 		return basicClass;
 	}
 
@@ -103,8 +103,7 @@ public class ClassTransformer extends BNBGamingClassTransformer
 	}
 
 	@Override
-	public void setAdditionHelper(ASMAdditionHelper helper) {
-		ASMPlugin.log.info("Received helper");
+	public void setAdditionHelper(final ASMAdditionHelper helper) {
 		BlockPhysics.asmHelper = helper;
 	}
 }

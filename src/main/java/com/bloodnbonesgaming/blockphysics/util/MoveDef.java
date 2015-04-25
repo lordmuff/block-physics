@@ -16,40 +16,40 @@ public class MoveDef
 	public String floatingBlock;
 	//public int floatingMeta;
 	public boolean branch;		// 0,1
-	
-	public MoveDef(String id1, int moveType1, int slideChance1, boolean ceiling1, int smallArc1, int bigArc1, int corbel1, int nCorbel1, int hanging1, int attached1, int floatingRadius1, String floatingBlock1, boolean branch1)
+
+	public MoveDef(final String id1, final int moveType1, final int slideChance1, final boolean ceiling1, final int smallArc1, final int bigArc1, final int corbel1, final int nCorbel1, final int hanging1, final int attached1, final int floatingRadius1, final String floatingBlock1, final boolean branch1)
 	{
-		id = id1;
-		movetype = moveType1;
-		slidechance = slideChance1;
-		ceiling = ceiling1;
-		smallarc = smallArc1;
-		bigarc = bigArc1;
-		corbel = corbel1;
-		ncorbel = nCorbel1;
-		hanging = hanging1;
-		attached = attached1;
-		floatingRadius = floatingRadius1;
-		floatingBlock = floatingBlock1;
+		this.id = id1;
+		this.movetype = moveType1;
+		this.slidechance = slideChance1;
+		this.ceiling = ceiling1;
+		this.smallarc = smallArc1;
+		this.bigarc = bigArc1;
+		this.corbel = corbel1;
+		this.ncorbel = nCorbel1;
+		this.hanging = hanging1;
+		this.attached = attached1;
+		this.floatingRadius = floatingRadius1;
+		this.floatingBlock = floatingBlock1;
 		//floatingMeta = floatingMeta1;
-		branch = branch1;
+		this.branch = branch1;
 	}
-	
-	public MoveDef(String id1)
+
+	public MoveDef(final String id1)
 	{
-		id = id1;
-		movetype = 0;
-		slidechance = 0;
-		ceiling	= false;
-		smallarc = 0;
-		bigarc = 0;
-		corbel = 0;
-		ncorbel = 0;
-		hanging = 0;
-		attached = 0;
-		floatingRadius = 0;
-		floatingBlock = null;
+		this.id = id1;
+		this.movetype = 0;
+		this.slidechance = 0;
+		this.ceiling	= false;
+		this.smallarc = 0;
+		this.bigarc = 0;
+		this.corbel = 0;
+		this.ncorbel = 0;
+		this.hanging = 0;
+		this.attached = 0;
+		this.floatingRadius = 0;
+		this.floatingBlock = null;
 		//floatingMeta = 0;
-		branch = false;
+		this.branch = false;
 	}
 }

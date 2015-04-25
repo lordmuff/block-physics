@@ -17,41 +17,41 @@ public class BlockDef
 	public int mass;			//1-40000
 	public int strength;		//0-64000
 
-	public BlockDef(String id1, String movedefs1, String movedefs2, int movenum1, int moveflipnumber1, int movechanger1, int supportingblock1, int fragile1, boolean trapping1, int pushtype1, boolean randomtick1, int tickrate1, int placedmove1, int mass1, int strength1)
+	public BlockDef(final String id1, final String movedefs1, final String movedefs2, final int movenum1, final int moveflipnumber1, final int movechanger1, final int supportingblock1, final int fragile1, final boolean trapping1, final int pushtype1, final boolean randomtick1, final int tickrate1, final int placedmove1, final int mass1, final int strength1)
 	{
-		id = id1;
-		movedefs[0] = movedefs1;
-		movedefs[1] = movedefs2;
-		movenum = movenum1;
-		moveflipnumber = moveflipnumber1;
-		movechanger = movechanger1;
-		supportingblock = supportingblock1;
-		fragile = fragile1;
-		trapping = trapping1;
-		pushtype = pushtype1;
-		randomtick = randomtick1;
-		tickrate = tickrate1;
-		placedmove = placedmove1;
-		mass = mass1;
-		strength = strength1;
+		this.id = id1;
+		this.movedefs[0] = movedefs1;
+		this.movedefs[1] = movedefs2;
+		this.movenum = movenum1;
+		this.moveflipnumber = moveflipnumber1;
+		this.movechanger = movechanger1;
+		this.supportingblock = supportingblock1;
+		this.fragile = fragile1;
+		this.trapping = trapping1;
+		this.pushtype = pushtype1;
+		this.randomtick = randomtick1;
+		this.tickrate = tickrate1;
+		this.placedmove = placedmove1;
+		this.mass = mass1;
+		this.strength = strength1;
 	}
 
-	public BlockDef(String id1)
+	public BlockDef(final String id1)
 	{
-		id = id1;
-		movenum = 0;	
-		movedefs[0] = "default";	
-		movedefs[1] = "default";
-		moveflipnumber = 0;
-		movechanger = 0;
-		supportingblock = 0;
-		fragile = 0;
-		trapping = false;
-		pushtype = 0;
-		randomtick = false;
-		tickrate = 10;
-		placedmove = 0;
-		mass = 1500;
-		strength = 64000;
+		this.id = id1;
+		this.movenum = 0;
+		this.movedefs[0] = "default";
+		this.movedefs[1] = "default";
+		this.moveflipnumber = 0;
+		this.movechanger = 0;
+		this.supportingblock = 0;
+		this.fragile = 0;
+		this.trapping = false;
+		this.pushtype = 0;
+		this.randomtick = false;
+		this.tickrate = 10;
+		this.placedmove = 0;
+		this.mass = 1500;
+		this.strength = 64000;
 	}
 }
