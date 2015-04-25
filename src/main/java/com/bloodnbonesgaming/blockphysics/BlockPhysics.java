@@ -2195,7 +2195,7 @@ public class BlockPhysics extends BNBGamingMod
 
 							if ( !world.isRemote )
 							{
-								BlockPhysics.instance.log.info("Attacking entity for " + d + " damage.");
+								//BlockPhysics.instance.log.info("Attacking entity for " + d + " damage.");
 								((EntityLivingBase)collent).attackEntityFrom(DamageSource.fallingBlock, d);
 							}
 						}
@@ -2370,13 +2370,14 @@ public class BlockPhysics extends BNBGamingMod
 
 	}
 
-	public static void dropFallingSand( final EntityFallingBlock fsand )
-	{
-		if ( fsand.field_145810_d != null ) {
-			BlockPhysics.dropItemsNBT(fsand.worldObj, MathHelper.floor_double(fsand.posX), MathHelper.floor_double(fsand.posY), MathHelper.floor_double(fsand.posZ), fsand.field_145810_d );
-		}
-		fsand.entityDropItem(new ItemStack(fsand.func_145805_f(), 1, fsand.func_145805_f().damageDropped(fsand.field_145814_a)), 0.0F);
-	}
+    public static void dropFallingSand(final EntityFallingBlock fallingBlock)
+    {
+        if (fallingBlock.field_145810_d != null)
+            BlockPhysics.dropItemsNBT(fallingBlock.worldObj, MathHelper.floor_double(fallingBlock.posX), MathHelper.floor_double(fallingBlock.posY), MathHelper.floor_double(fallingBlock.posZ), fallingBlock.field_145810_d);
+
+        if (fallingBlock.func_145805_f() != null)
+            fallingBlock.entityDropItem(new ItemStack(fallingBlock.func_145805_f(), 1, fallingBlock.func_145805_f().damageDropped(fallingBlock.field_145814_a)), 0.0F);
+    }
 
 	protected static void placeBlock(final World world, final EntityFallingBlock fsand, final double jumpPosX, final double jumpPosY, final double jumpPosZ,  final int i, final int j, final int k)
 	{
