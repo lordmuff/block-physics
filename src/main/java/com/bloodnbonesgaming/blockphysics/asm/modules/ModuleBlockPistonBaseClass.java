@@ -8,6 +8,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
@@ -48,7 +49,7 @@ public class ModuleBlockPistonBaseClass implements IClassTransformerModule
 			ASMPlugin.log.info("Transforming class: " + transformedName);
 
 			//"onNeighborBlockChange", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V"
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149695_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onNeighborBlockChange" : "func_149695_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V");
 			if (methodNode != null)
 			{
 				this.transformOnNeighborBlockChange(methodNode);
@@ -57,7 +58,7 @@ public class ModuleBlockPistonBaseClass implements IClassTransformerModule
 			}
 
 			//"updatePistonState", "(Lnet/minecraft/world/World;III)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_150078_e", "(Lnet/minecraft/world/World;III)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "updatePistonState" : "func_150078_e", "(Lnet/minecraft/world/World;III)V");
 			if (methodNode != null)
 			{
 				this.transformUpdatePistonState(methodNode);
@@ -66,7 +67,7 @@ public class ModuleBlockPistonBaseClass implements IClassTransformerModule
 			}
 
 			//"onBlockEventReceived", "(Lnet/minecraft/world/World;IIIII)Z"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149696_a", "(Lnet/minecraft/world/World;IIIII)Z");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onBlockEventReceived" : "func_149696_a", "(Lnet/minecraft/world/World;IIIII)Z");
 			if (methodNode != null)
 			{
 				this.transformOnBlockEventReceived(methodNode);
@@ -93,9 +94,9 @@ public class ModuleBlockPistonBaseClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 3));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 4));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", !ObfHelper.isObfuscated() ? "blockRegistry" : "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", !ObfHelper.isObfuscated() ? "getNameForObject" : "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onNeighborBlockChange", "(Lnet/minecraft/world/World;IIILjava/lang/String;)V", false, this));
 
 		method.instructions.insertBefore(target, toInject);
@@ -123,7 +124,7 @@ public class ModuleBlockPistonBaseClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 4));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/block/BlockPistonBase", "field_150082_a", "Z", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/block/BlockPistonBase", !ObfHelper.isObfuscated() ? "isSticky" : "field_150082_a", "Z", this));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "updatePistonState", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/BlockPistonBase;Z)V", false, this));
 
 		method.instructions.insertBefore(target, toInject);
@@ -153,7 +154,7 @@ public class ModuleBlockPistonBaseClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 6));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/block/BlockPistonBase", "field_150082_a", "Z", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/block/BlockPistonBase", !ObfHelper.isObfuscated() ? "isSticky" : "field_150082_a", "Z", this));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onBlockPistonEventReceived", "(Lnet/minecraft/world/World;IIIIILnet/minecraft/block/BlockPistonBase;Z)Z", false, this));
 
 		method.instructions.insertBefore(target, toInject);

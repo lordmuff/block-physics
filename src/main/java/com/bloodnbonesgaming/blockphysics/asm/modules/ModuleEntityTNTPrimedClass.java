@@ -11,6 +11,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
@@ -62,7 +63,7 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 			}
 
 			//"canBeCollidedWith", "()Z"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_70067_L", "()Z");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "canBeCollidedWith" : "func_70067_L", "()Z");
 			if (methodNode != null)
 			{
 				this.transformCanBeCollidedWith(methodNode);
@@ -71,7 +72,7 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 			}
 
 			//"onUpdate", "()V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_70071_h_", "()V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onUpdate" : "func_70071_h_", "()V");
 			if (methodNode != null)
 			{
 				this.transformOnUpdate(methodNode);
@@ -80,7 +81,7 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 			}
 
 			//"explode", "()V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_70515_d", "()V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "explode" : "func_70515_d", "()V");
 			if (methodNode != null)
 			{
 				this.transformExplode(methodNode);
@@ -89,7 +90,7 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 			}
 
 			//"writeEntityToNBT", "(Lnet/minecraft/nbt/NBTTagCompound;)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_70014_b", "(Lnet/minecraft/nbt/NBTTagCompound;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "writeEntityToNBT" : "func_70014_b", "(Lnet/minecraft/nbt/NBTTagCompound;)V");
 			if (methodNode != null)
 			{
 				this.transformWriteEntityToNBT(methodNode);
@@ -98,7 +99,7 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 			}
 
 			//"readEntityFromNBT", "(Lnet/minecraft/nbt/NBTTagCompound;)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_70037_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "readEntityFromNBT" : "func_70037_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V");
 			if (methodNode != null)
 			{
 				this.transformReadEntityFromNBT(methodNode);
@@ -150,14 +151,14 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.DLOAD, 2));
 		toInject.add(new VarInsnNode(Opcodes.DLOAD, 4));
 		toInject.add(new VarInsnNode(Opcodes.DLOAD, 6));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/init/Blocks", "field_150335_W", "Lnet/minecraft/block/Block;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/init/Blocks", !ObfHelper.isObfuscated() ? "tnt" : "field_150335_W", "Lnet/minecraft/block/Block;", this));
 		toInject.add(new InsnNode(Opcodes.ICONST_0));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", "<init>", "(Lnet/minecraft/world/World;DDDLnet/minecraft/block/Block;I)V", false, this));
 
 		//this.fuse = 80;
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
 		toInject.add(new IntInsnNode(Opcodes.BIPUSH, 80));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.PUTFIELD, "net/minecraft/entity/item/EntityTNTPrimed", "field_70516_a", "I", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.PUTFIELD, "net/minecraft/entity/item/EntityTNTPrimed", !ObfHelper.isObfuscated() ? "fuse" : "field_70516_a", "I", this));
 
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -200,7 +201,7 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 
 		final InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", "field_70170_p", "Lnet/minecraft/world/World;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/entity/item/EntityFallingBlock", !ObfHelper.isObfuscated() ? "worldObj" : "field_70170_p", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "fallingSandUpdate", "(Lnet/minecraft/world/World;Lnet/minecraft/entity/item/EntityFallingBlock;)V", false, this));
 
@@ -231,7 +232,7 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 		final InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 1));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70014_b", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", !ObfHelper.isObfuscated() ? "writeEntityToNBT" : "func_70014_b", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false, this));
 
 		method.instructions.insertBefore(target,  toInject);
 	}
@@ -244,7 +245,7 @@ public class ModuleEntityTNTPrimedClass implements IClassTransformerModule
 		final InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 1));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", "func_70037_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESPECIAL, "net/minecraft/entity/item/EntityFallingBlock", !ObfHelper.isObfuscated() ? "readEntityFromNBT" : "func_70037_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V", false, this));
 
 		method.instructions.insertBefore(target,  toInject);
 	}

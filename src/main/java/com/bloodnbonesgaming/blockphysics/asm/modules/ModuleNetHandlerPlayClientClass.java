@@ -10,6 +10,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
@@ -50,7 +51,7 @@ public class ModuleNetHandlerPlayClientClass implements IClassTransformerModule
 			ASMPlugin.log.info("Transforming class: " + transformedName);
 
 			//"handleSpawnObject", "(Lnet/minecraft/network/play/server/S0EPacketSpawnObject;)V"
-			final MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_147235_a", "(Lnet/minecraft/network/play/server/S0EPacketSpawnObject;)V");
+			final MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "handleSpawnObject" : "func_147235_a", "(Lnet/minecraft/network/play/server/S0EPacketSpawnObject;)V");
 			if (methodNode != null)
 			{
 				this.transformHandleSpawnObject(methodNode);
@@ -71,7 +72,7 @@ public class ModuleNetHandlerPlayClientClass implements IClassTransformerModule
 		//p_147235_1_.func_149002_g(1);
 		final InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/network/NetHandlerPlayClient", "field_147300_g", "Lnet/minecraft/client/multiplayer/WorldClient;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/network/NetHandlerPlayClient", !ObfHelper.isObfuscated() ? "clientWorldController" : "field_147300_g", "Lnet/minecraft/client/multiplayer/WorldClient;", this));
 		toInject.add(new VarInsnNode(Opcodes.DLOAD, 2));
 		toInject.add(new VarInsnNode(Opcodes.DLOAD, 4));
 		toInject.add(new VarInsnNode(Opcodes.DLOAD, 6));

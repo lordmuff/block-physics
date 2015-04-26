@@ -12,6 +12,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
@@ -51,7 +52,7 @@ public class ModuleRenderFallingBlockClass implements IClassTransformerModule
 			ASMPlugin.log.info("Transforming class: " + transformedName);
 
 			//"doRender", "(Lnet/minecraft/entity/item/EntityFallingBlock;DDDFF)V"
-			final MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_76986_a", "(Lnet/minecraft/entity/item/EntityFallingBlock;DDDFF)V");
+			final MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "doRender" : "func_76986_a", "(Lnet/minecraft/entity/item/EntityFallingBlock;DDDFF)V");
 			if (methodNode != null)
 			{
 				this.transformDoRender(methodNode);
@@ -100,7 +101,7 @@ public class ModuleRenderFallingBlockClass implements IClassTransformerModule
 		}
 
 		//this.field_147920_a.renderBlockSandFalling(block, world, i, j, k, p_76986_1_.field_145814_a);
-		final AbstractInsnNode toReplace = ASMHelper.find(method.instructions, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/client/renderer/RenderBlocks", "func_147749_a", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false));
+		final AbstractInsnNode toReplace = ASMHelper.find(method.instructions, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/client/renderer/RenderBlocks", !ObfHelper.isObfuscated() ? "renderBlockSandFalling" : "func_147749_a", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false));
 		//BClient.renderBlockSandFalling(this.field_147920_a, block, world, i, j, k, p_76986_1_.field_145814_a);
 		final AbstractInsnNode replaceWith = new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BClient", "renderBlockSandFalling", "(Lnet/minecraft/client/renderer/RenderBlocks;Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false, this);
 

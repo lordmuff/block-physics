@@ -13,6 +13,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
@@ -50,15 +51,15 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		{
 			ASMPlugin.log.info("Transforming class: " + transformedName);
 			//writeChunkToNBT
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_75820_a", "(Lnet/minecraft/world/chunk/Chunk;Lnet/minecraft/world/World;Lnet/minecraft/nbt/NBTTagCompound;)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "writeChunkToNBT" : "func_75820_a", "(Lnet/minecraft/world/chunk/Chunk;Lnet/minecraft/world/World;Lnet/minecraft/nbt/NBTTagCompound;)V");
 			if (methodNode != null)
 			{
 				this.transformWriteChunkToNBT(methodNode);
 			} else {
 				throw new RuntimeException("Could not find writeChunkToNBT method in " + transformedName);
 			}
-
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_75823_a", "(Lnet/minecraft/world/World;Lnet/minecraft/nbt/NBTTagCompound;)Lnet/minecraft/world/chunk/Chunk;");
+			//readChunkFromNBT
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "readChunkFromNBT" : "func_75823_a", "(Lnet/minecraft/world/World;Lnet/minecraft/nbt/NBTTagCompound;)Lnet/minecraft/world/chunk/Chunk;");
 			if (methodNode != null)
 			{
 				this.transformReadChunkFromNBT(methodNode);
@@ -77,7 +78,7 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		//InsnList toFind = new InsnList();
 		//toFind.add(new VarInsnNode(ALOAD, 5));
 		//toFind.add(new VarInsnNode(ALOAD, 9));
-		final AbstractInsnNode appendTag = ASMHelper.find(method.instructions, new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagList", "func_74742_a", "(Lnet/minecraft/nbt/NBTBase;)V", false, this));
+		final AbstractInsnNode appendTag = ASMHelper.find(method.instructions, new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagList", !ObfHelper.isObfuscated() ? "appendTag" : "func_74742_a", "(Lnet/minecraft/nbt/NBTBase;)V", false, this));
 		final VarInsnNode nbtTagCompound = (VarInsnNode) ASMHelper.move(appendTag, -1);
 		final AbstractInsnNode target = ASMHelper.move(appendTag, -2);
 
@@ -93,7 +94,7 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		toInject.add(new LdcInsnNode("BPData"));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, extendedBlockStorage.var));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "getBPdataArray", "()[B", false, this));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74773_a", "(Ljava/lang/String;[B)V", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", !ObfHelper.isObfuscated() ? "setByteArray" : "func_74773_a", "(Ljava/lang/String;[B)V", false, this));
 
 		method.instructions.insertBefore(target, toInject);
 	}
@@ -103,7 +104,7 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		//extendedblockstorage.removeInvalidBlocks();
 		final InsnList toFind = new InsnList();
 		toFind.add(new VarInsnNode(Opcodes.ALOAD, 13));
-		toFind.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "func_76672_e", "()V", false, this));
+		toFind.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", !ObfHelper.isObfuscated() ? "removeInvalidBlocks" : "func_76672_e", "()V", false, this));
 
 		final AbstractInsnNode target = ASMHelper.find(method.instructions, toFind);
 
@@ -122,13 +123,13 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		final InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 11));
 		toInject.add(new LdcInsnNode("BPData"));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74764_b", "(Ljava/lang/String;)Z", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", !ObfHelper.isObfuscated() ? "hasKey" : "func_74764_b", "(Ljava/lang/String;)Z", false, this));
 		final LabelNode label1 = new LabelNode();
 		toInject.add(new JumpInsnNode(Opcodes.IFEQ, label1));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 13));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 11));
 		toInject.add(new LdcInsnNode("BPData"));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", "func_74770_j", "(Ljava/lang/String;)[B", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/nbt/NBTTagCompound", !ObfHelper.isObfuscated() ? "getByteArray" : "func_74770_j", "(Ljava/lang/String;)[B", false, this));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "setBPdataArray", "([B)V", false, this));
 		final LabelNode label2 = new LabelNode();
 		toInject.add(new JumpInsnNode(Opcodes.GOTO, label2));

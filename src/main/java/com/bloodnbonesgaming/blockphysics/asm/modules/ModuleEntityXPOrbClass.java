@@ -5,6 +5,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
 import com.bnbgaming.lib.core.module.IClassTransformerModule;
@@ -39,7 +40,7 @@ public class ModuleEntityXPOrbClass implements IClassTransformerModule
 
 	public void createSetInWeb(final ClassNode classNode)
 	{
-		final MethodVisitor methodVisitor = classNode.visitMethod(Opcodes.ACC_PUBLIC, "func_70110_aj", "()V", null, null);
+		final MethodVisitor methodVisitor = classNode.visitMethod(Opcodes.ACC_PUBLIC, !ObfHelper.isObfuscated() ? "setInWeb" : "func_70110_aj", "()V", null, null);
 		methodVisitor.visitCode();
 		methodVisitor.visitInsn(Opcodes.RETURN);
 		methodVisitor.visitMaxs(0, 1);
@@ -52,6 +53,6 @@ public class ModuleEntityXPOrbClass implements IClassTransformerModule
 
 		this.createSetInWeb(classNode);
 
-		registry.registerMethodAddition("net/minecraft/entity/item/EntityXPOrb", ASMHelper.findMethodNodeOfClass(classNode, "func_70110_aj", "()V"));
+		//registry.registerMethodAddition("net/minecraft/entity/item/EntityXPOrb", ASMHelper.findMethodNodeOfClass(classNode, "func_70110_aj", "()V"));
 	}
 }

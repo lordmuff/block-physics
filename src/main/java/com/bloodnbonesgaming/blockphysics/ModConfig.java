@@ -91,60 +91,60 @@ public class ModConfig
 				final int colonIndex = propertie.indexOf(":");
 				final String keyString = propertie.substring(0, colonIndex);
 
-				if (!keyString.equals("floating") && !keyString.equals("branch") && !keyString.equals("ceiling"))
+				if (!keyString.equalsIgnoreCase("floating") && !keyString.equalsIgnoreCase("branch") && !keyString.equalsIgnoreCase("ceiling"))
 				{
 					final int value = Integer.parseInt(propertie.substring(colonIndex +1));
-					if (keyString.equals("movetype"))
+					if (keyString.equalsIgnoreCase("movetype"))
 					{
 						movetype = value;
 					}
-					else if (keyString.equals("slidechance"))
+					else if (keyString.equalsIgnoreCase("slidechance"))
 					{
 						slidechance = value;
 					}
-					else if (keyString.equals("smallarc"))
+					else if (keyString.equalsIgnoreCase("smallarc"))
 					{
 						smallarc = value;
 					}
-					else if (keyString.equals("bigarc"))
+					else if (keyString.equalsIgnoreCase("bigarc"))
 					{
 						bigarc = value;
 					}
-					else if (keyString.equals("corbel"))
+					else if (keyString.equalsIgnoreCase("corbel"))
 					{
 						corbel = value;
 					}
-					else if (keyString.equals("ncorbel"))
+					else if (keyString.equalsIgnoreCase("ncorbel"))
 					{
 						ncorbel = value;
 					}
-					else if (keyString.equals("hanging"))
+					else if (keyString.equalsIgnoreCase("hanging"))
 					{
 						hanging = value;
 					}
-					else if (keyString.equals("attached"))
+					else if (keyString.equalsIgnoreCase("attached"))
 					{
 						attached = value;
 					}
-					else if (keyString.equals("tree"))
+					else if (keyString.equalsIgnoreCase("tree"))
 					{
 						tree = value;
 					}
 				}
-				else if (keyString.equals("ceiling") || keyString.equals("branch"))
+				else if (keyString.equalsIgnoreCase("ceiling") || keyString.equalsIgnoreCase("branch"))
 				{
 					final Boolean value = Boolean.valueOf(propertie.substring(colonIndex +1));
 
-					if (keyString.equals("ceiling"))
+					if (keyString.equalsIgnoreCase("ceiling"))
 					{
 						ceiling = value;
 					}
-					else if (keyString.equals("branch"))
+					else if (keyString.equalsIgnoreCase("branch"))
 					{
 						branch = value;
 					}
 				}
-				else if (keyString.equals("floating"))
+				else if (keyString.equalsIgnoreCase("floating"))
 				{
 
 					final int value2 = propertie.indexOf(":", colonIndex +1);
@@ -240,72 +240,72 @@ public class ModConfig
 				final String keyString = propertie.substring(0, colonIndex);
 
 
-				if (keyString.equals("movenum") || keyString.equals("moveflipnumber") || keyString.equals("movechanger") || keyString.equals("supportingblock") || keyString.equals("fragile") || keyString.equals("pushtype") || keyString.equals("tickrate") || keyString.equals("placedmove") || keyString.equals("mass") || keyString.equals("strength"))
+				if (keyString.equalsIgnoreCase("movenum") || keyString.equalsIgnoreCase("moveflipnumber") || keyString.equalsIgnoreCase("movechanger") || keyString.equalsIgnoreCase("supportingblock") || keyString.equalsIgnoreCase("fragile") || keyString.equalsIgnoreCase("pushtype") || keyString.equalsIgnoreCase("tickrate") || keyString.equalsIgnoreCase("placedmove") || keyString.equalsIgnoreCase("mass") || keyString.equalsIgnoreCase("strength"))
 				{
 					final int value = Integer.parseInt(propertie.substring(colonIndex +1));
-					if (keyString.equals("movenum"))
+					if (keyString.equalsIgnoreCase("movenum"))
 					{
 						movenum = value;
 					}
-					else if (keyString.equals("moveflipnumber"))
+					else if (keyString.equalsIgnoreCase("moveflipnumber"))
 					{
 						moveflipnumber = value;
 					}
-					else if (keyString.equals("movechanger"))
+					else if (keyString.equalsIgnoreCase("movechanger"))
 					{
 						movechanger = value;
 					}
-					else if (keyString.equals("supportingblock"))
+					else if (keyString.equalsIgnoreCase("supportingblock"))
 					{
 						supportingblock = value;
 					}
-					else if (keyString.equals("fragile"))
+					else if (keyString.equalsIgnoreCase("fragile"))
 					{
 						fragile = value;
 					}
-					else if (keyString.equals("pushtype"))
+					else if (keyString.equalsIgnoreCase("pushtype"))
 					{
 						pushtype = value;
 					}
-					else if (keyString.equals("tickrate"))
+					else if (keyString.equalsIgnoreCase("tickrate"))
 					{
 						tickrate = value;
 					}
-					else if (keyString.equals("placedmove"))
+					else if (keyString.equalsIgnoreCase("placedmove"))
 					{
 						placedmove = value;
 					}
-					else if (keyString.equals("mass"))
+					else if (keyString.equalsIgnoreCase("mass"))
 					{
 						mass = value;
 					}
-					else if (keyString.equals("strength"))
+					else if (keyString.equalsIgnoreCase("strength"))
 					{
 						strength = value;
 					}
-					else if (keyString.equals("tickrate"))
+					else if (keyString.equalsIgnoreCase("tickrate"))
 					{
 						tickrate = value;
 					}
 				}
-				else if (keyString.equals("trapping") || keyString.equals("randomtick"))
+				else if (keyString.equalsIgnoreCase("trapping") || keyString.equalsIgnoreCase("randomtick"))
 				{
 					final Boolean value = Boolean.valueOf(propertie.substring(colonIndex +1));
 
-					if (keyString.equals("trapping"))
+					if (keyString.equalsIgnoreCase("trapping"))
 					{
 						trapping = value;
 					}
-					else if (keyString.equals("randomtick"))
+					else if (keyString.equalsIgnoreCase("randomtick"))
 					{
 						randomtick = value;
 					}
 				}
-				else if (keyString.equals("movedef1"))
+				else if (keyString.equalsIgnoreCase("movedef1"))
 				{
 					movedefs1 = propertie.substring(colonIndex +1);
 				}
-				else if (keyString.equals("movedef2"))
+				else if (keyString.equalsIgnoreCase("movedef2"))
 				{
 					movedefs2 = propertie.substring(colonIndex +1);
 				}

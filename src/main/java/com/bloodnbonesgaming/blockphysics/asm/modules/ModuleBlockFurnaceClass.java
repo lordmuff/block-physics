@@ -8,6 +8,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
@@ -46,7 +47,7 @@ public class ModuleBlockFurnaceClass implements IClassTransformerModule
 			ASMPlugin.log.info("Transforming class: " + transformedName);
 
 			//"onBlockAdded", "(Lnet/minecraft/world/World;III)V"
-			final MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149726_b", "(Lnet/minecraft/world/World;III)V");
+			final MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onBlockAdded" : "func_149726_b", "(Lnet/minecraft/world/World;III)V");
 			if (methodNode != null)
 			{
 				this.transformOnBlockAdded(methodNode);

@@ -6,6 +6,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
 import com.bnbgaming.lib.core.insn.RedirectedMethodVisitor;
@@ -65,7 +66,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 
 		methodVisitor.visitCode();
 		methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
-		rMethodVisitor.visitRedirectedFieldInsn(Opcodes.GETFIELD, "net/minecraft/world/chunk/Chunk", "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;", this);
+		rMethodVisitor.visitRedirectedFieldInsn(Opcodes.GETFIELD, "net/minecraft/world/chunk/Chunk", !ObfHelper.isObfuscated() ? "storageArrays" : "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;", this);
 		methodVisitor.visitVarInsn(Opcodes.ILOAD, 2);
 		methodVisitor.visitInsn(Opcodes.ICONST_4);
 		methodVisitor.visitInsn(Opcodes.ISHR);
@@ -94,7 +95,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 		methodVisitor.visitLabel(label2);
 		methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
 		methodVisitor.visitInsn(Opcodes.ICONST_1);
-		rMethodVisitor.visitRedirectedFieldInsn(Opcodes.PUTFIELD, "net/minecraft/world/chunk/Chunk", "field_76643_l", "Z", this);
+		rMethodVisitor.visitRedirectedFieldInsn(Opcodes.PUTFIELD, "net/minecraft/world/chunk/Chunk", !ObfHelper.isObfuscated() ? "isModified" : "field_76643_l", "Z", this);
 		methodVisitor.visitVarInsn(Opcodes.ALOAD, 5);
 		methodVisitor.visitVarInsn(Opcodes.ILOAD, 1);
 		methodVisitor.visitVarInsn(Opcodes.ILOAD, 2);
@@ -138,7 +139,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 		methodVisitor.visitInsn(Opcodes.ICONST_4);
 		methodVisitor.visitInsn(Opcodes.ISHR);
 		methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
-		rMethodVisitor.visitRedirectedFieldInsn(Opcodes.GETFIELD, "net/minecraft/world/chunk/Chunk", "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;", this);
+		rMethodVisitor.visitRedirectedFieldInsn(Opcodes.GETFIELD, "net/minecraft/world/chunk/Chunk", !ObfHelper.isObfuscated() ? "storageArrays" : "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;", this);
 		methodVisitor.visitInsn(Opcodes.ARRAYLENGTH);
 		final Label l1 = new Label();
 		methodVisitor.visitJumpInsn(Opcodes.IF_ICMPLT, l1);
@@ -146,7 +147,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 		methodVisitor.visitInsn(Opcodes.IRETURN);
 		methodVisitor.visitLabel(l1);
 		methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
-		rMethodVisitor.visitRedirectedFieldInsn(Opcodes.GETFIELD, "net/minecraft/world/chunk/Chunk", "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;", this);
+		rMethodVisitor.visitRedirectedFieldInsn(Opcodes.GETFIELD, "net/minecraft/world/chunk/Chunk", !ObfHelper.isObfuscated() ? "storageArrays" : "field_76652_q", "[Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;", this);
 		methodVisitor.visitVarInsn(Opcodes.ILOAD, 2);
 		methodVisitor.visitInsn(Opcodes.ICONST_4);
 		methodVisitor.visitInsn(Opcodes.ISHR);
@@ -161,7 +162,7 @@ public class ModuleChunkClass implements IClassTransformerModule
 		methodVisitor.visitIntInsn(Opcodes.BIPUSH, 15);
 		methodVisitor.visitInsn(Opcodes.IAND);
 		methodVisitor.visitVarInsn(Opcodes.ILOAD, 3);
-		rMethodVisitor.visitRedirectedMethodInsn(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "blockphysctgetBlockBPdata", "(III)I", false, this);
+		rMethodVisitor.visitRedirectedMethodInsn(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", "getBlockBPdata", "(III)I", false, this);
 		methodVisitor.visitInsn(Opcodes.IRETURN);
 		methodVisitor.visitLabel(l4);
 		methodVisitor.visitInsn(Opcodes.ICONST_0);

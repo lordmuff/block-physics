@@ -12,6 +12,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
@@ -70,7 +71,7 @@ public class ModuleWorldClass implements IClassTransformerModule
 			}
 
 			//"newExplosion", "(Lnet/minecraft/entity/Entity;DDDFZZ)Lnet/minecraft/world/Explosion;"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_72885_a", "(Lnet/minecraft/entity/Entity;DDDFZZ)Lnet/minecraft/world/Explosion;");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "newExplosion" : "func_72885_a", "(Lnet/minecraft/entity/Entity;DDDFZZ)Lnet/minecraft/world/Explosion;");
 			if (methodNode != null)
 			{
 				this.transformNewExplosion(methodNode);
@@ -147,7 +148,7 @@ public class ModuleWorldClass implements IClassTransformerModule
 	{
 		final InsnList toRemove = new InsnList();
 		toRemove.add(new VarInsnNode(Opcodes.ALOAD, 11));
-		toRemove.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/Explosion", "func_77278_a", "()V", false));
+		toRemove.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/Explosion", !ObfHelper.isObfuscated() ? "doExplosionA" : "func_77278_a", "()V", false));
 
 		final AbstractInsnNode start = ASMHelper.find(method.instructions, toRemove);
 		final AbstractInsnNode end = ASMHelper.move(start, 7);

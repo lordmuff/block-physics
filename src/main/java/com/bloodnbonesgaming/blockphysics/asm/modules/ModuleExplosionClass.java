@@ -10,6 +10,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
@@ -59,7 +60,7 @@ public class ModuleExplosionClass implements IClassTransformerModule
 			}
 
 			//"doExplosionA", "()V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_77278_a", "()V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "doExplosionA" : "func_77278_a", "()V");
 			if (methodNode != null)
 			{
 				this.transformDoExplosionA(methodNode);
@@ -68,7 +69,7 @@ public class ModuleExplosionClass implements IClassTransformerModule
 			}
 
 			//"doExplosionB", "(Z)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_77279_a", "(Z)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "doExplosionB" : "func_77279_a", "(Z)V");
 			if (methodNode != null)
 			{
 				this.transformDoExplosionB(methodNode);
@@ -104,7 +105,7 @@ public class ModuleExplosionClass implements IClassTransformerModule
 
 		final InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/world/Explosion", "field_77287_j", "Lnet/minecraft/world/World;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/world/Explosion", !ObfHelper.isObfuscated() ? "worldObj" : "field_77287_j", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "doExplosionA", "(Lnet/minecraft/world/World;Lnet/minecraft/world/Explosion;)V", false, this));
 		toInject.add(new InsnNode(Opcodes.RETURN));
@@ -124,7 +125,7 @@ public class ModuleExplosionClass implements IClassTransformerModule
 
 		final InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/world/Explosion", "field_77287_j", "Lnet/minecraft/world/World;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETFIELD, "net/minecraft/world/Explosion", !ObfHelper.isObfuscated() ? "worldObj" : "field_77287_j", "Lnet/minecraft/world/World;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 1));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "doExplosionB", "(Lnet/minecraft/world/World;Lnet/minecraft/world/Explosion;Z)V", false, this));

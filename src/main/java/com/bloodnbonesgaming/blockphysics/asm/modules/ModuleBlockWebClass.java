@@ -8,6 +8,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
@@ -48,7 +49,7 @@ public class ModuleBlockWebClass implements IClassTransformerModule
 			ASMPlugin.log.info("Transforming class: " + transformedName);
 
 			//"onEntityCollidedWithBlock", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V"
-			final MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149670_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V");
+			final MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onEntityCollidedWithBlock" : "func_149670_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V");
 			if (methodNode != null)
 			{
 				this.trasnformOnEntityCollidedWithBlock(methodNode);
@@ -75,9 +76,9 @@ public class ModuleBlockWebClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 3));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 4));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", !ObfHelper.isObfuscated() ? "blockRegistry" : "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", !ObfHelper.isObfuscated() ? "getNameForObject" : "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 5));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onEntityCollidedWithBlock", "(Lnet/minecraft/world/World;IIILjava/lang/String;Lnet/minecraft/entity/Entity;)V", false, this));
 

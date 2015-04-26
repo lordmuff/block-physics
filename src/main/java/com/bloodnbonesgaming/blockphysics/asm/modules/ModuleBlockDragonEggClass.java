@@ -9,6 +9,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
@@ -49,7 +50,7 @@ public class ModuleBlockDragonEggClass implements IClassTransformerModule
 			ASMPlugin.log.info("Transforming class: " + transformedName);
 
 			//"onNeighborBlockChange", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V"
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149695_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onNeighborBlockChange" : "func_149695_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V");
 			if (methodNode != null)
 			{
 				this.transformOnNeighborBlockChange(methodNode);
@@ -57,7 +58,7 @@ public class ModuleBlockDragonEggClass implements IClassTransformerModule
 				throw new RuntimeException("Could not find onNeighborBlockChange method in " + transformedName);
 			}
 			//"updateTick", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "updateTick" : "func_149674_a", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 			if (methodNode != null)
 			{
 				this.transformUpdateTick(methodNode);
@@ -110,9 +111,9 @@ public class ModuleBlockDragonEggClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 3));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 4));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", !ObfHelper.isObfuscated() ? "blockRegistry" : "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", !ObfHelper.isObfuscated() ? "getNameForObject" : "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onNeighborBlockChange", "(Lnet/minecraft/world/World;IIILjava/lang/String;)V", false, this));
 
 		method.instructions.insertBefore(target, toInject);
@@ -147,7 +148,7 @@ public class ModuleBlockDragonEggClass implements IClassTransformerModule
 	public void transformFunc_150019_m(final MethodNode method)
 	{
 		//p_150019_1_.setBlockToAir(p_150019_2_, p_150019_3_, p_150019_4_);
-		final AbstractInsnNode target = ASMHelper.find(method.instructions, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/World", "func_147468_f", "(III)Z", false));
+		final AbstractInsnNode target = ASMHelper.find(method.instructions, new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/World", !ObfHelper.isObfuscated() ? "setBlockToAir" : "func_147468_f", "(III)Z", false));
 
 		if (target == null) {
 			throw new RuntimeException("Unexpected instruction pattern in BlockDragonEgg.func_150019_m");

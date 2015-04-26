@@ -8,6 +8,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
@@ -48,7 +49,7 @@ public class ModuleBlockClass implements IClassTransformerModule
 			ASMPlugin.log.info("Transforming class: " + transformedName);
 
 			//"onBlockDestroyedByPlayer", "(Lnet/minecraft/world/World;IIII)V"
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149664_b", "(Lnet/minecraft/world/World;IIII)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onBlockDestroyedByPlayer" : "func_149664_b", "(Lnet/minecraft/world/World;IIII)V");
 			if (methodNode != null)
 			{
 				this.transformOnBlockDestroyedByPlayer(methodNode);
@@ -56,7 +57,7 @@ public class ModuleBlockClass implements IClassTransformerModule
 				throw new RuntimeException("Could not find onBlockDestroyedByPlayer method in " + transformedName);
 			}
 			//"onNeighborBlockChange", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149695_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onNeighborBlockChange" : "func_149695_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/block/Block;)V");
 			if (methodNode != null)
 			{
 				this.transformOnNeighborBlockChange(methodNode);
@@ -64,7 +65,7 @@ public class ModuleBlockClass implements IClassTransformerModule
 				throw new RuntimeException("Could not find onNeighborBlockChange method in " + transformedName);
 			}
 			//"onEntityWalking", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149724_b", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onEntityWalking" : "func_149724_b", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V");
 			if (methodNode != null)
 			{
 				this.transformOnEntityWalking(methodNode);
@@ -72,7 +73,7 @@ public class ModuleBlockClass implements IClassTransformerModule
 				throw new RuntimeException("Could not find onEntityWalking method in " + transformedName);
 			}
 			//"onEntityCollidedWithBlock", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149670_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onEntityCollidedWithBlock" : "func_149670_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;)V");
 			if (methodNode != null)
 			{
 				this.trasnformOnEntityCollidedWithBlock(methodNode);
@@ -80,7 +81,7 @@ public class ModuleBlockClass implements IClassTransformerModule
 				throw new RuntimeException("Could not find onEntityCollidedWithBlock method in " + transformedName);
 			}
 			//"onPostBlockPlaced", "(Lnet/minecraft/world/World;IIII)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149714_e", "(Lnet/minecraft/world/World;IIII)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onPostBlockPlaced" : "func_149714_e", "(Lnet/minecraft/world/World;IIII)V");
 			if (methodNode != null)
 			{
 				this.transformOnPostBlockPlaced(methodNode);
@@ -88,7 +89,7 @@ public class ModuleBlockClass implements IClassTransformerModule
 				throw new RuntimeException("Could not find onPostBlockPlaced method in " + transformedName);
 			}
 			//"onFallenUpon", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;F)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149746_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;F)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "onFallenUpon" : "func_149746_a", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/Entity;F)V");
 			if (methodNode != null)
 			{
 				this.transformOnFallenUpon(methodNode);
@@ -116,9 +117,9 @@ public class ModuleBlockClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 3));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 4));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 5));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", !ObfHelper.isObfuscated() ? "blockRegistry" : "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", !ObfHelper.isObfuscated() ? "getNameForObject" : "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onBlockDestroyedByPlayer", "(Lnet/minecraft/world/World;IIIILjava/lang/String;)V", false, this));
 
 		method.instructions.insertBefore(target, toInject);
@@ -138,9 +139,9 @@ public class ModuleBlockClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 3));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 4));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", !ObfHelper.isObfuscated() ? "blockRegistry" : "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", !ObfHelper.isObfuscated() ? "getNameForObject" : "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onNeighborBlockChange", "(Lnet/minecraft/world/World;IIILjava/lang/String;)V", false, this));
 
 		method.instructions.insertBefore(target, toInject);
@@ -160,9 +161,9 @@ public class ModuleBlockClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 3));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 4));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", !ObfHelper.isObfuscated() ? "blockRegistry" : "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", !ObfHelper.isObfuscated() ? "getNameForObject" : "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onNeighborBlockChange", "(Lnet/minecraft/world/World;IIILjava/lang/String;)V", false, this));
 
 		method.instructions.insertBefore(target, toInject);
@@ -182,9 +183,9 @@ public class ModuleBlockClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 3));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 4));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", !ObfHelper.isObfuscated() ? "blockRegistry" : "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", !ObfHelper.isObfuscated() ? "getNameForObject" : "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 5));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onEntityCollidedWithBlock", "(Lnet/minecraft/world/World;IIILjava/lang/String;Lnet/minecraft/entity/Entity;)V", false, this));
 
@@ -205,9 +206,9 @@ public class ModuleBlockClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 3));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 4));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", !ObfHelper.isObfuscated() ? "blockRegistry" : "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", !ObfHelper.isObfuscated() ? "getNameForObject" : "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 5));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onPostBlockPlaced", "(Lnet/minecraft/world/World;IIILjava/lang/String;I)V", false, this));
 
@@ -228,9 +229,9 @@ public class ModuleBlockClass implements IClassTransformerModule
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 2));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 3));
 		toInject.add(new VarInsnNode(Opcodes.ILOAD, 4));
-		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
+		toInject.add(new RedirectedFieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/block/Block", !ObfHelper.isObfuscated() ? "blockRegistry" : "field_149771_c", "Lnet/minecraft/util/RegistryNamespaced;", this));
 		toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
+		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/RegistryNamespaced", !ObfHelper.isObfuscated() ? "getNameForObject" : "func_148750_c", "(Ljava/lang/Object;)Ljava/lang/String;", false, this));
 		toInject.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, ModInfo.MAIN_PACKACE + "/blockphysics/BlockPhysics", "onNeighborBlockChange", "(Lnet/minecraft/world/World;IIILjava/lang/String;)V", false, this));
 
 		method.instructions.insertBefore(target, toInject);

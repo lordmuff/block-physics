@@ -15,6 +15,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
 import com.bnbgaming.lib.core.ASMAdditionRegistry;
@@ -63,7 +64,7 @@ public class ModuleEntityTrackerClass implements IClassTransformerModule
 			}
 
 			//"addEntityToTracker", "(Lnet/minecraft/entity/Entity;)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_72786_a", "(Lnet/minecraft/entity/Entity;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "addEntityToTracker" : "func_72786_a", "(Lnet/minecraft/entity/Entity;)V");
 			if (methodNode != null)
 			{
 				this.transformAddEntityToTracker(methodNode);
@@ -72,7 +73,7 @@ public class ModuleEntityTrackerClass implements IClassTransformerModule
 			}
 
 			//"removeEntityFromAllTrackingPlayers", "(Lnet/minecraft/entity/Entity;)V"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_72790_b", "(Lnet/minecraft/entity/Entity;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "removeEntityFromAllTrackingPlayers" : "func_72790_b", "(Lnet/minecraft/entity/Entity;)V");
 			if (methodNode != null)
 			{
 				this.transformRemoveEntityFromAllTrackingPlayers(methodNode);

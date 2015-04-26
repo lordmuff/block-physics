@@ -10,6 +10,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
+import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
@@ -50,7 +51,7 @@ public class ModuleWorldServerClass implements IClassTransformerModule
 			ASMPlugin.log.info("Transforming class: " + transformedName);
 
 			//"tick", "()V"
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_72835_b", "()V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "tick" : "func_72835_b", "()V");
 			if (methodNode != null)
 			{
 				this.transformTick(methodNode);
@@ -59,7 +60,7 @@ public class ModuleWorldServerClass implements IClassTransformerModule
 			}
 
 			//"newExplosion", "(Lnet/minecraft/entity/Entity;DDDFZZ)Lnet/minecraft/world/Explosion;"
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_72885_a", "(Lnet/minecraft/entity/Entity;DDDFZZ)Lnet/minecraft/world/Explosion;");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, !ObfHelper.isObfuscated() ? "newExplosion" : "func_72885_a", "(Lnet/minecraft/entity/Entity;DDDFZZ)Lnet/minecraft/world/Explosion;");
 			if (methodNode != null)
 			{
 				this.transformNewExplosion(methodNode);
@@ -104,7 +105,7 @@ public class ModuleWorldServerClass implements IClassTransformerModule
 	{
 		final InsnList toRemove1 = new InsnList();
 		toRemove1.add(new VarInsnNode(Opcodes.ALOAD, 11));
-		toRemove1.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/Explosion", "func_77278_a", "()V", false, this));
+		toRemove1.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/Explosion", !ObfHelper.isObfuscated() ? "doExplosionA" : "func_77278_a", "()V", false, this));
 
 		final AbstractInsnNode start1 = ASMHelper.find(method.instructions, toRemove1);
 		final AbstractInsnNode end1 = ASMHelper.move(start1, 2);
@@ -118,7 +119,7 @@ public class ModuleWorldServerClass implements IClassTransformerModule
 		final InsnList toRemove2 = new InsnList();
 		toRemove2.add(new VarInsnNode(Opcodes.ALOAD, 11));
 		toRemove2.add(new InsnNode(Opcodes.ICONST_0));
-		toRemove2.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/Explosion", "func_77279_a", "(Z)V", false, this));
+		toRemove2.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/Explosion", !ObfHelper.isObfuscated() ? "doExplosionB" : "func_77279_a", "(Z)V", false, this));
 
 		final AbstractInsnNode start2 = ASMHelper.find(method.instructions, toRemove2);
 		final AbstractInsnNode end2 = ASMHelper.move(start2, 3);
