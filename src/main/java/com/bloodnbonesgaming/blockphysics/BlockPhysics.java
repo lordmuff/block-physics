@@ -781,18 +781,18 @@ public class BlockPhysics extends BNBGamingMod
 
 	public static boolean sameBlock(final String id1, final String id2)
 	{
-		/*if ((id1.equals("minecraft:log") || id1.equals("minecraft:log2") || id1.equals("harvestcraft:pamMaple") || id1.equals("MineFactoryReloaded:rubberwood.log") || id1.equals("TConstruct:slime.gel") || id1.equals("Natura:tree") || id1.equals("Natura:redwood") || id1.equals("Natura:Saguaro") || id1.equals("Natura:willow") || id1.equals("Natura:bloodwood") || id1.equals("Natura:DarkTree") || id1.equals("Natura:RareTree"))
+		if ((id1.equals("minecraft:log") || id1.equals("minecraft:log2") || id1.equals("harvestcraft:pamMaple") || id1.equals("MineFactoryReloaded:rubberwood.log") || id1.equals("TConstruct:slime.gel") || id1.equals("Natura:tree") || id1.equals("Natura:redwood") || id1.equals("Natura:Saguaro") || id1.equals("Natura:willow") || id1.equals("Natura:bloodwood") || id1.equals("Natura:DarkTree") || id1.equals("Natura:RareTree"))
 		 && (id2.equals("minecraft:log") || id2.equals("minecraft:log2") || id2.equals("harvestcraft:pamMaple") || id2.equals("MineFactoryReloaded:rubberwood.log") || id2.equals("TConstruct:slime.gel") || id2.equals("Natura:tree") || id2.equals("Natura:redwood") || id2.equals("Natura:Saguaro") || id2.equals("Natura:willow") || id2.equals("Natura:bloodwood") || id2.equals("Natura:DarkTree") || id2.equals("Natura:RareTree")))
 		{
 			return true;
-		}*/
+		}
 		if (!id1.equals(id2)) {
 			return false;
 		}
-		/*if (Block.blockRegistry.getObject(id1) instanceof BlockSlab || Block.blockRegistry.getObject(id1) instanceof BlockSilverfish)
+		if (Block.blockRegistry.getObject(id1) instanceof BlockSlab || Block.blockRegistry.getObject(id1) instanceof BlockSilverfish)
 		{
 			return true;
-		}*/
+		}
 		return true;
 	}
 
