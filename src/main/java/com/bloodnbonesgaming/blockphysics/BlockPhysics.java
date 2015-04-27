@@ -2619,9 +2619,9 @@ public class BlockPhysics extends BNBGamingMod
 		}
 	}
 
-	public static void tickBlocksRandomMove(final WorldServer worldServer)
+	public static void tickBlocksRandomMove(final WorldServer wserver)
 	{
-		/*if ( skipMove ) return;
+		if ( skipMove ) return;
 
         Iterator var3 = wserver.activeChunkSet.iterator();
 
@@ -2655,15 +2655,15 @@ public class BlockPhysics extends BNBGamingMod
                         String var17 = Block.blockRegistry.getNameForObject(var21.getBlockByExtId(var14, var16, var15));
                         int m = var21.getExtBlockMetadata(var14, var16, var15);
 
-                        if (DefinitionMaps.getBlockDef(Block.blockRegistry.getNameForObject(var17),m).randomtick)
+                        if (DefinitionMaps.getBlockDef(var17,m).randomtick)
                         {
                         	BlockPhysics.tryToMove(wserver, var14 + var5, var16 + var21.getYLocation(), var15 + var6, var17, m, false);
                         }
                     }
                 }
             }
-        }*/
-		if (BlockPhysics.skipMove) {
+        }
+		/*if (BlockPhysics.skipMove) {
 			return;
 		}
 
@@ -2700,12 +2700,12 @@ public class BlockPhysics extends BNBGamingMod
 
 				if (DefinitionMaps.getBlockDef(blockName, m).randomtick)
 				{
-					BlockPhysics.tryToMove(worldServer, xx + x, yy + blockStorage.getYLocation(), zz + z, blockName, m, false);
+					//BlockPhysics.tryToMove(worldServer, xx + x, yy + blockStorage.getYLocation(), zz + z, blockName, m, false);
 				}
 					}
 				}
 			}
-		}
+		}*/
 	}
 
 	public static void setSkipMove(final long tickTime)

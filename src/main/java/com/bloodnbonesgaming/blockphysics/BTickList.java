@@ -49,7 +49,7 @@ public class BTickList
 			siz = 1000;
 		}
 
-		ChunkCoordIntPair chunk;
+		//ChunkCoordIntPair chunk;
 
 		for (int var3 = 0; var3 < siz; ++var3)
 		{
@@ -59,8 +59,8 @@ public class BTickList
 				continue;
 			}
 
-			chunk = new ChunkCoordIntPair(var4.xCoord / 16, var4.zCoord / 16);
-
+			//chunk = new ChunkCoordIntPair(var4.xCoord / 16, var4.zCoord / 16);
+			
 			BlockPhysics.tryToMove(world, var4.xCoord, var4.yCoord, var4.zCoord, Block.blockRegistry.getNameForObject(world.getBlock(var4.xCoord, var4.yCoord, var4.zCoord)), world.getBlockMetadata(var4.xCoord, var4.yCoord, var4.zCoord), var4.slide);
 		}
 	}
