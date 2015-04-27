@@ -154,7 +154,7 @@ public class ModConfig
 						floatingradius = Integer.parseInt(propertie.substring(colonIndex +1, value2));
 						//int value3 = properties[i].indexOf(":", value2);
 						floatingblock = propertie.substring(value2 + 1);
-						BlockPhysics.instance.getLog().info("FLOATINGBLOCK = " + floatingblock);
+						//BlockPhysics.instance.getLog().info("FLOATINGBLOCK = " + floatingblock);
 						/*if (value3 != -1)
 						{
 							floatingblock = properties[i].substring(value2 +1, value3);
@@ -208,7 +208,7 @@ public class ModConfig
 			ModConfig.config.get("block definitions", "tnt", new String[]{"movenum:1", "movedef1:grass", "movedef2:default", "moveflipnumber:0", "movechanger:0", "supportingblock:0", "fragile:0", "trapping:false", "pushtype:1", "randomtick:true", "tickrate:4", "placedmove:0", "mass:1500", "strength:64000"}).getStringList();
 			ModConfig.config.get("block definitions", "wall", new String[]{"movenum:1", "movedef1:cobblestone", "movedef2:default", "moveflipnumber:0", "movechanger:0", "supportingblock:1", "fragile:0", "trapping:false", "pushtype:1", "randomtick:true", "tickrate:4", "placedmove:0", "mass:700", "strength:64000"}).getStringList();
 			ModConfig.config.get("block definitions", "web", new String[]{"movenum:0", "movedef1:default", "movedef2:default", "moveflipnumber:0", "movechanger:0", "supportingblock:0", "fragile:1", "trapping:true", "pushtype:0", "randomtick:false", "tickrate:4", "placedmove:0", "mass:1", "strength:50"}).getStringList();
-			ModConfig.config.get("block definitions", "wood", new String[]{"movenum:2", "movedef1:wood", "movedef2:default", "moveflipnumber:15", "movechanger:0", "supportingblock:0", "fragile:1", "trapping:false", "pushtype:1", "randomtick:true", "tickrate:4", "placedmove:1", "mass:500", "strength:2000"}).getStringList();
+			ModConfig.config.get("block definitions", "wood", new String[]{"movenum:2", "movedef1:wood", "movedef2:default", "moveflipnumber:15", "movechanger:0", "supportingblock:0", "fragile:0", "trapping:false", "pushtype:1", "randomtick:true", "tickrate:4", "placedmove:1", "mass:500", "strength:2000"}).getStringList();
 			ModConfig.config.get("block definitions", "wool", new String[]{"movenum:2", "movedef1:default", "movedef2:wool", "moveflipnumber:5", "movechanger:2", "supportingblock:0", "fragile:1", "trapping:false", "pushtype:1", "randomtick:true", "tickrate:4", "placedmove:1", "mass:10", "strength:100"}).getStringList();
 
 			ModConfig.categoryMap = ModConfig.config.getCategory("block definitions");

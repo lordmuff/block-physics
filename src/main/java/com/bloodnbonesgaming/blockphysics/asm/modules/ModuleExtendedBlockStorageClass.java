@@ -48,6 +48,9 @@ public class ModuleExtendedBlockStorageClass implements IClassTransformerModule
 		if (transformedName.equals("net.minecraft.world.chunk.storage.ExtendedBlockStorage"))
 		{
 			ASMPlugin.log.info("Transforming class: " + transformedName);
+			
+			this.createSetBlockBPdata(classNode);
+	        this.createGetBlockBPdata(classNode);
 
 			//<init>(IZ)V
 			final MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "(IZ)V");
@@ -183,13 +186,12 @@ public class ModuleExtendedBlockStorageClass implements IClassTransformerModule
 		registry.registerFieldAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", new FieldNode(Opcodes.ACC_PRIVATE, "blockBPdataArray", "[B", null, null));
 
 		final ClassNode classNode = new ClassNode();
-		this.createSetBlockBPdata(classNode);
-		this.createGetBlockBPdata(classNode);
+		
 		this.createSetBPdataArray(classNode);
 		this.createGetBPdataArray(classNode);
 
-		registry.registerMethodAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "getBlockBPdata", "(III)I"));
-		registry.registerMethodAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "setBlockBPdata", "(IIII)V"));
+		//registry.registerMethodAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "getBlockBPdata", "(III)I"));
+		//registry.registerMethodAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "setBlockBPdata", "(IIII)V"));
 		registry.registerMethodAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "getBPdataArray", "()[B"));
 		registry.registerMethodAddition("net/minecraft/world/chunk/storage/ExtendedBlockStorage", ASMHelper.findMethodNodeOfClass(classNode, "setBPdataArray", "([B)V"));
 	}

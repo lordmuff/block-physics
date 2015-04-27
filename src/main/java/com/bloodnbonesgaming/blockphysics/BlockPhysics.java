@@ -69,7 +69,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = ModInfo.MODID, version = ModInfo.VERSION, dependencies = "")
+@Mod(modid = ModInfo.MODID, version = ModInfo.VERSION, dependencies = "required-after:BNBGamingLib@[1.0.1,)")
 public class BlockPhysics extends BNBGamingMod
 {
 	@Instance("BlockPhysics")
