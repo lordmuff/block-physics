@@ -1367,10 +1367,13 @@ public class BlockPhysics extends BNBGamingMod
 
 	public static boolean canBurn(final String blid)
 	{
-		if ( Blocks.fire.getFlammability((Block)Block.blockRegistry.getObject(blid)) != 0 ) {
+		if(blid == null) {
+			return false;
+		}
+		if (Blocks.fire.getFlammability((Block)Block.blockRegistry.getObject(blid)) != 0) {
 			return true;
 		}
-		if ( (Block)Block.blockRegistry.getObject(blid) == Blocks.netherrack ) {
+		if ((Block)Block.blockRegistry.getObject(blid) == Blocks.netherrack) {
 			return true;
 		}
 		return false;
