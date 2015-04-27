@@ -3,7 +3,6 @@ package com.bloodnbonesgaming.blockphysics;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
-import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 
 import com.bloodnbonesgaming.blockphysics.util.DefinitionMaps;
@@ -60,7 +59,7 @@ public class BTickList
 			}
 
 			//chunk = new ChunkCoordIntPair(var4.xCoord / 16, var4.zCoord / 16);
-			
+
 			BlockPhysics.tryToMove(world, var4.xCoord, var4.yCoord, var4.zCoord, Block.blockRegistry.getNameForObject(world.getBlock(var4.xCoord, var4.yCoord, var4.zCoord)), world.getBlockMetadata(var4.xCoord, var4.yCoord, var4.zCoord), var4.slide);
 		}
 	}

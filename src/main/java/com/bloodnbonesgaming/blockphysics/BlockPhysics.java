@@ -525,18 +525,18 @@ public class BlockPhysics extends BNBGamingMod
 				}
 				switch (slide[rr])
 				{
-				case 0:
-					id = - 1;
-					break;
-				case 1:
-					kd = - 1;
-					break;
-				case 2:
-					kd = + 1;
-					break;
-				case 3:
-					id = + 1;
-					break;
+					case 0:
+						id = - 1;
+						break;
+					case 1:
+						kd = - 1;
+						break;
+					case 2:
+						kd = + 1;
+						break;
+					case 3:
+						id = + 1;
+						break;
 				}
 				final int iv = i + id, kv = k + kd;
 				for (; BlockPhysics.canMoveTo(world, iv, jv - 1, kv, ms) && jv > 0; jv--) {
@@ -608,18 +608,18 @@ public class BlockPhysics extends BNBGamingMod
 			}
 			switch (slide[rr])
 			{
-			case 0:
-				id = - 1;
-				break;
-			case 1:
-				kd = - 1;
-				break;
-			case 2:
-				kd = + 1;
-				break;
-			case 3:
-				id = + 1;
-				break;
+				case 0:
+					id = - 1;
+					break;
+				case 1:
+					kd = - 1;
+					break;
+				case 2:
+					kd = + 1;
+					break;
+				case 3:
+					id = + 1;
+					break;
 			}
 			//int metadata = world.getBlockMetadata(i, j, k);
 			final EntityFallingBlock entityfallingsand = new EntityFallingBlock(world, 0.5D + i + 0.0625D * id, 0.5D + j - 0.0625D, 0.5D + k + 0.0625D * kd, (Block)Block.blockRegistry.getObject(blid), meta);
@@ -782,7 +782,7 @@ public class BlockPhysics extends BNBGamingMod
 	public static boolean sameBlock(final String id1, final String id2)
 	{
 		if ((id1.equals("minecraft:log") || id1.equals("minecraft:log2") || id1.equals("harvestcraft:pamMaple") || id1.equals("MineFactoryReloaded:rubberwood.log") || id1.equals("TConstruct:slime.gel") || id1.equals("Natura:tree") || id1.equals("Natura:redwood") || id1.equals("Natura:Saguaro") || id1.equals("Natura:willow") || id1.equals("Natura:bloodwood") || id1.equals("Natura:DarkTree") || id1.equals("Natura:RareTree"))
-		 && (id2.equals("minecraft:log") || id2.equals("minecraft:log2") || id2.equals("harvestcraft:pamMaple") || id2.equals("MineFactoryReloaded:rubberwood.log") || id2.equals("TConstruct:slime.gel") || id2.equals("Natura:tree") || id2.equals("Natura:redwood") || id2.equals("Natura:Saguaro") || id2.equals("Natura:willow") || id2.equals("Natura:bloodwood") || id2.equals("Natura:DarkTree") || id2.equals("Natura:RareTree")))
+				&& (id2.equals("minecraft:log") || id2.equals("minecraft:log2") || id2.equals("harvestcraft:pamMaple") || id2.equals("MineFactoryReloaded:rubberwood.log") || id2.equals("TConstruct:slime.gel") || id2.equals("Natura:tree") || id2.equals("Natura:redwood") || id2.equals("Natura:Saguaro") || id2.equals("Natura:willow") || id2.equals("Natura:bloodwood") || id2.equals("Natura:DarkTree") || id2.equals("Natura:RareTree")))
 		{
 			return true;
 		}
@@ -1771,11 +1771,11 @@ public class BlockPhysics extends BNBGamingMod
 				{
 					switch ( sdir )
 					{
-					case 0:	fsand.setPosition(i - 0.0625D  + 0.5D, j - 0.0625D  + 0.5D, k  + 0.5D); break;
-					case 1:	fsand.setPosition(i  + 0.5D, j - 0.0625D  + 0.5D, k - 0.0625D  + 0.5D); break;
-					case 2: fsand.setPosition(i  + 0.5D, j - 0.0625D  + 0.5D, k + 0.0625D  + 0.5D); break;
-					case 3:	fsand.setPosition(i + 0.0625D  + 0.5D, j - 0.0625D  + 0.5D, k  + 0.5D); break;
-					default:
+						case 0:	fsand.setPosition(i - 0.0625D  + 0.5D, j - 0.0625D  + 0.5D, k  + 0.5D); break;
+						case 1:	fsand.setPosition(i  + 0.5D, j - 0.0625D  + 0.5D, k - 0.0625D  + 0.5D); break;
+						case 2: fsand.setPosition(i  + 0.5D, j - 0.0625D  + 0.5D, k + 0.0625D  + 0.5D); break;
+						case 3:	fsand.setPosition(i + 0.0625D  + 0.5D, j - 0.0625D  + 0.5D, k  + 0.5D); break;
+						default:
 					}
 				}
 
@@ -2370,14 +2370,16 @@ public class BlockPhysics extends BNBGamingMod
 
 	}
 
-    public static void dropFallingSand(final EntityFallingBlock fallingBlock)
-    {
-        if (fallingBlock.field_145810_d != null)
-            BlockPhysics.dropItemsNBT(fallingBlock.worldObj, MathHelper.floor_double(fallingBlock.posX), MathHelper.floor_double(fallingBlock.posY), MathHelper.floor_double(fallingBlock.posZ), fallingBlock.field_145810_d);
+	public static void dropFallingSand(final EntityFallingBlock fallingBlock)
+	{
+		if (fallingBlock.field_145810_d != null) {
+			BlockPhysics.dropItemsNBT(fallingBlock.worldObj, MathHelper.floor_double(fallingBlock.posX), MathHelper.floor_double(fallingBlock.posY), MathHelper.floor_double(fallingBlock.posZ), fallingBlock.field_145810_d);
+		}
 
-        if (fallingBlock.func_145805_f() != null)
-            fallingBlock.entityDropItem(new ItemStack(fallingBlock.func_145805_f(), 1, fallingBlock.func_145805_f().damageDropped(fallingBlock.field_145814_a)), 0.0F);
-    }
+		if (fallingBlock.func_145805_f() != null) {
+			fallingBlock.entityDropItem(new ItemStack(fallingBlock.func_145805_f(), 1, fallingBlock.func_145805_f().damageDropped(fallingBlock.field_145814_a)), 0.0F);
+		}
+	}
 
 	protected static void placeBlock(final World world, final EntityFallingBlock fsand, final double jumpPosX, final double jumpPosY, final double jumpPosZ,  final int i, final int j, final int k)
 	{
@@ -2621,48 +2623,50 @@ public class BlockPhysics extends BNBGamingMod
 
 	public static void tickBlocksRandomMove(final WorldServer wserver)
 	{
-		if ( skipMove ) return;
+		if ( BlockPhysics.skipMove ) {
+			return;
+		}
 
-        Iterator var3 = wserver.activeChunkSet.iterator();
+		final Iterator var3 = wserver.activeChunkSet.iterator();
 
-        while (var3.hasNext())
-        {
-            ChunkCoordIntPair var4 = (ChunkCoordIntPair)var3.next();
-            int var5 = var4.chunkXPos * 16;
-            int var6 = var4.chunkZPos * 16;
-            Chunk var7 = wserver.getChunkFromChunkCoords(var4.chunkXPos, var4.chunkZPos);
+		while (var3.hasNext())
+		{
+			final ChunkCoordIntPair var4 = (ChunkCoordIntPair)var3.next();
+			final int var5 = var4.chunkXPos * 16;
+			final int var6 = var4.chunkZPos * 16;
+			final Chunk var7 = wserver.getChunkFromChunkCoords(var4.chunkXPos, var4.chunkZPos);
 
-            int var9;
-            int var10;
-            int var13;
+			int var9;
+			int var10;
+			int var13;
 
-            ExtendedBlockStorage[] var19 = var7.getBlockStorageArray();
-            var9 = var19.length;
+			final ExtendedBlockStorage[] var19 = var7.getBlockStorageArray();
+			var9 = var19.length;
 
-            for (var10 = 0; var10 < var9; ++var10)
-            {
-                ExtendedBlockStorage var21 = var19[var10];
+			for (var10 = 0; var10 < var9; ++var10)
+			{
+				final ExtendedBlockStorage var21 = var19[var10];
 
-                if (var21 != null )
-                {
-                    for (int var20 = 0; var20 < 3; ++var20)
-                    {
-                    	updateLCG = updateLCG * 3 + 1013904223;
-                        var13 = updateLCG >> 2;
-                        int var14 = var13 & 15;
-                        int var15 = var13 >> 8 & 15;
-                        int var16 = var13 >> 16 & 15;
-                        String var17 = Block.blockRegistry.getNameForObject(var21.getBlockByExtId(var14, var16, var15));
-                        int m = var21.getExtBlockMetadata(var14, var16, var15);
+				if (var21 != null )
+				{
+					for (int var20 = 0; var20 < 3; ++var20)
+					{
+						BlockPhysics.updateLCG = BlockPhysics.updateLCG * 3 + 1013904223;
+						var13 = BlockPhysics.updateLCG >> 2;
+					final int var14 = var13 & 15;
+					final int var15 = var13 >> 8 & 15;
+			final int var16 = var13 >> 16 & 15;
+				final String var17 = Block.blockRegistry.getNameForObject(var21.getBlockByExtId(var14, var16, var15));
+				final int m = var21.getExtBlockMetadata(var14, var16, var15);
 
-                        if (DefinitionMaps.getBlockDef(var17,m).randomtick)
-                        {
-                        	BlockPhysics.tryToMove(wserver, var14 + var5, var16 + var21.getYLocation(), var15 + var6, var17, m, false);
-                        }
-                    }
-                }
-            }
-        }
+				if (DefinitionMaps.getBlockDef(var17,m).randomtick)
+				{
+					BlockPhysics.tryToMove(wserver, var14 + var5, var16 + var21.getYLocation(), var15 + var6, var17, m, false);
+				}
+					}
+				}
+			}
+		}
 		/*if (BlockPhysics.skipMove) {
 			return;
 		}
@@ -2872,48 +2876,48 @@ public class BlockPhysics extends BNBGamingMod
 					double pspX = 0, pspY = 0, pspZ = 0;
 					switch ( var6 )
 					{
-					case 0:
-					{
-						pspX = -(double)power[0] / 3D + power[2] / 3D - power[6] / 3D + power[8] / 3D - power[3] / 2D + power[5] / 2D;
-						pspY = -( power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D);
-						pspZ = -(double)power[0] / 3D - power[2] / 3D + power[6] / 3D + power[8] / 3D - power[1] / 2D + power[7] / 2D;
-						break;
-					}
-					case 1:
-					{
-						pspX = -(double)power[0] / 3D + power[2] / 3D - power[6] / 3D + power[8] / 3D - power[3] / 2D + power[5] / 2D;
-						pspY = power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D;
-						pspZ = -(double)power[0] / 3D - power[2] / 3D + power[6] / 3D + power[8] / 3D - power[1] / 2D + power[7] / 2D;
-						break;
-					}
-					case 2:   	// - Z
-					{
-						pspX = power[0] / 3D - power[2] / 3D + power[6] / 3D - power[8] / 3D + power[3] / 2D - power[5] / 2D;
-						pspY = power[0] / 3D - power[6] / 3D + power[2] / 3D - power[8] / 3D + power[1] / 2D - power[7] / 2D;
-						pspZ = -( power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D);
-						break;
-					}
-					case 3:		// + Z
-					{
-						pspX = -( power[0] / 3D - power[2] / 3D + power[6] / 3D - power[8] / 3D + power[3] / 2D - power[5] / 2D );
-						pspY = power[0] / 3D - power[6] / 3D + power[2] / 3D - power[8] / 3D + power[1] / 2D - power[7] / 2D;
-						pspZ = power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D;
-						break;
-					}
-					case 4:		// - X
-					{
-						pspX = -( power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D);
-						pspY = power[0] / 3D - power[6] / 3D + power[2] / 3D - power[8] / 3D + power[1] / 2D - power[7] / 2D;
-						pspZ = -( power[0] / 3D - power[2] / 3D + power[6] / 3D - power[8] / 3D + power[3] / 2D - power[5] / 2D );
-						break;
-					}
-					case 5:		// + X
-					{
-						pspX = power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D;
-						pspY = power[0] / 3D - power[6] / 3D + power[2] / 3D - power[8] / 3D + power[1] / 2D - power[7] / 2D;
-						pspZ = power[0] / 3D - power[2] / 3D + power[6] / 3D - power[8] / 3D + power[3] / 2D - power[5] / 2D;
-						break;
-					}
+						case 0:
+						{
+							pspX = -(double)power[0] / 3D + power[2] / 3D - power[6] / 3D + power[8] / 3D - power[3] / 2D + power[5] / 2D;
+							pspY = -( power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D);
+							pspZ = -(double)power[0] / 3D - power[2] / 3D + power[6] / 3D + power[8] / 3D - power[1] / 2D + power[7] / 2D;
+							break;
+						}
+						case 1:
+						{
+							pspX = -(double)power[0] / 3D + power[2] / 3D - power[6] / 3D + power[8] / 3D - power[3] / 2D + power[5] / 2D;
+							pspY = power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D;
+							pspZ = -(double)power[0] / 3D - power[2] / 3D + power[6] / 3D + power[8] / 3D - power[1] / 2D + power[7] / 2D;
+							break;
+						}
+						case 2:   	// - Z
+						{
+							pspX = power[0] / 3D - power[2] / 3D + power[6] / 3D - power[8] / 3D + power[3] / 2D - power[5] / 2D;
+							pspY = power[0] / 3D - power[6] / 3D + power[2] / 3D - power[8] / 3D + power[1] / 2D - power[7] / 2D;
+							pspZ = -( power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D);
+							break;
+						}
+						case 3:		// + Z
+						{
+							pspX = -( power[0] / 3D - power[2] / 3D + power[6] / 3D - power[8] / 3D + power[3] / 2D - power[5] / 2D );
+							pspY = power[0] / 3D - power[6] / 3D + power[2] / 3D - power[8] / 3D + power[1] / 2D - power[7] / 2D;
+							pspZ = power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D;
+							break;
+						}
+						case 4:		// - X
+						{
+							pspX = -( power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D);
+							pspY = power[0] / 3D - power[6] / 3D + power[2] / 3D - power[8] / 3D + power[1] / 2D - power[7] / 2D;
+							pspZ = -( power[0] / 3D - power[2] / 3D + power[6] / 3D - power[8] / 3D + power[3] / 2D - power[5] / 2D );
+							break;
+						}
+						case 5:		// + X
+						{
+							pspX = power[4] + power[0] / 3D + power[6] / 3D + power[2] / 3D + power[8] / 3D + power[1] / 2D + power[7] / 2D + power[3] / 2D + power[5] / 2D;
+							pspY = power[0] / 3D - power[6] / 3D + power[2] / 3D - power[8] / 3D + power[1] / 2D - power[7] / 2D;
+							pspZ = power[0] / 3D - power[2] / 3D + power[6] / 3D - power[8] / 3D + power[3] / 2D - power[5] / 2D;
+							break;
+						}
 					}
 
 					pspX = pspX * 40D;
