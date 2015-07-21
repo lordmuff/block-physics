@@ -37,9 +37,9 @@ import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleRenderFallingBlockCl
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleTileEntityPistonClass;
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleWorldClass;
 import com.bloodnbonesgaming.blockphysics.asm.modules.ModuleWorldServerClass;
-import com.bnbgaming.lib.core.ASMAdditionHelper;
-import com.bnbgaming.lib.core.BNBGamingClassTransformer;
-import com.bnbgaming.lib.core.module.IClassTransformerModule;
+import com.bloodnbonesgaming.lib.core.ASMAdditionHelper;
+import com.bloodnbonesgaming.lib.core.BNBGamingClassTransformer;
+import com.bloodnbonesgaming.lib.core.module.IClassTransformerModule;
 import com.google.common.collect.Lists;
 
 public class ClassTransformer extends BNBGamingClassTransformer

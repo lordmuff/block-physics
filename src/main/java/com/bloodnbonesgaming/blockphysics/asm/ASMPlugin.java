@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.ModInfo;
-import com.bnbgaming.lib.util.LogHelper;
+import com.bloodnbonesgaming.lib.util.LogHelper;
 
 import cpw.mods.fml.common.asm.transformers.AccessTransformer;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;

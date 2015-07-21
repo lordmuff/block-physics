@@ -16,9 +16,9 @@ import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ObfHelper;
 
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
-import com.bnbgaming.lib.core.ASMAdditionRegistry;
-import com.bnbgaming.lib.core.insn.RedirectedMethodInsnNode;
-import com.bnbgaming.lib.core.module.IClassTransformerModule;
+import com.bloodnbonesgaming.lib.core.ASMAdditionRegistry;
+import com.bloodnbonesgaming.lib.core.insn.RedirectedMethodInsnNode;
+import com.bloodnbonesgaming.lib.core.module.IClassTransformerModule;
 
 public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 {

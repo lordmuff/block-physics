@@ -58,8 +58,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import com.bloodnbonesgaming.blockphysics.util.DefinitionMaps;
 import com.bloodnbonesgaming.blockphysics.util.TypeHelper;
-import com.bnbgaming.lib.BNBGamingMod;
-import com.bnbgaming.lib.core.ASMAdditionHelper;
+import com.bloodnbonesgaming.lib.BNBGamingMod;
+import com.bloodnbonesgaming.lib.core.ASMAdditionHelper;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;

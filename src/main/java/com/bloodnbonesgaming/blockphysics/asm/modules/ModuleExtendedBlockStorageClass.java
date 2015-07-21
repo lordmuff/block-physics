@@ -13,10 +13,10 @@ import org.objectweb.asm.tree.VarInsnNode;
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
-import com.bnbgaming.lib.core.ASMAdditionRegistry;
-import com.bnbgaming.lib.core.insn.RedirectedFieldInsnNode;
-import com.bnbgaming.lib.core.insn.RedirectedMethodVisitor;
-import com.bnbgaming.lib.core.module.IClassTransformerModule;
+import com.bloodnbonesgaming.lib.core.ASMAdditionRegistry;
+import com.bloodnbonesgaming.lib.core.insn.RedirectedFieldInsnNode;
+import com.bloodnbonesgaming.lib.core.insn.RedirectedMethodVisitor;
+import com.bloodnbonesgaming.lib.core.module.IClassTransformerModule;
 
 public class ModuleExtendedBlockStorageClass implements IClassTransformerModule
 {

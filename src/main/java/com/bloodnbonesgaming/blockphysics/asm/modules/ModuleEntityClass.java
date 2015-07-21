@@ -8,8 +8,8 @@ import org.objectweb.asm.tree.MethodNode;
 import squeek.asmhelper.com.bloodnbonesgaming.lib.ASMHelper;
 
 import com.bloodnbonesgaming.blockphysics.asm.ASMPlugin;
-import com.bnbgaming.lib.core.ASMAdditionRegistry;
-import com.bnbgaming.lib.core.module.IClassTransformerModule;
+import com.bloodnbonesgaming.lib.core.ASMAdditionRegistry;
+import com.bloodnbonesgaming.lib.core.module.IClassTransformerModule;
 
 public class ModuleEntityClass implements IClassTransformerModule
 {
