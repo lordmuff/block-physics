@@ -45,65 +45,65 @@ import com.google.common.collect.Lists;
 public class ClassTransformer extends BNBGamingClassTransformer
 {
 
-	public static FieldNode findFieldNodeOfClass(final ClassNode classNode, final String fieldName, final String fieldDesc)
-	{
-		for (final FieldNode field : classNode.fields)
-		{
-			if (field.name.equals(fieldName) && (fieldDesc == null || field.desc.equals(fieldDesc)))
-			{
-				return field;
-			}
-		}
-		return null;
-	}
+    public static FieldNode findFieldNodeOfClass(final ClassNode classNode, final String fieldName, final String fieldDesc)
+    {
+        for (final FieldNode field : classNode.fields)
+        {
+            if (field.name.equals(fieldName) && (fieldDesc == null || field.desc.equals(fieldDesc)))
+            {
+                return field;
+            }
+        }
+        return null;
+    }
 
-	@Override
-	public List<IClassTransformerModule> createModules() {
-		return Lists.newArrayList(new ModuleBlockClass(),
-				new ModuleBlockAnvilClass(),
-				new ModuleBlockChestClass(),
-				new ModuleBlockDispenserClass(),
-				new ModuleBlockDragonEggClass(),
-				new ModuleBlockFallingClass(),
-				new ModuleBlockFarmlandClass(),
-				new ModuleBlockFurnaceClass(),
-				new ModuleBlockPistonBaseClass(),
-				new ModuleBlockRailBaseClass(),
-				new ModuleBlockRedstoneLightClass(),
-				new ModuleBlockTNTClass(),
-				new ModuleBlockWebClass(),
-				new ModuleNetHandlerPlayClientClass(),
-				new ModuleRenderFallingBlockClass(),
-				new ModuleEntityBoatClass(),
-				new ModuleEntityFallingBlockClass(),
-				new ModuleEntityMinecartClass(),
-				new ModuleEntityTNTPrimedClass(),
-				new ModuleEntityXPOrbClass(),
-				new ModuleEntityClass(),
-				new ModuleEntityTrackerClass(),
-				new ModuleEntityTrackerEntryClass(),
-				new ModuleMinecraftServerClass(),
-				new ModuleTileEntityPistonClass(),
-				new ModuleAnvilChunkLoaderClass(),
-				new ModuleExtendedBlockStorageClass(),
-				new ModuleChunkClass(),
-				new ModuleExplosionClass(),
-				new ModuleWorldClass(),
-				new ModuleWorldServerClass());
-	}
+    @Override
+    public List<IClassTransformerModule> createModules() {
+        return Lists.newArrayList(new ModuleBlockClass(),
+                                  new ModuleBlockAnvilClass(),
+                                  new ModuleBlockChestClass(),
+                                  new ModuleBlockDispenserClass(),
+                                  new ModuleBlockDragonEggClass(),
+                                  new ModuleBlockFallingClass(),
+                                  new ModuleBlockFarmlandClass(),
+                                  new ModuleBlockFurnaceClass(),
+                                  new ModuleBlockPistonBaseClass(),
+                                  new ModuleBlockRailBaseClass(),
+                                  new ModuleBlockRedstoneLightClass(),
+                                  new ModuleBlockTNTClass(),
+                                  new ModuleBlockWebClass(),
+                                  new ModuleNetHandlerPlayClientClass(),
+                                  new ModuleRenderFallingBlockClass(),
+                                  new ModuleEntityBoatClass(),
+                                  new ModuleEntityFallingBlockClass(),
+                                  new ModuleEntityMinecartClass(),
+                                  new ModuleEntityTNTPrimedClass(),
+                                  new ModuleEntityXPOrbClass(),
+                                  new ModuleEntityClass(),
+                                  new ModuleEntityTrackerClass(),
+                                  new ModuleEntityTrackerEntryClass(),
+                                  new ModuleMinecraftServerClass(),
+                                  new ModuleTileEntityPistonClass(),
+                                  new ModuleAnvilChunkLoaderClass(),
+                                  new ModuleExtendedBlockStorageClass(),
+                                  new ModuleChunkClass(),
+                                  new ModuleExplosionClass(),
+                                  new ModuleWorldClass(),
+                                  new ModuleWorldServerClass());
+    }
 
-	@Override
-	public byte[] transform(final String name, final String transformedName, final byte[] basicClass) {
-		return basicClass;
-	}
+    @Override
+    public byte[] transform(final String name, final String transformedName, final byte[] basicClass) {
+        return basicClass;
+    }
 
-	@Override
-	public String getName() {
-		return "blockphysct";
-	}
+    @Override
+    public String getName() {
+        return "blockphysct";
+    }
 
-	@Override
-	public void setAdditionHelper(final ASMAdditionHelper helper) {
-		BlockPhysics.asmHelper = helper;
-	}
+    @Override
+    public void setAdditionHelper(final ASMAdditionHelper helper) {
+        BlockPhysics.asmHelper = helper;
+    }
 }

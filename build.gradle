@@ -40,7 +40,7 @@ group = "com.bloodnbonesgaming.blockphysics"
 archivesBaseName = "BlockPhysics"
 
 minecraft {
-    version = config.minecraft_version + "-" + config.forge_version
+    version = config.forge_version + "-" + config.minecraft_version
 
     replaceIn "blockphysics/ModInfo.java"
     replace "@VERSION@", "${config.mod_version}"
