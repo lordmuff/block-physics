@@ -106,10 +106,23 @@ public class ModuleAnvilChunkLoaderClass implements IClassTransformerModule
 		toFind.add(new VarInsnNode(Opcodes.ALOAD, 13));
 		toFind.add(new RedirectedMethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/chunk/storage/ExtendedBlockStorage", !ObfHelper.isObfuscated() ? "removeInvalidBlocks" : "func_76672_e", "()V", false, this));
 
-		final AbstractInsnNode target = ASMHelper.find(method.instructions, toFind);
+		AbstractInsnNode target = ASMHelper.find(method.instructions, toFind);
 
 		if (target == null) {
-			throw new RuntimeException("Unexpected instruction pattern in AnvilChunkLoader.readChunkFromNBT");
+			toFind.clear();
+			toFind.add(new VarInsnNode(Opcodes.ALOAD, 13));
+			toFind.add(new RedirectedMethodInsnNode(Opcodes.INVOKESTATIC, "fastcraft/Hooks", "q", "(Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;)V", false, this));
+			
+			target = ASMHelper.find(method.instructions, toFind);
+			
+			if (target == null)
+			{
+				throw new RuntimeException("Unexpected instruction pattern in AnvilChunkLoader.readChunkFromNBT");
+			}
+			else
+			{
+				ASMPlugin.log.info("Adjusting injection in AnvilChunkLoader.readChunkFromNBT for Fastcraft");
+			}
 		}
 
 		//if (nbttagcompound1.hasKey("BPData"))

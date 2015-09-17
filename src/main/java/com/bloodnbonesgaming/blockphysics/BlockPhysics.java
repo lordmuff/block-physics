@@ -115,7 +115,7 @@ public class BlockPhysics extends BNBGamingMod
 			else if (node instanceof MethodInsnNode)
 			{
 				final MethodInsnNode nodey = (MethodInsnNode)node;
-				BlockPhysics.instance.log.info("DEBUG111 - MethodNode: " + nodey.owner + " : " + nodey.name + " : " + nodey.desc);
+				BlockPhysics.instance.log.info("DEBUG111 - MethodNode: " + nodey.owner + " : " + nodey.name + " : " + nodey.desc + " : " + nodey.getOpcode());
 			}
 			else if (node instanceof VarInsnNode)
 			{
