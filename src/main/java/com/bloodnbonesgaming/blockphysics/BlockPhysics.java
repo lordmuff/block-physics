@@ -358,10 +358,15 @@ public class BlockPhysics extends BNBGamingMod
 				if ( block.hasTileEntity(meta) )
 				{
 					//TODO I hope this works....
-					final NBTTagCompound nnn = new NBTTagCompound();
-					world.getTileEntity(i, j, k).writeToNBT(nnn);
-					BlockPhysics.dropItemsNBT(world, i, j, k, nnn);
-					world.removeTileEntity(i, j, k);
+					final TileEntity tileEntity = world.getTileEntity(i, j, k);
+					
+					if (tileEntity != null)
+					{
+						final NBTTagCompound nnn = new NBTTagCompound();
+						tileEntity.writeToNBT(nnn);
+						BlockPhysics.dropItemsNBT(world, i, j, k, nnn);
+						world.removeTileEntity(i, j, k);
+					}
 				}
 
 				block.dropBlockAsItem(world, i, j, k, meta, 0);
@@ -558,12 +563,20 @@ public class BlockPhysics extends BNBGamingMod
 		{
 			//int metadata = world.getBlockMetadata(i, j, k);
 			final EntityFallingBlock entityfallingsand = new EntityFallingBlock(world, 0.5D + i, 0.5D + j, 0.5D + k, (Block)Block.blockRegistry.getObject(blid), meta);
+			BlockPhysics.instance.getLog().info("Checking if block: " + blid +  " with meta: " + meta + " has tile entity");
 			if ( ((Block)Block.blockRegistry.getObject(blid)).hasTileEntity(meta) )
 			{
+				BlockPhysics.instance.getLog().info("Block: " + blid +  " with meta: " + meta + " has tile entity");
 				//TODO I hope this works too....
-				entityfallingsand.field_145810_d = new NBTTagCompound();
-				world.getTileEntity(i, j, k).writeToNBT(entityfallingsand.field_145810_d);
-				world.removeTileEntity(i, j, k);
+				final TileEntity tileEntity = world.getTileEntity(i, j, k);
+				if (tileEntity != null)
+				{
+					entityfallingsand.field_145810_d = new NBTTagCompound();
+					BlockPhysics.instance.getLog().info("Attempting to write tile entity");
+					tileEntity.writeToNBT(entityfallingsand.field_145810_d);
+					BlockPhysics.instance.getLog().info("Attempting to remove tile entity");
+					world.removeTileEntity(i, j, k);
+				}
 			}
 			if (BlockPhysics.canBurn(blid) && world.getBlock(i, j+1, k) == Blocks.fire) {
 				entityfallingsand.setFire(60);
@@ -625,9 +638,14 @@ public class BlockPhysics extends BNBGamingMod
 			final EntityFallingBlock entityfallingsand = new EntityFallingBlock(world, 0.5D + i + 0.0625D * id, 0.5D + j - 0.0625D, 0.5D + k + 0.0625D * kd, (Block)Block.blockRegistry.getObject(blid), meta);
 			if ( ((Block)Block.blockRegistry.getObject(blid)).hasTileEntity(meta) )
 			{
-				entityfallingsand.field_145810_d = new NBTTagCompound();
-				world.getTileEntity(i, j, k).writeToNBT(entityfallingsand.field_145810_d);
-				world.removeTileEntity(i, j, k);
+				final TileEntity tileEntity = world.getTileEntity(i, j, k);
+				
+				if (tileEntity != null)
+				{
+					entityfallingsand.field_145810_d = new NBTTagCompound();
+					tileEntity.writeToNBT(entityfallingsand.field_145810_d);
+					world.removeTileEntity(i, j, k);
+				}
 			}
 
 			BlockPhysics.asmHelper.set(entityfallingsand, "slideDir", (byte) (slide[rr]+1));
@@ -1578,9 +1596,14 @@ public class BlockPhysics extends BNBGamingMod
 											BlockPhysics.asmHelper.set(entityfallingsand, "bpdata", bpdata);
 											if ( ((Block)Block.blockRegistry.getObject(var25)).hasTileEntity(meta) )
 											{
-												entityfallingsand.field_145810_d = new NBTTagCompound();
-												world.getTileEntity(var22, var23, var24).writeToNBT(entityfallingsand.field_145810_d);
-												world.removeTileEntity(var22, var23, var24);
+												final TileEntity tileEntity = world.getTileEntity(var22, var23, var24);
+
+												if (tileEntity != null)
+												{
+													entityfallingsand.field_145810_d = new NBTTagCompound();
+													tileEntity.writeToNBT(entityfallingsand.field_145810_d);
+													world.removeTileEntity(var22, var23, var24);
+												}
 											}
 											world.spawnEntityInWorld(entityfallingsand);
 										}
@@ -1933,10 +1956,15 @@ public class BlockPhysics extends BNBGamingMod
 						{
 							if ( ((Block)Block.blockRegistry.getObject(bidn)).hasTileEntity(metan) )
 							{
-								final NBTTagCompound nnn = new NBTTagCompound();
-								world.getTileEntity(in, jn, kn).writeToNBT(nnn);
-								BlockPhysics.dropItemsNBT(world, in, jn, kn, nnn);
-								world.removeTileEntity(in, jn, kn);
+								final TileEntity tileEntity = world.getTileEntity(in, jn, kn);
+								
+								if (tileEntity != null)
+								{
+									final NBTTagCompound nnn = new NBTTagCompound();
+									tileEntity.writeToNBT(nnn);
+									BlockPhysics.dropItemsNBT(world, in, jn, kn, nnn);
+									world.removeTileEntity(in, jn, kn);
+								}
 							}
 
 							if ( DefinitionMaps.getBlockDef(bidn,metan).fragile == 2 ) {
@@ -2961,10 +2989,15 @@ public class BlockPhysics extends BNBGamingMod
 					{
 						if ( ((Block)Block.blockRegistry.getObject(blid)).hasTileEntity(meta) )
 						{
-							final NBTTagCompound nnn = new NBTTagCompound();
-							par1World.getTileEntity(xx, yy, zz).writeToNBT(nnn);
-							BlockPhysics.dropItemsNBT(par1World, xx, yy, zz, nnn);
-							par1World.removeTileEntity(xx, yy, zz);
+							final TileEntity tileEntity = par1World.getTileEntity(xx, yy, zz);
+							
+							if (tileEntity != null)
+							{
+								final NBTTagCompound nnn = new NBTTagCompound();
+								tileEntity.writeToNBT(nnn);
+								BlockPhysics.dropItemsNBT(par1World, xx, yy, zz, nnn);
+								par1World.removeTileEntity(xx, yy, zz);
+							}
 						}
 
 						if ( DefinitionMaps.getBlockDef(blid,meta).fragile == 2 ) {
@@ -3084,9 +3117,14 @@ public class BlockPhysics extends BNBGamingMod
 						BlockPhysics.asmHelper.set(entityfallingsand, "bpdata", BlockPhysics.getBlockBPdata( par1World, xx, yy, zz ));
 						if ( ((Block)Block.blockRegistry.getObject(blid2)).hasTileEntity(meta) )
 						{
-							entityfallingsand.field_145810_d = new NBTTagCompound();
-							par1World.getTileEntity(xx, yy, zz).writeToNBT(entityfallingsand.field_145810_d);
-							par1World.removeTileEntity(xx, yy, zz);
+							final TileEntity tileEntity = par1World.getTileEntity(xx, yy, zz);
+
+							if (tileEntity != null)
+							{
+								entityfallingsand.field_145810_d = new NBTTagCompound();
+								tileEntity.writeToNBT(entityfallingsand.field_145810_d);
+								par1World.removeTileEntity(xx, yy, zz);
+							}
 						}
 						par1World.setBlockToAir( xx, yy, zz);
 						BlockPhysics.setBlockBPdata( par1World, xx, yy, zz, 0 );
@@ -3267,10 +3305,15 @@ public class BlockPhysics extends BNBGamingMod
 				{
 					if ( ((Block)Block.blockRegistry.getObject(blid)).hasTileEntity(meta) )
 					{
-						final NBTTagCompound nnn = new NBTTagCompound();
-						par1World.getTileEntity(xx, yy, zz).writeToNBT(nnn);
-						BlockPhysics.dropItemsNBT(par1World, xx, yy, zz, nnn);
-						par1World.removeTileEntity(xx, yy, zz);
+						final TileEntity tileEntity = par1World.getTileEntity(xx, yy, zz);
+						
+						if (tileEntity != null)
+						{
+							final NBTTagCompound nnn = new NBTTagCompound();
+							tileEntity.writeToNBT(nnn);
+							BlockPhysics.dropItemsNBT(par1World, xx, yy, zz, nnn);
+							par1World.removeTileEntity(xx, yy, zz);
+						}
 					}
 
 					if ( DefinitionMaps.getBlockDef(blid,meta).fragile == 2 ) {
@@ -3302,10 +3345,15 @@ public class BlockPhysics extends BNBGamingMod
 
 				if ( ((Block)Block.blockRegistry.getObject(var12)).hasTileEntity(var13) )
 				{
-					final NBTTagCompound compound = new NBTTagCompound();
-					BlockPhysics.asmHelper.set(tePiston, "movingBlockTileEntityData", compound);
-					par1World.getTileEntity(xxf, yyf, zzf).writeToNBT(compound);
-					par1World.removeTileEntity(xxf, yyf, zzf);
+					final TileEntity tileEntity = par1World.getTileEntity(xxf, yyf, zzf);
+					
+					if (tileEntity != null)
+					{
+						final NBTTagCompound compound = new NBTTagCompound();
+						BlockPhysics.asmHelper.set(tePiston, "movingBlockTileEntityData", compound);
+						tileEntity.writeToNBT(compound);
+						par1World.removeTileEntity(xxf, yyf, zzf);
+					}
 				}
 
 				par1World.setBlock(xx, yy, zz, Blocks.piston_extension, var13, 2);
@@ -3343,10 +3391,15 @@ public class BlockPhysics extends BNBGamingMod
 
 				if ( ((Block)Block.blockRegistry.getObject(var11)).hasTileEntity(var12) )
 				{
-					final NBTTagCompound compound = new NBTTagCompound();
-					BlockPhysics.asmHelper.set(tePiston, "movingBlockTileEntityData", compound);
-					par1World.getTileEntity(var8, var9, var10).writeToNBT(compound);
-					par1World.removeTileEntity(var8, var9, var10);
+					final TileEntity tileEntity = par1World.getTileEntity(var8, var9, var10);
+					
+					if (tileEntity != null)
+					{
+						final NBTTagCompound compound = new NBTTagCompound();
+						BlockPhysics.asmHelper.set(tePiston, "movingBlockTileEntityData", compound);
+						tileEntity.writeToNBT(compound);
+						par1World.removeTileEntity(var8, var9, var10);
+					}
 				}
 
 				par2 += Facing.offsetsXForSide[par6];
