@@ -563,18 +563,14 @@ public class BlockPhysics extends BNBGamingMod
 		{
 			//int metadata = world.getBlockMetadata(i, j, k);
 			final EntityFallingBlock entityfallingsand = new EntityFallingBlock(world, 0.5D + i, 0.5D + j, 0.5D + k, (Block)Block.blockRegistry.getObject(blid), meta);
-			BlockPhysics.instance.getLog().info("Checking if block: " + blid +  " with meta: " + meta + " has tile entity");
+			
 			if ( ((Block)Block.blockRegistry.getObject(blid)).hasTileEntity(meta) )
 			{
-				BlockPhysics.instance.getLog().info("Block: " + blid +  " with meta: " + meta + " has tile entity");
-				//TODO I hope this works too....
 				final TileEntity tileEntity = world.getTileEntity(i, j, k);
 				if (tileEntity != null)
 				{
 					entityfallingsand.field_145810_d = new NBTTagCompound();
-					BlockPhysics.instance.getLog().info("Attempting to write tile entity");
 					tileEntity.writeToNBT(entityfallingsand.field_145810_d);
-					BlockPhysics.instance.getLog().info("Attempting to remove tile entity");
 					world.removeTileEntity(i, j, k);
 				}
 			}
