@@ -2443,7 +2443,7 @@ public class BlockPhysics extends BNBGamingMod
 		fsand.setDead();
 		//if (world.isRemote) return;
 
-		if ( dist2 < 100 || y < 0)
+		if ( dist2 < 100 && y > 0)
 		{
 			world.setBlock(x, y, z, fsand.func_145805_f(), fsand.field_145814_a, 3);
 			BlockPhysics.setBlockBPdata( world,x, y, z, (Integer)BlockPhysics.asmHelper.get(fsand, "bpdata"));
