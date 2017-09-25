@@ -18,9 +18,6 @@
 
 package blockphysics;
 
-import java.nio.ByteBuffer;
-
-
 public class BlockDef      
 {
 	public int id;

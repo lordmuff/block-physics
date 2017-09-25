@@ -18,32 +18,21 @@
 
 package blockphysics;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.NetworkMod;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import blockphysics.util.data.BlockDataHandler;
+import cpw.mods.fml.common.network.NetworkMod;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.BlockPistonMoving;
-import net.minecraft.block.BlockSand;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentProtection;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -58,24 +47,28 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet23VehicleSpawn;
 import net.minecraft.network.packet.Packet28EntityVelocity;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityDispenser;
 import net.minecraft.tileentity.TileEntityPiston;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Facing;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 @Mod(modid="BlockPhysics", name="BlockPhysics", version="0.8.0")
 @NetworkMod(clientSideRequired=true, serverSideRequired=true, channels={"BlockPhysics0000", "BlockPhysics0001", "BlockPhysics0002"}, packetHandler = BPacketHandler.class, connectionHandler = BPacketHandler.class)
@@ -323,39 +316,43 @@ public class BlockPhysics
     	return false; 
     }
     
-    public static boolean attached(World world, int i, int j, int k, int att, int bid, int met)
+    public static boolean attached(World world, int x, int y, int z, int att, int bid, int met)
     {
     	int b, m;
     	int cc;
     	for ( cc = 1; cc <= att; cc++ )
     	{
-    		b = world.getBlockId(i + cc , j, k );
-    		m = world.getBlockMetadata(i + cc , j, k );
-    		if (blockSet[b][m].supportingblock > 0 ) return true;
+//    		b = world.getBlockId(x + cc , y, z );
+//    		m = world.getBlockMetadata(x + cc , y, z );
+    		if (BlockDataHandler.getBlockDef(world, x + cc , y, z ).supportingblock > 0) return true;
+//    		if (blockSet[b][m].supportingblock > 0 ) return true;
     		else if (!sameBlock(bid,met,b,m)) break;
     	}
     	
     	for ( cc = 1; cc <= att; cc++ )
     	{
-    		b = world.getBlockId(i - cc , j, k );
-    		m = world.getBlockMetadata(i - cc , j, k );
-    		if (blockSet[b][m].supportingblock > 0 ) return true;
+//    		b = world.getBlockId(x - cc , y, z );
+//    		m = world.getBlockMetadata(x - cc , y, z );
+    		if (BlockDataHandler.getBlockDef(world, x - cc , y, z ).supportingblock > 0) return true;
+//    		if (blockSet[b][m].supportingblock > 0 ) return true;
     		else if (!sameBlock(bid,met,b,m)) break;
     	}
     	
     	for ( cc = 1; cc <= att; cc++ )
     	{
-    		b = world.getBlockId(i ,j ,k + cc );
-    		m = world.getBlockMetadata(i ,j ,k + cc );
-    		if (blockSet[b][m].supportingblock > 0 ) return true;
+//    		b = world.getBlockId(x ,y ,z + cc );
+//    		m = world.getBlockMetadata(x ,y ,z + cc );
+    		if (BlockDataHandler.getBlockDef(world, x ,y ,z + cc ).supportingblock > 0) return true;
+//    		if (blockSet[b][m].supportingblock > 0 ) return true;
     		else if (!sameBlock(bid,met,b,m)) break;
     	}
     	
     	for ( cc = 1; cc <= att; cc++ )
     	{
-    		b = world.getBlockId(i ,j ,k - cc );
-    		m = world.getBlockMetadata(i ,j ,k - cc );
-    		if (blockSet[b][m].supportingblock > 0 ) return true;
+//    		b = world.getBlockId(x ,y ,z - cc );
+//    		m = world.getBlockMetadata(x ,y ,z - cc );
+    		if (BlockDataHandler.getBlockDef(world, x ,y ,z - cc ).supportingblock > 0) return true;
+//    		if (blockSet[b][m].supportingblock > 0 ) return true;
     		else if (!sameBlock(bid,met,b,m)) break;
     	}
    	
@@ -2874,5 +2871,9 @@ public class BlockPhysics
 		}
 		return true;
 	}
-
+	
+	public static boolean sameBlock(final World world, final int x, final int y, final int z, final int x2, final int y2, final int z2)
+	{
+		return BlockDataHandler.sameBlock(world, x, y, z, x2, y2, z2);
+	}
 }
