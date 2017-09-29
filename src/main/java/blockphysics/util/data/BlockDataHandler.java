@@ -35,8 +35,13 @@ public class BlockDataHandler {
 	
 	public static BlockDef getBlockDef(final World world, final BlockPos pos)
 	{
-		if (BlockDataHandler.stateToBlockDefMap.containsKey(world.getBlockState(pos)))
-			return BlockDataHandler.stateToBlockDefMap.get(world.getBlockState(pos));
+		return BlockDataHandler.getBlockDef(world, world.getBlockState(pos));
+	}
+	
+	public static BlockDef getBlockDef(final World world, final IBlockState state)
+	{
+		if (BlockDataHandler.stateToBlockDefMap.containsKey(state))
+			return BlockDataHandler.stateToBlockDefMap.get(state);
 		else
 			return BlockDataHandler.defaultBlockDef;
 	}
@@ -76,5 +81,15 @@ public class BlockDataHandler {
 			}
 		}
 		//TODO properly fill the lists in the map
+	}
+	
+	public static IBlockState getBlockState(final World world, final int x, final int y, final int z)
+	{
+		return BlockDataHandler.getBlockState(world, new BlockPos(x, y, z));
+	}
+	
+	public static IBlockState getBlockState(final World world, final BlockPos pos)
+	{
+		return world.getBlockState(pos);
 	}
 }

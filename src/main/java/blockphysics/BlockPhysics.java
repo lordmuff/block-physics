@@ -30,17 +30,21 @@ import java.util.logging.Logger;
 import blockphysics.util.data.BlockDataHandler;
 import cpw.mods.fml.common.network.NetworkMod;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFire;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.BlockPistonMoving;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentProtection;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityFallingSand;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -51,9 +55,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityDispenser;
 import net.minecraft.tileentity.TileEntityPiston;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Facing;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.ChunkPosition;
@@ -242,50 +248,50 @@ public class BlockPhysics
     	return tickTime;
     }
 
-    public static boolean canBurn(int blid)
+    public static boolean canBurn(World world, BlockPos pos, Block block)
     {
-    	if ( Block.blockFlammability[blid] != 0 ) return true;
-    	if ( Block.blocksList[blid] == Block.netherrack ) return true;
+    	if ( block.isFlammable(world, pos, EnumFacing.UP) ) return true;
+    	if ( block == Blocks.NETHERRACK ) return true;
     	return false;
     }
     
-    public static boolean canSetMove(int blid)
+    public static boolean canSetMove(IBlockState state)
     {
-    	if (blid == 0) return false;
-    	Material mt = Block.blocksList[blid].blockMaterial;
+    	if (state.getBlock() == Blocks.AIR) return false;
+    	Material mt = state.getMaterial();
     	if ( !mt.isSolid() || mt.isLiquid() ) return false;	    	
 		else return true;
     }
     
     public static boolean canMoveTo(World world, int i, int j, int k, int e)
     {
-    	int l = world.getBlockId(i, j, k);
-        if (l == 0) return true;
-        if (l > 7 && l < 12) return true;		// water, lava
-        if (l == 51) return true;				// fire
+        IBlockState state = BlockDataHandler.getBlockState(world, i, j, k);
+        Block block = state.getBlock();
+        if (block == Blocks.AIR) return true;
+        Material material = state.getMaterial();
+        if (material.isLiquid()) return true;
+        if (block instanceof BlockFire) return true;
         
-        Material mt = Block.blocksList[l].blockMaterial;
-        if ( mt.isLiquid() ) return true; 
-        int m = world.getBlockMetadata(i, j, k);
-        if ( blockSet[l][m].fragile > 0 && e > blockSet[l][m].strength ) return true;
+        BlockDef def = BlockDataHandler.getBlockDef(world, state);
+        if ( def.fragile > 0 && e > def.strength ) return true;
         
         return false;
     }
     
-    public static boolean branch(World world, int i, int j, int k, int bid, int met)
+    public static boolean branch(World world, int i, int j, int k, IBlockState orgState)
     {
-    	if (sameBlock(world.getBlockId(i+1 , j-1, k ),world.getBlockMetadata(i+1 , j-1, k ),bid,met)) return true;
-    	if (sameBlock(world.getBlockId(i-1 , j-1, k ),world.getBlockMetadata(i-1 , j-1, k ),bid,met)) return true;
-    	if (sameBlock(world.getBlockId(i , j-1, k+1 ),world.getBlockMetadata(i , j-1, k+1 ),bid,met)) return true;
-    	if (sameBlock(world.getBlockId(i , j-1, k-1 ),world.getBlockMetadata(i , j-1, k-1 ),bid,met)) return true;
-    	if (sameBlock(world.getBlockId(i+1 , j-1, k+1 ),world.getBlockMetadata(i+1 , j-1, k+1 ),bid,met)) return true;
-    	if (sameBlock(world.getBlockId(i-1 , j-1, k-1 ),world.getBlockMetadata(i-1 , j-1, k-1 ),bid,met)) return true;
-    	if (sameBlock(world.getBlockId(i-1 , j-1, k+1 ),world.getBlockMetadata(i-1 , j-1, k+1 ),bid,met)) return true;
-    	if (sameBlock(world.getBlockId(i+1 , j-1, k-1 ),world.getBlockMetadata(i+1 , j-1, k-1 ),bid,met)) return true;
+    	if (sameBlock(BlockDataHandler.getBlockState(world, i+1 , j-1, k ), orgState)) return true;
+    	if (sameBlock(BlockDataHandler.getBlockState(world, i-1 , j-1, k ), orgState)) return true;
+    	if (sameBlock(BlockDataHandler.getBlockState(world, i , j-1, k+1 ), orgState)) return true;
+    	if (sameBlock(BlockDataHandler.getBlockState(world, i , j-1, k-1 ), orgState)) return true;
+    	if (sameBlock(BlockDataHandler.getBlockState(world, i+1 , j-1, k+1 ), orgState)) return true;
+    	if (sameBlock(BlockDataHandler.getBlockState(world, i-1 , j-1, k-1 ), orgState)) return true;
+    	if (sameBlock(BlockDataHandler.getBlockState(world, i-1 , j-1, k+1 ), orgState)) return true;
+    	if (sameBlock(BlockDataHandler.getBlockState(world, i+1 , j-1, k-1 ), orgState)) return true;
     	return false; 
     }
     
-    public static boolean floating(World world, int i, int j, int k, int rad, int bid, int met)
+    public static boolean floating(World world, int i, int j, int k, int rad, IBlockState orgState)
     {
     	for (int jj = j-rad; jj <= j+rad; jj++ )
     	{
@@ -293,67 +299,59 @@ public class BlockPhysics
         	{
     			for (int kk = k-rad; kk <= k+rad; kk++ )
     	    	{
-    				if (sameBlock(world.getBlockId(ii , jj, kk ),world.getBlockMetadata(ii , jj, kk ),bid,met)) return true;
+    				if (sameBlock(BlockDataHandler.getBlockState(world, ii , jj, kk ), orgState)) return true;
     	    	}
         	}    		
     	}
     	return false; 
     }
     
-    public static boolean hanging(World world, int i, int j, int k, int hang, int bid, int met)
+    public static boolean hanging(World world, int i, int j, int k, int hang, IBlockState orgState)
     {
-    	int b, m;
+//    	int b, m;
+    	IBlockState state;
     	j++;
     	hang = j+hang;
     	for (int cc = j; cc < hang; cc++ )
     	{
-    		b = world.getBlockId(i , cc, k );
-    		m = world.getBlockMetadata(i , cc, k );
-    		if (blockSet[b][m].supportingblock > 0 ) return true;
-    		else if (!sameBlock(bid,met,b,m)) return false;
+    		state = BlockDataHandler.getBlockState(world, i , cc, k );
+    		if (BlockDataHandler.getBlockDef(world, state).supportingblock > 0 ) return true;
+    		else if (!sameBlock(orgState, state)) return false;
     		
     	}
     	return false; 
     }
     
-    public static boolean attached(World world, int x, int y, int z, int att, int bid, int met)
+    public static boolean attached(World world, int i, int j, int k, int att, IBlockState orgState)
     {
-    	int b, m;
+    	IBlockState state;
     	int cc;
     	for ( cc = 1; cc <= att; cc++ )
     	{
-//    		b = world.getBlockId(x + cc , y, z );
-//    		m = world.getBlockMetadata(x + cc , y, z );
-    		if (BlockDataHandler.getBlockDef(world, x + cc , y, z ).supportingblock > 0) return true;
-//    		if (blockSet[b][m].supportingblock > 0 ) return true;
-    		else if (!sameBlock(bid,met,b,m)) break;
+    		state = BlockDataHandler.getBlockState(world, i + cc , j, k );
+    		if (BlockDataHandler.getBlockDef(world, state).supportingblock > 0 ) return true;
+    		else if (!sameBlock(orgState, state)) break;
     	}
     	
     	for ( cc = 1; cc <= att; cc++ )
     	{
-//    		b = world.getBlockId(x - cc , y, z );
-//    		m = world.getBlockMetadata(x - cc , y, z );
-    		if (BlockDataHandler.getBlockDef(world, x - cc , y, z ).supportingblock > 0) return true;
-//    		if (blockSet[b][m].supportingblock > 0 ) return true;
-    		else if (!sameBlock(bid,met,b,m)) break;
+    		state = BlockDataHandler.getBlockState(world, i - cc , j, k );
+    		if (BlockDataHandler.getBlockDef(world, state).supportingblock > 0 ) return true;
+    		else if (!sameBlock(orgState, state)) break;
     	}
     	
     	for ( cc = 1; cc <= att; cc++ )
     	{
-//    		b = world.getBlockId(x ,y ,z + cc );
-//    		m = world.getBlockMetadata(x ,y ,z + cc );
-    		if (BlockDataHandler.getBlockDef(world, x ,y ,z + cc ).supportingblock > 0) return true;
-//    		if (blockSet[b][m].supportingblock > 0 ) return true;
-    		else if (!sameBlock(bid,met,b,m)) break;
+    		state = BlockDataHandler.getBlockState(world, i ,j ,k + cc );
+    		if (BlockDataHandler.getBlockDef(world, state).supportingblock > 0 ) return true;
+    		else if (!sameBlock(orgState, state)) break;
     	}
     	
     	for ( cc = 1; cc <= att; cc++ )
     	{
-//    		b = world.getBlockId(x ,y ,z - cc );
-//    		m = world.getBlockMetadata(x ,y ,z - cc );
-    		if (BlockDataHandler.getBlockDef(world, x ,y ,z - cc ).supportingblock > 0) return true;
-//    		if (blockSet[b][m].supportingblock > 0 ) return true;
-    		else if (!sameBlock(bid,met,b,m)) break;
+    		state = BlockDataHandler.getBlockState(world, i ,j ,k - cc );
+    		if (BlockDataHandler.getBlockDef(world, state).supportingblock > 0 ) return true;
+    		else if (!sameBlock(orgState, state)) break;
     	}
    	
     	return false; 
@@ -361,36 +359,36 @@ public class BlockPhysics
         
     public static boolean ceiling(World world, int i, int j, int k)
     {
-    	if ( blockSet[world.getBlockId(i-1, j, k)][world.getBlockMetadata(i-1, j, k)].supportingblock > 0 && blockSet[world.getBlockId(i + 1, j, k )][world.getBlockMetadata(i + 1, j, k )].supportingblock > 0 ) return true;
-    	if ( blockSet[world.getBlockId(i, j, k-1)][world.getBlockMetadata(i, j, k-1)].supportingblock > 0 && blockSet[world.getBlockId(i, j, k + 1 )][world.getBlockMetadata(i, j, k + 1 )].supportingblock > 0 ) return true;
-    	if ( blockSet[world.getBlockId(i-1, j, k-1)][world.getBlockMetadata(i-1, j, k-1)].supportingblock > 0 && blockSet[world.getBlockId(i + 1, j, k + 1 )][world.getBlockMetadata(i + 1, j, k + 1 )].supportingblock > 0 ) return true;
-    	if ( blockSet[world.getBlockId(i-1, j, k+1)][world.getBlockMetadata(i-1, j, k+1)].supportingblock > 0 && blockSet[world.getBlockId(i + 1, j, k-1 )][world.getBlockMetadata(i + 1, j, k-1 )].supportingblock > 0 ) return true;
+    	if ( BlockDataHandler.getBlockDef(world, i-1, j, k).supportingblock > 0 && BlockDataHandler.getBlockDef(world, i + 1, j, k ).supportingblock > 0 ) return true;
+    	if ( BlockDataHandler.getBlockDef(world, i, j, k-1).supportingblock > 0 && BlockDataHandler.getBlockDef(world, i, j, k + 1 ).supportingblock > 0 ) return true;
+    	if ( BlockDataHandler.getBlockDef(world, i-1, j, k-1).supportingblock > 0 && BlockDataHandler.getBlockDef(world, i + 1, j, k + 1 ).supportingblock > 0 ) return true;
+    	if ( BlockDataHandler.getBlockDef(world, i-1, j, k+1).supportingblock > 0 && BlockDataHandler.getBlockDef(world, i + 1, j, k-1 ).supportingblock > 0 ) return true;
     	
     	return false;
     }
 	
     public static boolean smallArc(World world, int i, int j, int k, int si)
     {
-    	if (blockSet[world.getBlockId(i - 1, j, k)][world.getBlockMetadata(i - 1, j, k)].supportingblock > 0 && blockSet[world.getBlockId( i + 1, j, k )][world.getBlockMetadata( i + 1, j, k )].supportingblock > 0 )
+    	if (BlockDataHandler.getBlockDef(world, i - 1, j, k).supportingblock > 0 && BlockDataHandler.getBlockDef(world,  i + 1, j, k ).supportingblock > 0 )
     	{
-    		if ( blockSet[world.getBlockId( i - 1, j - 1, k )][world.getBlockMetadata( i - 1, j - 1, k )].supportingblock > 0 || blockSet[world.getBlockId(i + 1, j - 1, k)][world.getBlockMetadata(i + 1, j - 1, k)].supportingblock > 0) return true;
+    		if ( BlockDataHandler.getBlockDef(world,  i - 1, j - 1, k ).supportingblock > 0 || BlockDataHandler.getBlockDef(world, i + 1, j - 1, k).supportingblock > 0) return true;
     		if (si > 1)
     		{
     			int c;
     			for ( c = 2; c <= si; c++ )
     			{
-    				if ( blockSet[world.getBlockId( i - c, j, k )][world.getBlockMetadata( i - c, j, k )].supportingblock > 0 )
+    				if ( BlockDataHandler.getBlockDef(world,  i - c, j, k ).supportingblock > 0 )
     				{
-    					if ( blockSet[world.getBlockId( i - c, j - 1, k )][world.getBlockMetadata( i - c, j - 1, k )].supportingblock > 0 ) return true;
+    					if ( BlockDataHandler.getBlockDef(world,  i - c, j - 1, k ).supportingblock > 0 ) return true;
     				}
     				else break;
     			}
     			    			
     			for ( c = 2; c <= si; c++ )
     			{
-    				if ( blockSet[world.getBlockId( i + c, j, k )][world.getBlockMetadata( i + c, j, k )].supportingblock > 0 )
+    				if ( BlockDataHandler.getBlockDef(world,  i + c, j, k ).supportingblock > 0 )
     				{
-    					if ( blockSet[world.getBlockId( i + c, j - 1, k )][world.getBlockMetadata( i + c, j - 1, k )].supportingblock > 0 ) return true;
+    					if ( BlockDataHandler.getBlockDef(world,  i + c, j - 1, k ).supportingblock > 0 ) return true;
     				}
     				else break;
     			}
@@ -398,78 +396,78 @@ public class BlockPhysics
     		
     	}
     	
-    	if (blockSet[world.getBlockId(i, j, k - 1)][world.getBlockMetadata(i, j, k - 1)].supportingblock > 0 && blockSet[world.getBlockId( i, j, k + 1)][world.getBlockMetadata( i, j, k + 1)].supportingblock > 0)
+    	if (BlockDataHandler.getBlockDef(world, i, j, k - 1).supportingblock > 0 && BlockDataHandler.getBlockDef(world,  i, j, k + 1).supportingblock > 0)
     	{
-    		if (blockSet[world.getBlockId(i, j - 1, k - 1)][world.getBlockMetadata(i, j - 1, k - 1)].supportingblock > 0 || blockSet[world.getBlockId(i, j - 1, k + 1)][world.getBlockMetadata(i, j - 1, k + 1)].supportingblock > 0) return true;
+    		if (BlockDataHandler.getBlockDef(world, i, j - 1, k - 1).supportingblock > 0 || BlockDataHandler.getBlockDef(world, i, j - 1, k + 1).supportingblock > 0) return true;
     		if (si > 1)
     		{
     			int c;
     			for ( c = 2; c <= si; c++ )
     			{
-    				if ( blockSet[world.getBlockId( i, j, k - c )][world.getBlockMetadata( i, j, k - c )].supportingblock > 0 )
+    				if ( BlockDataHandler.getBlockDef(world,  i, j, k - c ).supportingblock > 0 )
     				{
-    					if ( blockSet[world.getBlockId( i, j - 1, k - c )][world.getBlockMetadata( i, j - 1, k - c )].supportingblock > 0 ) return true;
+    					if ( BlockDataHandler.getBlockDef(world,  i, j - 1, k - c ).supportingblock > 0 ) return true;
     				}
     				else break;
     			}
     			    			
     			for ( c = 2; c <= si; c++ )
     			{
-    				if ( blockSet[world.getBlockId( i, j, k + c )][world.getBlockMetadata( i, j, k + c )].supportingblock > 0 )
+    				if ( BlockDataHandler.getBlockDef(world,  i, j, k + c ).supportingblock > 0 )
     				{
-    					if ( blockSet[world.getBlockId( i, j - 1, k + c )][world.getBlockMetadata( i, j - 1, k + c )].supportingblock > 0 ) return true;
+    					if ( BlockDataHandler.getBlockDef(world,  i, j - 1, k + c ).supportingblock > 0 ) return true;
     				}
     				else break;
     			}
     		}
     	}
     	
-    	if (blockSet[world.getBlockId(i - 1, j, k + 1)][world.getBlockMetadata(i - 1, j, k + 1)].supportingblock > 0 && blockSet[world.getBlockId( i + 1, j, k -1 )][world.getBlockMetadata( i + 1, j, k -1 )].supportingblock > 0)
+    	if (BlockDataHandler.getBlockDef(world, i - 1, j, k + 1).supportingblock > 0 && BlockDataHandler.getBlockDef(world,  i + 1, j, k -1 ).supportingblock > 0)
     	{
-    		if (blockSet[world.getBlockId(i - 1, j - 1, k +1)][world.getBlockMetadata(i - 1, j - 1, k +1)].supportingblock > 0 || blockSet[world.getBlockId(i + 1, j - 1, k -1)][world.getBlockMetadata(i + 1, j - 1, k -1)].supportingblock > 0) return true;
+    		if (BlockDataHandler.getBlockDef(world, i - 1, j - 1, k +1).supportingblock > 0 || BlockDataHandler.getBlockDef(world, i + 1, j - 1, k -1).supportingblock > 0) return true;
     		if (si > 1)
     		{
     			int c;
     			for ( c = 2; c <= si; c++ )
     			{
-    				if ( blockSet[world.getBlockId( i - c, j, k + c )][world.getBlockMetadata( i - c, j, k + c )].supportingblock > 0 )
+    				if ( BlockDataHandler.getBlockDef(world,  i - c, j, k + c ).supportingblock > 0 )
     				{
-    					if ( blockSet[world.getBlockId( i - c, j - 1, k + c )][world.getBlockMetadata( i - c, j - 1, k + c )].supportingblock > 0 ) return true;
+    					if ( BlockDataHandler.getBlockDef(world,  i - c, j - 1, k + c ).supportingblock > 0 ) return true;
     				}
     				else break;
     			}
     			    			
     			for ( c = 2; c <= si; c++ )
     			{
-    				if ( blockSet[world.getBlockId( i + c, j, k - c)][world.getBlockMetadata( i + c, j, k - c)].supportingblock > 0 )
+    				if ( BlockDataHandler.getBlockDef(world,  i + c, j, k - c).supportingblock > 0 )
     				{
-    					if ( blockSet[world.getBlockId( i + c, j - 1, k - c )][world.getBlockMetadata( i + c, j - 1, k - c )].supportingblock > 0 ) return true;
+    					if ( BlockDataHandler.getBlockDef(world,  i + c, j - 1, k - c ).supportingblock > 0 ) return true;
     				}
     				else break;
     			}
     		}
     	}
     	
-    	if (blockSet[world.getBlockId(i + 1, j, k + 1)][world.getBlockMetadata(i + 1, j, k + 1)].supportingblock > 0 && blockSet[world.getBlockId( i - 1, j, k - 1)][world.getBlockMetadata( i - 1, j, k - 1)].supportingblock > 0)
+    	if (BlockDataHandler.getBlockDef(world, i + 1, j, k + 1).supportingblock > 0 && BlockDataHandler.getBlockDef(world,  i - 1, j, k - 1).supportingblock > 0)
     	{
-    		if (blockSet[world.getBlockId(i + 1, j - 1, k + 1)][world.getBlockMetadata(i + 1, j - 1, k + 1)].supportingblock > 0 || blockSet[world.getBlockId(i -1, j - 1, k - 1)][world.getBlockMetadata(i -1, j - 1, k - 1)].supportingblock > 0) return true;
+    		if (BlockDataHandler.getBlockDef(world, i + 1, j - 1, k + 1).supportingblock > 0 || BlockDataHandler.getBlockDef(world, i -1, j - 1, k - 1).supportingblock > 0) return true;
     		if (si > 1)
     		{
     			int c;
     			for ( c = 2; c <= si; c++ )
     			{
-    				if ( blockSet[world.getBlockId( i + c, j, k + c )][world.getBlockMetadata( i + c, j, k + c )].supportingblock > 0 )
+    				if ( BlockDataHandler.getBlockDef(world,  i + c, j, k + c ).supportingblock > 0 )
     				{
-    					if ( blockSet[world.getBlockId( i + c, j - 1, k + c )][world.getBlockMetadata( i + c, j - 1, k + c )].supportingblock > 0 ) return true;
+    					if ( BlockDataHandler.getBlockDef(world,  i + c, j - 1, k + c ).supportingblock > 0 ) return true;
     				}
     				else break;
     			}
     			    			
     			for ( c = 2; c <= si; c++ )
     			{
-    				if ( blockSet[world.getBlockId( i - c, j, k - c )][world.getBlockMetadata( i - c, j, k - c )].supportingblock > 0 )
+    				if ( BlockDataHandler.getBlockDef(world,  i - c, j, k - c ).supportingblock > 0 )
     				{
-    					if ( blockSet[world.getBlockId( i - c, j - 1, k - c )][world.getBlockMetadata( i - c, j - 1, k - c )].supportingblock > 0 ) return true;
+    					if ( BlockDataHandler.getBlockDef(world,  i - c, j - 1, k - c ).supportingblock > 0 ) return true;
     				}
     				else break;
     			}
@@ -481,100 +479,100 @@ public class BlockPhysics
     
     public static boolean bigArc(World world, int i, int j, int k, int bi)
     {
-    	if( blockSet[world.getBlockId(i,j+1,k)][world.getBlockMetadata(i,j+1,k)].supportingblock == 0) return false;
+    	if( BlockDataHandler.getBlockDef(world, i,j+1,k).supportingblock == 0) return false;
     	
     	int c;
-    	if (blockSet[world.getBlockId(i+1,j+1,k)][world.getBlockMetadata(i+1,j+1,k)].supportingblock > 0)
+    	if (BlockDataHandler.getBlockDef(world, i+1,j+1,k).supportingblock > 0)
     	{
     		for ( c = 1; c <= bi; c++ )
 			{
-				if ( blockSet[world.getBlockId( i - c, j, k )][world.getBlockMetadata( i - c, j, k )].supportingblock > 0 )
+				if ( BlockDataHandler.getBlockDef(world,  i - c, j, k ).supportingblock > 0 )
 				{
-					if ( blockSet[world.getBlockId( i - c, j - 1, k )][world.getBlockMetadata( i - c, j - 1, k )].supportingblock > 0 ) return true;
+					if ( BlockDataHandler.getBlockDef(world,  i - c, j - 1, k ).supportingblock > 0 ) return true;
 				}
 				else break;
 			}
     	}
     	
-    	if ( blockSet[world.getBlockId(i-1,j+1,k)][world.getBlockMetadata(i-1,j+1,k)].supportingblock > 0)
+    	if ( BlockDataHandler.getBlockDef(world, i-1,j+1,k).supportingblock > 0)
     	{
     		for ( c = 1; c <= bi; c++ )
 			{
-				if ( blockSet[world.getBlockId( i + c, j, k )][world.getBlockMetadata( i + c, j, k )].supportingblock > 0 )
+				if ( BlockDataHandler.getBlockDef(world,  i + c, j, k ).supportingblock > 0 )
 				{
-					if ( blockSet[world.getBlockId( i + c, j - 1, k )][world.getBlockMetadata( i + c, j - 1, k )].supportingblock > 0 ) return true;
+					if ( BlockDataHandler.getBlockDef(world,  i + c, j - 1, k ).supportingblock > 0 ) return true;
 				}
 				else break;
 			}
     	}
     	
-    	if ( blockSet[world.getBlockId(i,j+1,k+1)][world.getBlockMetadata(i,j+1,k+1)].supportingblock > 0)
+    	if ( BlockDataHandler.getBlockDef(world, i,j+1,k+1).supportingblock > 0)
     	{
     		for ( c = 1; c <= bi; c++ )
 			{
-				if ( blockSet[world.getBlockId( i, j, k - c )][world.getBlockMetadata( i, j, k - c)].supportingblock > 0 )
+				if ( BlockDataHandler.getBlockDef(world,  i, j, k - c ).supportingblock > 0 )
 				{
-					if ( blockSet[world.getBlockId( i , j - 1, k - c)][world.getBlockMetadata( i , j - 1, k - c)].supportingblock > 0 ) return true;
+					if ( BlockDataHandler.getBlockDef(world,  i , j - 1, k - c).supportingblock > 0 ) return true;
 				}
 				else break;
 			}
     	}
     	
-    	if ( blockSet[world.getBlockId(i,j+1,k-1)][world.getBlockMetadata(i,j+1,k-1)].supportingblock > 0)
+    	if ( BlockDataHandler.getBlockDef(world, i,j+1,k-1).supportingblock > 0)
     	{
     		for ( c = 1; c <= bi; c++ )
 			{
-				if ( blockSet[world.getBlockId( i, j, k + c )][world.getBlockMetadata( i, j, k + c)].supportingblock > 0 )
+				if ( BlockDataHandler.getBlockDef(world,  i, j, k + c ).supportingblock > 0 )
 				{
-					if ( blockSet[world.getBlockId( i , j - 1, k + c)][world.getBlockMetadata( i , j - 1, k + c)].supportingblock > 0 ) return true;
+					if ( BlockDataHandler.getBlockDef(world,  i , j - 1, k + c).supportingblock > 0 ) return true;
 				}
 				else break;
 			}
     	}
     	
-    	if ( blockSet[world.getBlockId(i+1,j+1,k+1)][world.getBlockMetadata(i+1,j+1,k+1)].supportingblock > 0)
+    	if ( BlockDataHandler.getBlockDef(world, i+1,j+1,k+1).supportingblock > 0)
     	{
     		for ( c = 1; c <= bi; c++ )
 			{
-				if ( blockSet[world.getBlockId( i-c, j, k - c )][world.getBlockMetadata( i-c, j, k - c)].supportingblock > 0 )
+				if ( BlockDataHandler.getBlockDef(world,  i-c, j, k - c ).supportingblock > 0 )
 				{
-					if ( blockSet[world.getBlockId( i -c, j - 1, k - c)][world.getBlockMetadata( i-c , j - 1, k - c)].supportingblock > 0 ) return true;
+					if ( BlockDataHandler.getBlockDef(world,  i -c, j - 1, k - c).supportingblock > 0 ) return true;
 				}
 				else break;
 			}
     	}
     	
-    	if ( blockSet[world.getBlockId(i-1,j+1,k-1)][world.getBlockMetadata(i-1,j+1,k-1)].supportingblock > 0)
+    	if ( BlockDataHandler.getBlockDef(world, i-1,j+1,k-1).supportingblock > 0)
     	{
     		for ( c = 1; c <= bi; c++ )
 			{
-				if ( blockSet[world.getBlockId( i+c, j, k + c )][world.getBlockMetadata( i+c, j, k + c)].supportingblock > 0 )
+				if ( BlockDataHandler.getBlockDef(world,  i+c, j, k + c ).supportingblock > 0 )
 				{
-					if ( blockSet[world.getBlockId( i +c, j - 1, k + c)][world.getBlockMetadata( i+c , j - 1, k + c)].supportingblock > 0 ) return true;
+					if ( BlockDataHandler.getBlockDef(world,  i +c, j - 1, k + c).supportingblock > 0 ) return true;
 				}
 				else break;
 			}
     	}
     	
-    	if ( blockSet[world.getBlockId(i+1,j+1,k-1)][world.getBlockMetadata(i+1,j+1,k-1)].supportingblock > 0)
+    	if ( BlockDataHandler.getBlockDef(world, i+1,j+1,k-1).supportingblock > 0)
     	{
     		for ( c = 1; c <= bi; c++ )
 			{
-				if ( blockSet[world.getBlockId( i-c, j, k + c )][world.getBlockMetadata( i-c, j, k + c)].supportingblock > 0 )
+				if ( BlockDataHandler.getBlockDef(world,  i-c, j, k + c ).supportingblock > 0 )
 				{
-					if ( blockSet[world.getBlockId( i -c, j - 1, k + c)][world.getBlockMetadata( i-c , j - 1, k + c)].supportingblock > 0 ) return true;
+					if ( BlockDataHandler.getBlockDef(world,  i -c, j - 1, k + c).supportingblock > 0 ) return true;
 				}
 				else break;
 			}
     	}
     	
-    	if ( blockSet[world.getBlockId(i-1,j+1,k+1)][world.getBlockMetadata(i-1,j+1,k+1)].supportingblock > 0)
+    	if ( BlockDataHandler.getBlockDef(world, i-1,j+1,k+1).supportingblock > 0)
     	{
     		for ( c = 1; c <= bi; c++ )
 			{
-				if ( blockSet[world.getBlockId( i+c, j, k - c )][world.getBlockMetadata( i+c, j, k - c)].supportingblock > 0 )
+				if ( BlockDataHandler.getBlockDef(world,  i+c, j, k - c ).supportingblock > 0 )
 				{
-					if ( blockSet[world.getBlockId( i +c, j - 1, k - c)][world.getBlockMetadata( i+c , j - 1, k - c)].supportingblock > 0 ) return true;
+					if ( BlockDataHandler.getBlockDef(world,  i +c, j - 1, k - c).supportingblock > 0 ) return true;
 				}
 				else break;
 			}
@@ -583,42 +581,42 @@ public class BlockPhysics
     	return false;
     }
     
-    public static boolean corbel(World world, int i, int j, int k, int ci, int blid, int meta)
+    public static boolean corbel(World world, int i, int j, int k, int ci, IBlockState orgState)
     {
-    	if( blockSet[blid][meta].supportingblock == 0) return false;
+    	if( BlockDataHandler.getBlockDef(world,  orgState).supportingblock == 0) return false;
     	int c;
     	for ( c = 1; c <= ci; c++ )
 		{
-			if ( sameBlock( world.getBlockId( i+c, j, k ), world.getBlockMetadata( i+c, j, k), blid, meta ))
+			if ( sameBlock( BlockDataHandler.getBlockState(world,  i+c, j, k ), orgState ))
 			{
-				if ( sameBlock( world.getBlockId( i+c, j - 1, k ), world.getBlockMetadata( i+c, j - 1, k), blid, meta ) ) return true;
+				if ( sameBlock( BlockDataHandler.getBlockState(world,  i+c, j - 1, k ), orgState ) ) return true;
 			}
 			else break;
 		}
     	
     	for ( c = 1; c <= ci; c++ )
 		{
-			if ( sameBlock( world.getBlockId( i-c, j, k ), world.getBlockMetadata( i-c, j, k), blid, meta ))
+			if ( sameBlock( BlockDataHandler.getBlockState(world,  i-c, j, k ), orgState ))
 			{
-				if ( sameBlock( world.getBlockId( i-c, j - 1, k ), world.getBlockMetadata( i-c, j - 1, k), blid, meta ) ) return true;
+				if ( sameBlock( BlockDataHandler.getBlockState(world,  i-c, j - 1, k ), orgState ) ) return true;
 			}
 			else break;
 		}
     	
     	for ( c = 1; c <= ci; c++ )
 		{
-			if ( sameBlock( world.getBlockId( i, j, k+c ), world.getBlockMetadata( i, j, k+c), blid, meta ))
+			if ( sameBlock( BlockDataHandler.getBlockState(world,  i, j, k+c ), orgState ))
 			{
-				if ( sameBlock( world.getBlockId( i, j - 1, k+c ), world.getBlockMetadata( i, j - 1, k+c), blid, meta ) ) return true;
+				if ( sameBlock( BlockDataHandler.getBlockState(world,  i, j - 1, k+c ), orgState ) ) return true;
 			}
 			else break;
 		}
     	
     	for ( c = 1; c <= ci; c++ )
 		{
-			if ( sameBlock( world.getBlockId( i, j, k-c ), world.getBlockMetadata( i, j, k-c), blid, meta ))
+			if ( sameBlock( BlockDataHandler.getBlockState(world,  i, j, k-c ), orgState ))
 			{
-				if ( sameBlock( world.getBlockId( i, j - 1, k-c ), world.getBlockMetadata( i, j - 1, k-c), blid, meta ) ) return true;
+				if ( sameBlock( BlockDataHandler.getBlockState(world,  i, j - 1, k-c ), orgState ) ) return true;
 			}
 			else break;
 		}
@@ -631,36 +629,36 @@ public class BlockPhysics
     	int c;
     	for ( c = 1; c <= ni; c++ )
 		{
-			if ( blockSet[world.getBlockId(i - c, j, k)][world.getBlockMetadata(i - c, j, k)].supportingblock > 0)
+			if ( BlockDataHandler.getBlockDef(world, i - c, j, k).supportingblock > 0)
 			{
-				if ( blockSet[world.getBlockId(i - c , j - 1, k)][world.getBlockMetadata(i - c , j - 1, k)].supportingblock > 0) return true;
+				if ( BlockDataHandler.getBlockDef(world, i - c , j - 1, k).supportingblock > 0) return true;
 			}
 			else break;
 		}
     	
     	for ( c = 1; c <= ni; c++ )
 		{
-			if ( blockSet[world.getBlockId(i + c, j, k)][world.getBlockMetadata(i + c, j, k)].supportingblock > 0)
+			if ( BlockDataHandler.getBlockDef(world, i + c, j, k).supportingblock > 0)
 			{
-				if ( blockSet[world.getBlockId(i + c , j - 1, k)][world.getBlockMetadata(i + c , j - 1, k)].supportingblock > 0) return true;
+				if ( BlockDataHandler.getBlockDef(world, i + c , j - 1, k).supportingblock > 0) return true;
 			}
 			else break;
 		}
     	
     	for ( c = 1; c <= ni; c++ )
 		{
-			if ( blockSet[world.getBlockId(i, j, k + c)][world.getBlockMetadata(i, j, k + c)].supportingblock > 0)
+			if ( BlockDataHandler.getBlockDef(world, i, j, k + c).supportingblock > 0)
 			{
-				if ( blockSet[world.getBlockId(i, j - 1, k + c)][world.getBlockMetadata(i , j - 1, k + c)].supportingblock > 0) return true;
+				if ( BlockDataHandler.getBlockDef(world, i, j - 1, k + c).supportingblock > 0) return true;
 			}
 			else break;
 		}
     	
     	for ( c = 1; c <= ni; c++ )
 		{
-			if ( blockSet[world.getBlockId(i, j, k - c)][world.getBlockMetadata(i, j, k - c)].supportingblock > 0)
+			if ( BlockDataHandler.getBlockDef(world, i, j, k - c).supportingblock > 0)
 			{
-				if ( blockSet[world.getBlockId(i, j - 1, k - c)][world.getBlockMetadata(i, j - 1, k - c)].supportingblock > 0) return true;
+				if ( BlockDataHandler.getBlockDef(world, i, j - 1, k - c).supportingblock > 0) return true;
 			}
 			else break;
 		}
@@ -671,8 +669,8 @@ public class BlockPhysics
     public static boolean isFallingEmpty(World world, int i, int j, int k)
     {
         AxisAlignedBB Sandbbox;
-        Sandbbox = AxisAlignedBB.getBoundingBox((float)i, (float)j, (float)k, (float)i + 1, (float)j + 1, (float)k + 1);
-        List ls = world.getEntitiesWithinAABB(net.minecraft.entity.item.EntityFallingSand.class, Sandbbox);
+        Sandbbox = new AxisAlignedBB((float)i, (float)j, (float)k, (float)i + 1, (float)j + 1, (float)k + 1);
+        List ls = world.getEntitiesWithinAABB(EntityFallingBlock.class, Sandbbox);
         if (ls.size() != 0) return false;
         return true;
     }
@@ -683,7 +681,7 @@ public class BlockPhysics
 	  	{
 	  		for (int j1 = j-1; j1 <= j + 1; j1++)
 	  		{
-	  			for (int k1 = k-1; k1 <= k + 1; k1++) world.moveTickList.scheduleBlockMoveUpdate(world, i1, j1, k1, world.getBlockId(i1, j1, k1), world.getBlockMetadata(i1, j1, k1), false);
+	  			for (int k1 = k-1; k1 <= k + 1; k1++) world.moveTickList.scheduleBlockMoveUpdate(world, i1, j1, k1, BlockDataHandler.getBlockState(world, i1, j1, k1), false);
 	  		}					
 	  	}
 	}
@@ -2150,7 +2148,7 @@ public class BlockPhysics
 
     }
     
-    protected static void placeBlock(World world, EntityFallingSand fsand, double jumpPosX, double jumpPosY, double jumpPosZ,  int i, int j, int k)
+    protected static void placeBlock(World world, EntityFallingBlock fsand, double jumpPosX, double jumpPosY, double jumpPosZ,  int i, int j, int k)
     {
 	    double dist2 = 100;
 	    double dist22, s1 = 0, s2 = 0, s3 = 0;
@@ -2557,7 +2555,7 @@ public class BlockPhysics
         return var8;
     }
     
-    public static Packet23VehicleSpawn spawnFallingSandPacket(EntityFallingSand ent)
+    public static Packet23VehicleSpawn spawnFallingSandPacket(EntityFallingBlock ent)
     {
 	    int burn = 0;
 	    if (ent.isBurning()) burn = 32768; 
@@ -2582,7 +2580,7 @@ public class BlockPhysics
     	return (double)((int)(speed * 8000D)) / 8000D;
     }
     
-    public static void moveEntity(World world, EntityFallingSand fsand, double par1, double par3, double par5)
+    public static void moveEntity(World world, EntityFallingBlock fsand, double par1, double par3, double par5)
     {
         if (fsand.noClip)
         {
@@ -2875,5 +2873,10 @@ public class BlockPhysics
 	public static boolean sameBlock(final World world, final int x, final int y, final int z, final int x2, final int y2, final int z2)
 	{
 		return BlockDataHandler.sameBlock(world, x, y, z, x2, y2, z2);
+	}
+	
+	public static boolean sameBlock(final IBlockState state1, final IBlockState state2)
+	{
+		return BlockDataHandler.sameBlock(state1, state2);
 	}
 }
