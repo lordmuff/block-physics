@@ -33,6 +33,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.BlockPistonMoving;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentProtection;
@@ -57,6 +58,7 @@ import net.minecraft.tileentity.TileEntityPiston;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Facing;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -246,6 +248,11 @@ public class BlockPhysics
     	}
     	
     	return tickTime;
+    }
+    
+    public static boolean canBurn(World world, int x, int y, int z, Block block)
+    {
+    	return BlockPhysics.canBurn(world, new BlockPos(x, y, z), block);
     }
 
     public static boolean canBurn(World world, BlockPos pos, Block block)
@@ -686,15 +693,16 @@ public class BlockPhysics
 	  	}
 	}
 	
-	public static boolean tryToMove(World world, int i, int j, int k, int blid, int meta, boolean contslide)
+	public static boolean tryToMove(World world, int i, int j, int k, IBlockState orgState, boolean contslide)
     {
 		if ( world.isRemote ) return false;
-		if ( blockSet[blid][meta].movenum == 0 ) return false;
+		BlockDef orgDef = BlockDataHandler.getBlockDef(orgState);
+		if ( orgDef.movenum == 0 ) return false;
 		
 		int players = world.playerEntities.size();
 		if (players == 0) return false;
 				
-		if ( Block.blocksList[blid] instanceof BlockPistonBase && !canmove(world,i,j,k, (BlockPistonBase) Block.blocksList[blid]) ) return false;
+		if ( orgState.getBlock() instanceof BlockPistonBase && !canmove(world,i,j,k, (BlockPistonBase) orgState.getBlock()) ) return false;
 		
 		boolean outofRenderRange = true;
 		boolean outofFallRange = true;
@@ -703,7 +711,7 @@ public class BlockPhysics
     	for ( ii = 0; ii < players; ii++ )
     	{
     		EntityPlayer entityplayer = (EntityPlayer)world.playerEntities.get(ii);
-    		if ( Math.abs( i - MathHelper.floor_double(entityplayer.posX) ) <= fallRange && Math.abs( k - MathHelper.floor_double(entityplayer.posZ) ) <= fallRange )
+    		if ( Math.abs( i - MathHelper.floor(entityplayer.posX) ) <= fallRange && Math.abs( k - MathHelper.floor(entityplayer.posZ) ) <= fallRange )
     		{
     			outofFallRange = false;
     			break;
@@ -713,55 +721,56 @@ public class BlockPhysics
     	if ( outofFallRange ) return false;
     	    	
     	int move = 0;
-		if (blockSet[blid][meta].movenum == 2)
+		if (orgDef.movenum == 2)
 		{
-			if ( (getBlockBPdata( world,i, j, k) &15) >= blockSet[blid][meta].moveflipnumber) move = 1;
+			if ( (getBlockBPdata( world,i, j, k) &15) >= orgDef.moveflipnumber) move = 1;
 		}
 		
-		int movedefnum = blockSet[blid][meta].move[move];
+		int movedefnum = orgDef.move[move];
 		
-		if ( blockMoveDef[movedefnum].floating[0] > 0 )
+		if ( blockMoveDef[movedefnum].floating != null )
 		{
-			if (floating(world,i,j,k,blockMoveDef[movedefnum].floating[0],blockMoveDef[movedefnum].floating[1],blockMoveDef[movedefnum].floating[2])) return false;
+			if (floating(world,i,j,k, blockMoveDef[movedefnum].floatingRadius,blockMoveDef[movedefnum].floating)) return false;
 			move = 1;
-			movedefnum = blockSet[blid][meta].move[move];
+			movedefnum = orgDef.move[move];
 			setBlockBPdata( world, i, j, k, 15);
 		}
 	
 		if ( blockMoveDef[movedefnum].movetype == 3 )
 		{
-			if ( canMoveTo(world, i, j - 1, k, blockSet[blid][meta].mass/10) )
+			if ( canMoveTo(world, i, j - 1, k, orgDef.mass/10) )
 			{
 				int sv = blockMoveDef[movedefnum].hanging;
-				if ( sv > 0 && hanging(world, i, j, k, sv, blid, meta)) return false;
+				if ( sv > 0 && hanging(world, i, j, k, sv, orgState)) return false;
 				sv = blockMoveDef[movedefnum].attached;
-				if ( sv > 0 && attached(world, i, j, k, sv, blid, meta)) return false;
+				if ( sv > 0 && attached(world, i, j, k, sv, orgState)) return false;
 				sv = blockMoveDef[movedefnum].ncorbel;
 				if ( sv > 0 && ncorbel(world, i, j, k, sv)) return false;
 				sv = blockMoveDef[movedefnum].corbel;
-				if ( sv > 0 && corbel(world, i, j, k, sv, blid, meta)) return false;
+				if ( sv > 0 && corbel(world, i, j, k, sv, orgState)) return false;
 				if ( blockMoveDef[movedefnum].ceiling && ceiling(world, i, j, k)) return false;
 				sv = blockMoveDef[movedefnum].smallarc;
 				if ( sv > 0 && smallArc(world, i, j, k, sv)) return false;
 		    	sv = blockMoveDef[movedefnum].bigarc;
 				if ( sv > 0 && bigArc(world, i, j, k, sv)) return false;
-				if (blockMoveDef[movedefnum].branch && branch(world, i, j, k, blid, meta) ) return false;
+				if (blockMoveDef[movedefnum].branch && branch(world, i, j, k, orgState) ) return false;
 				
-				Block block = Block.blocksList[blid];
+				Block block = orgState.getBlock();
 				
-				if ( block.hasTileEntity(meta) ) 
+				if ( block.hasTileEntity(orgState) ) 
         		{
-        			NBTTagCompound nnn = new NBTTagCompound("TileEntityData");
-        			world.getBlockTileEntity(i, j, k).writeToNBT(nnn);
+        			NBTTagCompound nnn = new NBTTagCompound();
+        			BlockDataHandler.getTileEntity(world, i, j, k).writeToNBT(nnn);
         			dropItemsNBT(world, i, j, k, nnn);            			
-        			world.removeBlockTileEntity(i, j, k);
+        			BlockDataHandler.removeTileEntity(world, i, j, k);
         		}
 				
-				block.dropBlockAsItem(world, i, j, k, meta, 0);
+				BlockDataHandler.dropBlockAsItem(block, orgState, world, i, j, k, 0);
 				
-				world.setBlock(i, j, k, 0, 0, 3);
+				BlockDataHandler.setBlockState(world, i, j, k, Blocks.AIR.getDefaultState(), 3);
 				
-				world.playSoundEffect((double)((float)i + 0.5F), (double)((float)j + 0.5F), (double)((float)k + 0.5F), block.stepSound.getBreakSound(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
+				SoundType sound = block.getSoundType(orgState, world, new BlockPos(i, j, k), null);
+				world.playSound((double)((float)i + 0.5F), (double)((float)j + 0.5F), (double)((float)k + 0.5F), sound.getBreakSound(), SoundCategory.BLOCKS, (sound.getVolume() + 1.0F) / 2.0F, sound.getPitch() * 0.8F, true);
 	    		
 	            return true;
 			}
@@ -773,9 +782,9 @@ public class BlockPhysics
     	{
     		EntityPlayer entityplayer = (EntityPlayer)world.playerEntities.get(iii);
 
-    		if( Math.abs( i - MathHelper.floor_double(entityplayer.posX) ) <= fallRenderRange && Math.abs( k - MathHelper.floor_double(entityplayer.posZ) ) <= fallRenderRange ) 
+    		if( Math.abs( i - MathHelper.floor(entityplayer.posX) ) <= fallRenderRange && Math.abs( k - MathHelper.floor(entityplayer.posZ) ) <= fallRenderRange ) 
     		{	
-    			if ( MathHelper.floor_double(entityplayer.posY) - j <= fallRenderRange )
+    			if ( MathHelper.floor(entityplayer.posY) - j <= fallRenderRange )
 				{
 					outofRenderRange = false;
 					break;
@@ -790,7 +799,7 @@ public class BlockPhysics
 		else movetype = blockMoveDef[movedefnum].movetype;
 					
 		if ( movetype == 0) return false;
-		int ms = blockSet[blid][meta].mass/10;
+		int ms = orgDef.mass/10;
 		boolean canfall = canMoveTo(world, i, j - 1, k, ms);
     	
     	if ( !canfall )
@@ -802,19 +811,19 @@ public class BlockPhysics
     	if ( !contslide )
     	{
 			int sv = blockMoveDef[movedefnum].hanging;
-			if ( sv > 0 && hanging(world,i,j,k,sv,blid,meta)) return false;
+			if ( sv > 0 && hanging(world,i,j,k,sv,orgState)) return false;
 			sv = blockMoveDef[movedefnum].attached;
-			if ( sv > 0 && attached(world, i, j, k, sv, blid, meta)) return false;
+			if ( sv > 0 && attached(world, i, j, k, sv, orgState)) return false;
 			sv = blockMoveDef[movedefnum].ncorbel;
 			if ( sv > 0 && ncorbel(world, i, j, k, sv)) return false;
 			sv = blockMoveDef[movedefnum].corbel;
-			if ( sv > 0 && corbel(world, i, j, k, sv, blid, meta)) return false;
+			if ( sv > 0 && corbel(world, i, j, k, sv, orgState)) return false;
 			if ( blockMoveDef[movedefnum].ceiling && ceiling(world, i, j, k)) return false;
 			sv = blockMoveDef[movedefnum].smallarc;
 			if ( sv > 0 && smallArc(world, i, j, k, sv)) return false;
 	    	sv = blockMoveDef[movedefnum].bigarc;
 			if ( sv > 0 && bigArc(world, i, j, k, sv)) return false;
-			if (blockMoveDef[movedefnum].branch && branch(world, i, j, k, blid, meta)) return false;
+			if (blockMoveDef[movedefnum].branch && branch(world, i, j, k, orgState)) return false;
     	}
     	
     	boolean canslide[] = new boolean[4];
@@ -832,13 +841,20 @@ public class BlockPhysics
     		if (canslide[3]) canslide[3] = canMoveTo(world, i + 1, j, k, ms);
     		if (!(canslide[0] || canslide[1] || canslide[2] || canslide[3])) return false;
     	}    	
-    	
-    	if ( blid == 2 || blid == 60 || blid == 110 ) blid = 3;
+    	    	
+    	{
+    		final Block block = orgState.getBlock();
+    		if (block == Blocks.GRASS || block == Blocks.FARMLAND || block == Blocks.MYCELIUM || block == Blocks.GRASS_PATH)
+    		{
+    			orgState = Blocks.DIRT.getDefaultState();
+    			orgDef = BlockDataHandler.getBlockDef(orgState);
+    		}
+    	}
     	
     	if ( outofRenderRange )
         {
 			int bpdata = getBlockBPdata( world,i, j, k);
-    		world.setBlock(i, j, k, 0, 0, 3);
+    		BlockDataHandler.setBlockToAir(world, i, j, k, 3);
 			setBlockBPdata( world,i, j, k, 0);
 			notifyMove(world, i, j, k);
 			int jv = j;
@@ -847,7 +863,7 @@ public class BlockPhysics
     			for (; canMoveTo(world, i, jv - 1, k, ms) && jv > 0; jv--);
             	if (jv > 0) 
             	{
-            		world.setBlock(i, jv, k, blid, meta, 3);
+            		BlockDataHandler.setBlockState(world, i, jv, k, orgState, 3);
             		setBlockBPdata( world,i, jv, k, bpdata);
             		notifyMove(world, i, jv, k);
             	}
@@ -888,29 +904,29 @@ public class BlockPhysics
                 for (; canMoveTo(world, iv, jv - 1, kv, ms) && jv > 0; jv--);
             	if (jv > 0) 
             	{
-            		world.setBlock(iv, jv, kv, blid, meta, 3);
+            		BlockDataHandler.setBlockState(world, iv, jv, kv, orgState, 3);
             		setBlockBPdata( world,iv, jv, kv, bpdata);
             		notifyMove(world, iv, jv, kv);
             	}
         	}
 			j++;
-			tryToMove( world, i, j, k, world.getBlockId( i, j , k ), world.getBlockMetadata( i, j , k ),false );
+			tryToMove( world, i, j, k, BlockDataHandler.getBlockState(world,  i, j , k ),false );
 			return true;
         }
     	
     	if ( canfall )
     	{
-    		//int metadata = world.getBlockMetadata(i, j, k);
-    		EntityFallingSand entityfallingsand = new EntityFallingSand(world, 0.5D + i, 0.5D + j, 0.5D + k, blid, meta);
-    		if ( Block.blocksList[blid].hasTileEntity(meta) ) 
+    		Block block = orgState.getBlock();
+    		EntityFallingBlock entityfallingsand = new EntityFallingBlock(world, 0.5D + i, 0.5D + j, 0.5D + k, orgState);
+    		if ( block.hasTileEntity(orgState) ) 
     		{
-    			entityfallingsand.fallingBlockTileEntityData = new NBTTagCompound("TileEntityData");
-    			world.getBlockTileEntity(i, j, k).writeToNBT(entityfallingsand.fallingBlockTileEntityData);
-    			world.removeBlockTileEntity(i, j, k);
+    			entityfallingsand.fallingBlockTileEntityData = new NBTTagCompound();
+    			BlockDataHandler.getTileEntity(world, i, j, k).writeToNBT(entityfallingsand.fallingBlockTileEntityData);
+    			BlockDataHandler.removeTileEntity(world, i, j, k);
     		}
-    		if (canBurn(blid) && world.getBlockId(i, j+1, k) == 51) entityfallingsand.setFire(60);
+    		if (canBurn(world, i, j, k, block) && BlockDataHandler.getBlockState(world, i, j+1, k).getBlock() instanceof BlockFire) entityfallingsand.setFire(60);
             entityfallingsand.bpdata = getBlockBPdata( world,i, j, k);
-    		world.spawnEntityInWorld(entityfallingsand);
+    		world.spawnEntity(entityfallingsand);
      	}
     	else
     	{
@@ -950,39 +966,39 @@ public class BlockPhysics
                     id = + 1;
                     break;
             }
-            //int metadata = world.getBlockMetadata(i, j, k);
-            EntityFallingSand entityfallingsand = new EntityFallingSand(world, 0.5D + i + 0.0625D * id, 0.5D + j - 0.0625D, 0.5D + k + 0.0625D * kd, blid, meta);
-            if ( Block.blocksList[blid].hasTileEntity(meta) ) 
+            Block block = orgState.getBlock();
+            EntityFallingBlock entityfallingsand = new EntityFallingBlock(world, 0.5D + i + 0.0625D * id, 0.5D + j - 0.0625D, 0.5D + k + 0.0625D * kd, orgState);
+            if ( block.hasTileEntity(orgState) ) 
             {
-            	entityfallingsand.fallingBlockTileEntityData = new NBTTagCompound("TileEntityData");
-            	world.getBlockTileEntity(i, j, k).writeToNBT(entityfallingsand.fallingBlockTileEntityData);
-            	world.removeBlockTileEntity(i, j, k);
+            	entityfallingsand.fallingBlockTileEntityData = new NBTTagCompound();
+            	BlockDataHandler.getTileEntity(world, i, j, k).writeToNBT(entityfallingsand.fallingBlockTileEntityData);
+            	BlockDataHandler.removeTileEntity(world, i, j, k);
             }
     		
             entityfallingsand.slideDir = (byte) (slide[rr]+1);
-            if (canBurn(blid) && world.getBlockId(i, j+1, k) == 51) entityfallingsand.setFire(60);
+            if (canBurn(world, i, j, k, block) && BlockDataHandler.getBlockState(world, i, j+1, k).getBlock() instanceof BlockFire) entityfallingsand.setFire(60);
             entityfallingsand.bpdata = getBlockBPdata( world,i, j, k);
-            world.spawnEntityInWorld(entityfallingsand);
+            world.spawnEntity(entityfallingsand);
     	}
-    	world.setBlock(i, j, k, 0, 0, 3);
+    	BlockDataHandler.setBlockToAir(world, i, j, k, 3);
     	setBlockBPdata( world,i, j, k, 0);
     	j++;
-    	tryToMove(world, i, j, k, world.getBlockId(i, j, k), world.getBlockMetadata(i, j, k), false);
+    	tryToMove(world, i, j, k, BlockDataHandler.getBlockState(world, i, j, k), false);
         return true;
     }
 	
-	public static void moveChangeMechanic(World world, int i, int j, int k, int  blockID, int radius, int strength)
+	public static void moveChangeMechanic(World world, int i, int j, int k, int radius, int strength)
 	{
-		int state,bid,m;
+		BlockDef def;
+		int state;
 		for (int ii = i - radius; ii <= i + radius; ii++ )
 		{
 			for (int jj = j - radius; jj <= j + radius; jj++ )
 			{
 				for (int kk = k - radius; kk <= k + radius; kk++ )
 				{
-					bid = world.getBlockId( ii, jj, kk );
-					m = world.getBlockMetadata(ii, jj, kk );
-					if ( blockSet[bid][m].movenum == 2 && blockSet[bid][m].movechanger > 1 /*&& ( blockID == 0 || blockID == bid )*/ )
+					def = BlockDataHandler.getBlockDef(BlockDataHandler.getBlockState(world,  ii, jj, kk ));
+					if ( def.movenum == 2 && def.movechanger > 1 /*&& ( blockID == 0 || blockID == bid )*/ )
 					{
 						int bpd = getBlockBPdata( world, ii, jj, kk );
 						state = bpd & 15;
@@ -1517,7 +1533,7 @@ public class BlockPhysics
 		if (!par1World.isRemote) 
 		{
 			meta &= 15;
-			if ( blockSet[blockID][meta].movenum == 2 && blockSet[blockID][meta].movechanger > 1 ) moveChangeMechanic(par1World, par2, par3, par4, blockID, 1, 0);
+			if ( blockSet[blockID][meta].movenum == 2 && blockSet[blockID][meta].movechanger > 1 ) moveChangeMechanic(par1World, par2, par3, par4, 1, 0);
 			notifyMove(par1World, par2, par3, par4);
 		}
     }
@@ -1543,7 +1559,7 @@ public class BlockPhysics
     	}
     }
    
-    public static void fallingSandUpdate(World world, EntityFallingSand fsand)
+    public static void fallingSandUpdate(World world, EntityFallingBlock fsand)
     {
 	    fsand.fallTime++;
     	if (fsand.fallTime < 3) 

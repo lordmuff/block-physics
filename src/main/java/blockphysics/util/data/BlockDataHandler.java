@@ -10,6 +10,8 @@ import com.google.common.collect.ImmutableList;
 import blockphysics.BlockDef;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -35,10 +37,10 @@ public class BlockDataHandler {
 	
 	public static BlockDef getBlockDef(final World world, final BlockPos pos)
 	{
-		return BlockDataHandler.getBlockDef(world, world.getBlockState(pos));
+		return BlockDataHandler.getBlockDef(world.getBlockState(pos));
 	}
 	
-	public static BlockDef getBlockDef(final World world, final IBlockState state)
+	public static BlockDef getBlockDef(final IBlockState state)
 	{
 		if (BlockDataHandler.stateToBlockDefMap.containsKey(state))
 			return BlockDataHandler.stateToBlockDefMap.get(state);
@@ -91,5 +93,45 @@ public class BlockDataHandler {
 	public static IBlockState getBlockState(final World world, final BlockPos pos)
 	{
 		return world.getBlockState(pos);
+	}
+	
+	public static void setBlockState(final World world, final int x, final int y, final int z, final IBlockState state, final int flags)
+	{
+		BlockDataHandler.setBlockState(world, new BlockPos(x, y, z), state, flags);
+	}
+	
+	public static void setBlockState(final World world, final BlockPos pos, final IBlockState state, final int flags)
+	{
+		world.setBlockState(pos, state, flags);
+	}
+	
+	public static void setBlockToAir(final World world, final int x, final int y, final int z, final int flags)
+	{
+		world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState(), flags);
+	}
+	
+	public static TileEntity getTileEntity(final World world, final int x, final int y, final int z)
+	{
+		return BlockDataHandler.getTileEntity(world, new BlockPos(x, y, z));
+	}
+	
+	public static TileEntity getTileEntity(final World world, final BlockPos pos)
+	{
+		return world.getTileEntity(pos);
+	}
+	
+	public static void removeTileEntity(final World world, final int x, final int y, final int z)
+	{
+		BlockDataHandler.removeTileEntity(world, new BlockPos(x, y, z));
+	}
+	
+	public static void removeTileEntity(final World world, final BlockPos pos)
+	{
+		world.removeTileEntity(pos);
+	}
+	
+	public static void dropBlockAsItem(final Block block, final IBlockState state, final World world, final int x, final int y, final int z, final int fortune)
+	{
+		block.dropBlockAsItem(world, new BlockPos(x, y, z), state, fortune);
 	}
 }

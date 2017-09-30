@@ -18,7 +18,7 @@
 
 package blockphysics;
 
-import java.nio.ByteBuffer;
+import net.minecraft.block.state.IBlockState;
 
 
 public class MoveDef
@@ -33,10 +33,11 @@ public class MoveDef
 	public int ncorbel;			// 0-6
 	public int hanging;			// 0-10
 	public int attached;		// 0-6
-	public int[] floating;
+	public int floatingRadius;
+	public IBlockState floating;
 	public boolean branch;		// 0,1
 	
-	public MoveDef( int id1, int movetype1, int slidechance1, boolean ceiling1, int smallarc1, int bigarc1, int corbel1, int ncorbel1, int hanging1, int attached1, int floating1[], boolean branch1 )
+	public MoveDef( int id1, int movetype1, int slidechance1, boolean ceiling1, int smallarc1, int bigarc1, int corbel1, int ncorbel1, int hanging1, int attached1, int floatingRadius, IBlockState floating1, boolean branch1 )
 	{
 		id = id1;
 		movetype = movetype1;
@@ -48,10 +49,9 @@ public class MoveDef
 		ncorbel = ncorbel1;
 		hanging = hanging1;
 		attached = attached1;
-		int s = floating1.length;
-		floating = new int[s];
-		for (int i=0; i < s; i++) floating[i] = floating1[i];
+		floating = floating1;
 		branch = branch1;
+		this.floatingRadius = floatingRadius;
 	}
 	
 	public MoveDef(int id1)
@@ -66,9 +66,9 @@ public class MoveDef
 		ncorbel = 0;
 		hanging = 0;
 		attached = 0;
-		floating = new int[1];
-		floating[0] = 0;
+		floating = null;
 		branch = false;
+		floatingRadius = 0;
 	}
 	
 	public static void copyMoveDef(MoveDef def1, MoveDef def2) 
@@ -82,10 +82,9 @@ public class MoveDef
 		def1.ncorbel = def2.ncorbel;
 		def1.hanging = def2.hanging;
 		def1.attached = def2.attached;
-		int s = def2.floating.length;
-		def1.floating = new int[s];
-		for (int i=0; i < s; i++) def1.floating[i] = def2.floating[i];
+		def1.floating = def2.floating;
 		def1.branch = def2.branch;
+		def1.floatingRadius = def2.floatingRadius;
 	}
 }
 
